@@ -1,0 +1,256 @@
+{
+  "registryVersion": 1,
+  "notes": "Data guy fills member.metrics using these ids. Engine and frontend read this list to know what exists. Add new metrics here first, then implement.",
+  "metrics": [
+    {
+      "id": "github.contributions_1y",
+      "source": "github",
+      "type": "number",
+      "unit": "count",
+      "description": "Total contributions in the past 12 months"
+    },
+    {
+      "id": "github.public_repos",
+      "source": "github",
+      "type": "number",
+      "unit": "count",
+      "description": "Number of public repos"
+    },
+    {
+      "id": "github.original_repos",
+      "source": "github",
+      "type": "number",
+      "unit": "count",
+      "description": "Public repos that are not forks"
+    },
+    {
+      "id": "github.forked_ratio",
+      "source": "github",
+      "type": "number",
+      "unit": "ratio",
+      "description": "Forked repos / public repos (0 to 1)"
+    },
+    {
+      "id": "github.empty_repo_ratio",
+      "source": "github",
+      "type": "number",
+      "unit": "ratio",
+      "description": "Repos with almost no commits or files / public repos (0 to 1)"
+    },
+    {
+      "id": "github.stars_received",
+      "source": "github",
+      "type": "number",
+      "unit": "count",
+      "description": "Total stars across original repos"
+    },
+    {
+      "id": "github.merged_prs_1y",
+      "source": "github",
+      "type": "number",
+      "unit": "count",
+      "description": "Pull requests merged in the past 12 months"
+    },
+    {
+      "id": "github.active_months_1y",
+      "source": "github",
+      "type": "number",
+      "unit": "months",
+      "description": "Months with at least one contribution in the past 12 (0 to 12)"
+    },
+    {
+      "id": "github.last_activity_days",
+      "source": "github",
+      "type": "number",
+      "unit": "days",
+      "description": "Days since last public activity"
+    },
+    {
+      "id": "github.account_age_days",
+      "source": "github",
+      "type": "number",
+      "unit": "days",
+      "description": "Age of the account"
+    },
+    {
+      "id": "github.languages",
+      "source": "github",
+      "type": "string_list",
+      "unit": null,
+      "description": "Languages used across original repos"
+    },
+    {
+      "id": "github.language_count",
+      "source": "github",
+      "type": "number",
+      "unit": "count",
+      "description": "Number of distinct languages"
+    },
+
+    {
+      "id": "resume.project_count",
+      "source": "resume",
+      "type": "number",
+      "unit": "count",
+      "description": "Projects listed in the resume"
+    },
+    {
+      "id": "resume.achievement_count",
+      "source": "resume",
+      "type": "number",
+      "unit": "count",
+      "description": "Awards, hackathon wins, ranks, scholarships"
+    },
+    {
+      "id": "resume.certification_count",
+      "source": "resume",
+      "type": "number",
+      "unit": "count",
+      "description": "Certifications listed"
+    },
+    {
+      "id": "resume.internship_count",
+      "source": "resume",
+      "type": "number",
+      "unit": "count",
+      "description": "Internships or work positions listed"
+    },
+    {
+      "id": "resume.experience_months",
+      "source": "resume",
+      "type": "number",
+      "unit": "months",
+      "description": "Total professional experience in months"
+    },
+    {
+      "id": "resume.publication_count",
+      "source": "resume",
+      "type": "number",
+      "unit": "count",
+      "description": "Papers or publications listed"
+    },
+    {
+      "id": "resume.education_level",
+      "source": "resume",
+      "type": "number",
+      "unit": "ordinal",
+      "description": "0 none, 1 school, 2 diploma, 3 bachelors, 4 masters, 5 doctorate"
+    },
+    {
+      "id": "resume.skills",
+      "source": "resume",
+      "type": "string_list",
+      "unit": null,
+      "description": "Skills extracted from the resume"
+    },
+    {
+      "id": "resume.text",
+      "source": "resume",
+      "type": "string",
+      "unit": null,
+      "description": "Raw extracted resume text, used for keyword matching"
+    },
+
+    {
+      "id": "linkedin.post_count_1y",
+      "source": "linkedin",
+      "type": "number",
+      "unit": "count",
+      "description": "Posts in the past 12 months (from user-provided export only)"
+    },
+    {
+      "id": "linkedin.experience_count",
+      "source": "linkedin",
+      "type": "number",
+      "unit": "count",
+      "description": "Positions listed"
+    },
+    {
+      "id": "linkedin.certification_count",
+      "source": "linkedin",
+      "type": "number",
+      "unit": "count",
+      "description": "Certifications listed"
+    },
+    {
+      "id": "linkedin.endorsement_count",
+      "source": "linkedin",
+      "type": "number",
+      "unit": "count",
+      "description": "Skill endorsements received"
+    },
+    {
+      "id": "linkedin.skills",
+      "source": "linkedin",
+      "type": "string_list",
+      "unit": null,
+      "description": "Skills listed on the profile"
+    },
+    {
+      "id": "linkedin.text",
+      "source": "linkedin",
+      "type": "string",
+      "unit": null,
+      "description": "Headline, about and experience text from the export"
+    },
+
+    {
+      "id": "portfolio.is_reachable",
+      "source": "portfolio",
+      "type": "boolean",
+      "unit": null,
+      "description": "Link opens successfully"
+    },
+    {
+      "id": "portfolio.project_count",
+      "source": "portfolio",
+      "type": "number",
+      "unit": "count",
+      "description": "Projects shown on the site"
+    },
+    {
+      "id": "portfolio.has_live_demo",
+      "source": "portfolio",
+      "type": "boolean",
+      "unit": null,
+      "description": "At least one project links to a live demo"
+    },
+    {
+      "id": "portfolio.tech_stack",
+      "source": "portfolio",
+      "type": "string_list",
+      "unit": null,
+      "description": "Technologies mentioned on the site"
+    },
+    {
+      "id": "portfolio.text",
+      "source": "portfolio",
+      "type": "string",
+      "unit": null,
+      "description": "Visible text of the site, used for keyword matching"
+    },
+
+    {
+      "id": "resume.keyword_match",
+      "source": "computed",
+      "type": "number",
+      "unit": "ratio",
+      "description": "ENGINE computed from params.keywords against skills/text. Data guy does not provide this."
+    },
+    {
+      "id": "team.size",
+      "source": "computed",
+      "type": "number",
+      "unit": "count",
+      "description": "ENGINE computed. Number of members"
+    },
+    {
+      "id": "team.data_coverage",
+      "source": "computed",
+      "type": "number",
+      "unit": "ratio",
+      "description": "ENGINE computed. Share of scored criteria that had data (0 to 1)"
+    }
+  ],
+  "rawFields": "Any extra CSV/JSON column is available as field.<column_name> (string). Not part of this list."
+}
