@@ -1,3 +1,5 @@
+import pLimit from "p-limit";
+import { env } from "../../config/env.js";
 import {
   setMetric,
   notProvided,
@@ -6,6 +8,9 @@ import {
 } from "../metrics/metricValue.js";
 
 export async function enrichTeams(teams, enrichers) {
+  const limit = pLimit(env.enrichConcurrency);
+  const jobs = [];
+
   for (const team of teams) {
     for (const member of team.members) {
       for (const enr of enrichers) {
@@ -18,23 +23,30 @@ export async function enrichTeams(teams, enrichers) {
           continue;
         }
 
-        try {
-          const out = await enr.enrich(member);
-          for (const id of enr.metricIds) {
-            setMetric(
-              member,
-              id,
-              out[id] ?? fetchFailed(enr.name, "enricher_returned_no_value"),
-            );
-          }
-        } catch (e) {
-          enr.metricIds.forEach((id) =>
-            setMetric(member, id, fetchFailed(enr.name, e.message)),
-          );
-        }
+        jobs.push(
+          limit(async () => {
+            try {
+              const out = await enr.enrich(member);
+              for (const id of enr.metricIds) {
+                setMetric(
+                  member,
+                  id,
+                  out[id] ??
+                    fetchFailed(enr.name, "enricher_returned_no_value"),
+                );
+              }
+            } catch (e) {
+              enr.metricIds.forEach((id) =>
+                setMetric(member, id, fetchFailed(enr.name, e.message)),
+              );
+            }
+          }),
+        );
       }
     }
   }
+
+  await Promise.all(jobs);
   return { teams, summary: summarize(teams) };
 }
 
