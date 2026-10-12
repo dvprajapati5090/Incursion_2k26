@@ -1,0 +1,6 @@
+team_id,team_name,member_name,member_email,is_lead,resume_url,github_url,linkedin_url,portfolio_url
+T-001,Real Users,Linus,l@example.com,true,,https://github.com/torvalds,,
+T-001,Real Users,Dan,d@example.com,false,,github.com/gaearon,,
+T-002,Ghosts,No One,n@example.com,true,,https://github.com/this-user-should-not-exist-9f3k2,,
+T-003,Bad Link,Bad,b@example.com,true,,https://github.com/orgs,,
+T-004,Repeat,Same,s@example.com,true,,https://github.com/torvalds,,

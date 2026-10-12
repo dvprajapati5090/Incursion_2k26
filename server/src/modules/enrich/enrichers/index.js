@@ -1,4 +1,7 @@
+import { env } from "../../../config/env.js";
 import mockGithub from "./mockGithub.js";
+import github from "./github/index.js";
 
-// Phase 4 replaces mockGithub with the real one. Later phases add resume, portfolio, etc.
-export const ENRICHERS = [mockGithub];
+export const ENRICHERS = [env.githubToken ? github : mockGithub];
+
+console.log(`[enrich] GitHub enricher: ${ENRICHERS[0].name}`);
