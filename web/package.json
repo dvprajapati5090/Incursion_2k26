@@ -11,6 +11,7 @@
   "dependencies": {
     "@tanstack/react-table": "^8.21.2",
     "clsx": "^2.1.1",
+    "framer-motion": "^14.1.0",
     "lucide-react": "^0.475.0",
     "papaparse": "^5.5.2",
     "react": "^19.0.0",
