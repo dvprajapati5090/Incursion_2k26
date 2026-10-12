@@ -3,6 +3,9 @@ import { validateConfig } from "./config/validateConfig.js";
 import { applyEligibilityFilters } from "./filters/applyEligibilityFilters.js";
 import { calculateTeamScore } from "./scoring/calculateTeamScore.js";
 import { rankTeams } from "./scoring/rankTeams.js";
+import { generateExplanation } from "./explain/generateExplanation.js";
+import { compareTeams } from "./comparison/compareTeams.js";
+import { analyzeSensitivity } from "./sensitivity/analyzeSensitivity.js";
 
 export function runEngine(teams, config, registry) {
   validateConfig(config, registry);
@@ -23,14 +26,36 @@ export function runEngine(teams, config, registry) {
 
   const { rankedTeams, shortlist } = rankTeams(
     scoredTeams,
-    config.topX
+    config.topX,
+    { tieBreakers: config.tieBreakers }
   );
 
+  // Attach transparent explainability to all teams
+  const enrichedRanked = rankedTeams.map((t) => ({
+    ...t,
+    explanation: generateExplanation(t, config)
+  }));
+
+  const enrichedShortlist = shortlist.map((t) => ({
+    ...t,
+    explanation: generateExplanation(t, config)
+  }));
+
+  const enrichedRejected = rejectedTeams.map((t) => ({
+    ...t,
+    explanation: generateExplanation(t, config)
+  }));
+
+  const enrichedReview = reviewTeams.map((t) => ({
+    ...t,
+    explanation: generateExplanation(t, config)
+  }));
+
   return {
-    rankedTeams,
-    shortlist,
-    rejectedTeams,
-    reviewTeams,
+    rankedTeams: enrichedRanked,
+    shortlist: enrichedShortlist,
+    rejectedTeams: enrichedRejected,
+    reviewTeams: enrichedReview,
     summary: {
       totalTeams: teams.length,
       eligibleCount: eligibleTeams.length,
@@ -42,3 +67,10 @@ export function runEngine(teams, config, registry) {
     }
   };
 }
+
+export {
+  generateExplanation,
+  compareTeams,
+  analyzeSensitivity
+};
+

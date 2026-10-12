@@ -75,3 +75,74 @@ test("rejects unsupported filter operators", () => {
     /Unsupported filter operator/
   );
 });
+
+test("evaluates member-level rules with any_member scope (e.g. min 50 github contributions)", () => {
+  const memberTeams = [
+    {
+      teamId: "T_PASS",
+      members: [
+        { metrics: { "github.contributions_1y": { status: "ok", value: 10 } } },
+        { metrics: { "github.contributions_1y": { status: "ok", value: 65 } } }
+      ]
+    },
+    {
+      teamId: "T_FAIL",
+      members: [
+        { metrics: { "github.contributions_1y": { status: "ok", value: 12 } } },
+        { metrics: { "github.contributions_1y": { status: "ok", value: 20 } } }
+      ]
+    },
+    {
+      teamId: "T_REVIEW",
+      members: [
+        { metrics: { "github.contributions_1y": { status: "ok", value: 10 } } },
+        { metrics: { "github.contributions_1y": { status: "not_provided", value: null } } }
+      ]
+    }
+  ];
+
+  const filter = {
+    field: "github.contributions_1y",
+    scope: "any_member",
+    operator: "gte",
+    value: 50
+  };
+
+  const result = applyEligibilityFilters(memberTeams, [filter]);
+
+  assert.deepEqual(result.eligibleTeams.map((t) => t.teamId), ["T_PASS"]);
+  assert.deepEqual(result.rejectedTeams.map((t) => t.teamId), ["T_FAIL"]);
+  assert.deepEqual(result.reviewTeams.map((t) => t.teamId), ["T_REVIEW"]);
+});
+
+test("evaluates member-level rules with all_members scope", () => {
+  const memberTeams = [
+    {
+      teamId: "T_ALL_PASS",
+      members: [
+        { metrics: { "resume.project_count": { status: "ok", value: 2 } } },
+        { metrics: { "resume.project_count": { status: "ok", value: 3 } } }
+      ]
+    },
+    {
+      teamId: "T_ONE_FAILS",
+      members: [
+        { metrics: { "resume.project_count": { status: "ok", value: 2 } } },
+        { metrics: { "resume.project_count": { status: "ok", value: 0 } } }
+      ]
+    }
+  ];
+
+  const filter = {
+    field: "resume.project_count",
+    scope: "all_members",
+    operator: "gte",
+    value: 1
+  };
+
+  const result = applyEligibilityFilters(memberTeams, [filter]);
+
+  assert.deepEqual(result.eligibleTeams.map((t) => t.teamId), ["T_ALL_PASS"]);
+  assert.deepEqual(result.rejectedTeams.map((t) => t.teamId), ["T_ONE_FAILS"]);
+});
+
