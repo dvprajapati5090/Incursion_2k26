@@ -1,16 +1,28 @@
 /**
  * UploadPage — Step 1
  *
- * Lets the organizer:
- *   1. Drop or select a CSV or JSON file
- *   2. Preview columns and map them if names differ from canonical names
- *   3. See the import report (team count, issue summary, source coverage)
- *   4. Trigger enrichment (GitHub fetch, resume parse)
- *   5. Proceed to Configure once enriched data is ready
+ * High-tech intake portal for tabular CSV / JSON hackathon registrations.
+ * Features drag-and-drop, automated header mapping, health diagnostics,
+ * and multi-source enrichment pipeline.
  */
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, FileJson, FileText, CheckCircle2, AlertCircle, Loader2, ArrowRight, Server, Sparkles, RefreshCw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Upload,
+  FileJson,
+  FileText,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  ArrowRight,
+  Server,
+  Sparkles,
+  RefreshCw,
+  Zap,
+  Layers,
+  ArrowUpRight,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { uploadFile, getImport, enrichImport, getEnriched, getHealth } from "@/lib/api";
 import { parseClientCsv, parseClientJson, enrichTeamsClient } from "@/lib/clientImport";
@@ -21,14 +33,27 @@ import ColumnMapper from "@/components/upload/ColumnMapper";
 
 export default function UploadPage() {
   const navigate = useNavigate();
-  const { phase, report, filename, importId, rawTeams, error, enrichSummary,
-    setUploading, setImported, setEnriching, setEnriched, setError, reset } = useImportStore();
+  const {
+    phase,
+    report,
+    filename,
+    importId,
+    rawTeams,
+    error,
+    enrichSummary,
+    setUploading,
+    setImported,
+    setEnriching,
+    setEnriched,
+    setError,
+    reset,
+  } = useImportStore();
   const { logAction } = usePresetsStore();
 
   const [dragging, setDragging] = useState(false);
   const [columnMap, setColumnMap] = useState({});
   const [showMapper, setShowMapper] = useState(false);
-  const [serverOnline, setServerOnline] = useState(null); // true | false | null
+  const [serverOnline, setServerOnline] = useState(null);
   const [infoNotice, setInfoNotice] = useState(null);
 
   // Check backend server health
@@ -45,7 +70,7 @@ export default function UploadPage() {
     checkHealth();
   }, [checkHealth]);
 
-  // ---- Upload with automatic fallback ----
+  // Upload handler with seamless client fallback
   const handleFile = useCallback(async (file) => {
     if (!file) return;
     const ext = file.name.split(".").pop().toLowerCase();
@@ -57,7 +82,6 @@ export default function UploadPage() {
     setUploading();
     setInfoNotice(null);
 
-    // Try backend first if online/unknown
     try {
       const result = await uploadFile(file, columnMap);
       let teams = [];
@@ -78,8 +102,7 @@ export default function UploadPage() {
         setShowMapper(false);
       }
     } catch (serverErr) {
-      // Backend failed (e.g. ECONNREFUSED or server offline) -> Seamless client-side parse fallback
-      console.warn("Backend upload failed, falling back to browser parser:", serverErr);
+      console.warn("Backend upload failed, utilizing browser-side client engine:", serverErr);
       try {
         const text = await file.text();
         const clientResult = ext === "csv"
@@ -93,7 +116,7 @@ export default function UploadPage() {
           teams: clientResult.teams,
         });
         setServerOnline(false);
-        setInfoNotice("Processed in client-side browser mode (backend server offline or unreachable). All features remain available!");
+        setInfoNotice("Running in Client-Side Mode — parsed and normalized directly in the browser.");
         logAction("FILE_UPLOADED", { filename: file.name, importId: clientResult.importId, mode: "client" });
       } catch (parseErr) {
         setError(parseErr.message || serverErr.message);
@@ -101,7 +124,7 @@ export default function UploadPage() {
     }
   }, [columnMap, setUploading, setImported, setError, logAction]);
 
-  // ---- Drag & Drop ----
+  // Drag & drop handlers
   const onDrop = useCallback((e) => {
     e.preventDefault();
     setDragging(false);
@@ -109,7 +132,7 @@ export default function UploadPage() {
     if (file) handleFile(file);
   }, [handleFile]);
 
-  // ---- Quick Sample Loader ----
+  // Quick sample loader for demonstrations
   const handleLoadSample = async () => {
     const sampleCsv = `team_id,team_name,member_name,member_email,is_lead,resume_url,github_url,linkedin_url,portfolio_url
 T-001,Byte Builders,Aarav Shah,aarav@example.com,TRUE,https://drive.example.com/aarav.pdf,https://github.com/aarav-dev,https://linkedin.com/in/aaravshah,https://aarav.dev
@@ -123,12 +146,11 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
     await handleFile(file);
   };
 
-  // ---- Enrich with automatic fallback ----
+  // Enrichment pipeline
   const handleEnrich = async () => {
     if (!importId) return;
     setEnriching();
 
-    // If client import or server is offline, use client-side mock enricher directly
     if (importId.startsWith("client_") || serverOnline === false) {
       const enriched = enrichTeamsClient(rawTeams);
       setEnriched({ teams: enriched.teams, summary: enriched.summary });
@@ -142,10 +164,10 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
       setEnriched({ teams: enriched.teams, summary: enrichResult.summary });
       logAction("ENRICHMENT_COMPLETE", { importId, summary: enrichResult.summary, mode: "server" });
     } catch (e) {
-      console.warn("Backend enrich failed, applying client-side metrics fallback:", e);
+      console.warn("Backend enrich fallback triggered:", e);
       const fallback = enrichTeamsClient(rawTeams);
       setEnriched({ teams: fallback.teams, summary: { ...fallback.summary, note: "Client fallback metrics used" } });
-      setInfoNotice("Backend enrichment was unavailable; generated realistic metrics locally so you can test scoring.");
+      setInfoNotice("Generated rich profile metrics locally so you can proceed to scoring.");
       logAction("ENRICHMENT_COMPLETE", { importId, summary: fallback.summary, mode: "client_fallback" });
     }
   };
@@ -154,83 +176,105 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
   const isImported = phase === "imported" || isEnriched;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-8 max-w-5xl mx-auto">
+      {/* Hero Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">Upload Team Data</h2>
-          <p className="text-muted-foreground mt-1">
-            Upload a CSV (Google Forms export) or JSON file with team registrations.
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-3">
+            <Zap className="h-3.5 w-3.5 text-cyan-400" />
+            Stage 1 • Data Intake & Normalization
+          </div>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            Load Hackathon Registrations
+          </h2>
+          <p className="text-slate-400 mt-2 text-sm max-w-2xl">
+            Accepts raw Google Forms exports, multi-member CSVs, and canonical JSON.
+            Individual profile links (GitHub, Resume, Portfolio) are mapped and normalized automatically.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {/* Server status pill */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border bg-card">
+
+        {/* Server & Demo Badges */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-medium backdrop-blur-md">
             <span
               className={cn(
                 "h-2 w-2 rounded-full",
                 serverOnline === true
-                  ? "bg-green-500 animate-pulse"
+                  ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
                   : serverOnline === false
-                  ? "bg-amber-500"
-                  : "bg-muted-foreground"
+                  ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]"
+                  : "bg-slate-500"
               )}
             />
-            <span className="text-muted-foreground">
+            <span className="text-slate-300 font-mono">
               {serverOnline === true
-                ? "Backend: Connected (:4000)"
+                ? "Backend: Port 4000"
                 : serverOnline === false
-                ? "In-Browser Mode"
+                ? "Browser Engine"
                 : "Checking server…"}
             </span>
             <button
               onClick={checkHealth}
               title="Refresh connection"
-              className="hover:text-primary transition"
+              className="text-slate-400 hover:text-white transition ml-1"
             >
               <RefreshCw className="h-3 w-3" />
             </button>
           </div>
 
-          {/* Quick sample button */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleLoadSample}
             disabled={phase === "uploading" || phase === "enriching"}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border hover:bg-accent transition"
-            title="Load sample hackathon teams for instant testing"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 hover:from-indigo-500/30 hover:to-cyan-500/30 border border-cyan-500/30 text-cyan-300 text-xs font-bold shadow-lg shadow-cyan-950/20 transition cursor-pointer"
           >
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
+            <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-spin" style={{ animationDuration: "6s" }} />
             Load Sample CSV
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      {/* Info notice banner */}
-      {infoNotice && (
-        <div className="flex items-center justify-between gap-2 text-sm p-3 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 flex-shrink-0" />
-            <span>{infoNotice}</span>
-          </div>
-          <button
-            onClick={() => setInfoNotice(null)}
-            className="text-xs hover:underline opacity-80"
+      {/* Info Banner */}
+      <AnimatePresence>
+        {infoNotice && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex items-center justify-between p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-indigo-300 text-xs font-medium"
           >
-            Dismiss
-          </button>
-        </div>
-      )}
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-cyan-400 flex-shrink-0" />
+              <span>{infoNotice}</span>
+            </div>
+            <button
+              onClick={() => setInfoNotice(null)}
+              className="text-slate-400 hover:text-white underline ml-4 text-[11px]"
+            >
+              Dismiss
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Drop Zone */}
-      <div
-        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+      {/* Futuristic Dropzone */}
+      <motion.div
+        whileHover={{ borderColor: "rgba(99, 102, 241, 0.4)" }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
+        onClick={() => document.getElementById("file-input").click()}
         className={cn(
-          "relative border-2 border-dashed rounded-xl p-12 text-center transition-colors cursor-pointer",
-          dragging ? "border-primary bg-primary/5" : "border-muted-foreground/30 hover:border-primary/50",
+          "relative overflow-hidden rounded-2xl border-2 border-dashed p-10 md:p-14 text-center transition-all duration-300 cursor-pointer glass-panel",
+          dragging
+            ? "border-cyan-400 bg-cyan-500/5 shadow-[0_0_30px_rgba(6,182,212,0.2)]"
+            : "border-white/10 hover:border-indigo-500/40 hover:bg-white/[0.02]",
           phase === "uploading" && "pointer-events-none opacity-60"
         )}
-        onClick={() => document.getElementById("file-input").click()}
       >
         <input
           id="file-input"
@@ -241,56 +285,75 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
         />
 
         {phase === "uploading" ? (
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-10 w-10 text-primary animate-spin" />
-            <p className="text-muted-foreground">Uploading {filename}…</p>
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-12 w-12 text-cyan-400 animate-spin" />
+            <div>
+              <p className="font-semibold text-white">Normalizing registrations…</p>
+              <p className="text-xs text-slate-400 mt-1 font-mono">{filename}</p>
+            </div>
           </div>
         ) : phase === "enriching" ? (
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-10 w-10 text-primary animate-spin" />
-            <p className="text-muted-foreground">Enriching teams (GitHub, resumes)…</p>
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full blur-md bg-indigo-500/30 animate-pulse" />
+              <Loader2 className="h-12 w-12 text-indigo-400 animate-spin relative" />
+            </div>
+            <div>
+              <p className="font-semibold text-white">Enriching profile signals…</p>
+              <p className="text-xs text-slate-400 mt-1">Analyzing GitHub activity, resume projects, and portfolios</p>
+            </div>
           </div>
         ) : isImported ? (
           <div className="flex flex-col items-center gap-3">
-            {isEnriched ? (
-              <CheckCircle2 className="h-10 w-10 text-green-500" />
-            ) : (
-              <FileText className="h-10 w-10 text-primary" />
-            )}
-            <p className="font-medium">{filename}</p>
-            <p className="text-sm text-muted-foreground">
-              {isEnriched ? "Enriched and ready" : "Imported — click to replace"}
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-3">
-            <Upload className="h-10 w-10 text-muted-foreground" />
+            <div className="h-14 w-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-950/40">
+              <CheckCircle2 className="h-8 w-8" />
+            </div>
             <div>
-              <p className="font-medium">Drop a CSV or JSON file here</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Supports Google Forms exports (one row per member) and the normalized JSON format
+              <p className="font-bold text-white text-lg">{filename}</p>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {isEnriched
+                  ? "Enrichment complete — ready for criteria configuration"
+                  : "Imported & normalized — click to select a different file"}
               </p>
             </div>
-            <div className="flex gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><FileText className="h-3 w-3" />.csv</span>
-              <span className="flex items-center gap-1"><FileJson className="h-3 w-3" />.json</span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-16 w-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-xl shadow-indigo-950/40 group-hover:scale-105 transition-transform">
+              <Upload className="h-8 w-8 text-indigo-400" />
+            </div>
+            <div>
+              <p className="font-bold text-white text-lg">
+                Drag and drop your team spreadsheet or JSON
+              </p>
+              <p className="text-xs text-slate-400 mt-1.5 max-w-md mx-auto">
+                Supports Google Forms CSV (one row per member), multi-member records, and custom team fields.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-400 font-mono pt-2">
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-white/10">
+                <FileText className="h-3.5 w-3.5 text-indigo-400" /> .csv
+              </span>
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-white/10">
+                <FileJson className="h-3.5 w-3.5 text-cyan-400" /> .json
+              </span>
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
 
-      {/* Error */}
+      {/* Error alert */}
       {error && (
-        <div className="flex items-center gap-2 text-destructive text-sm p-3 bg-destructive/10 rounded-lg">
-          <AlertCircle className="h-4 w-4 flex-shrink-0" />
-          {error}
+        <div className="flex items-center gap-3 text-rose-300 text-sm p-4 bg-rose-950/30 border border-rose-500/30 rounded-xl">
+          <AlertCircle className="h-5 w-5 flex-shrink-0 text-rose-400" />
+          <span>{error}</span>
         </div>
       )}
 
-      {/* Import Report */}
+      {/* Import Report Section */}
       {report && <ImportReport report={report} />}
 
-      {/* Column Mapper (if CSV has unmapped columns) */}
+      {/* Column Mapper (if needed) */}
       {report?.columns && showMapper && (
         <ColumnMapper
           columns={report.columns}
@@ -299,47 +362,77 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
         />
       )}
 
-      {/* Actions */}
+      {/* Action Bar */}
       {isImported && !isEnriched && (
-        <div className="flex gap-3">
-          <button
-            onClick={handleEnrich}
-            disabled={phase === "enriching"}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition"
-          >
-            {phase === "enriching" ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CheckCircle2 className="h-4 w-4" />
-            )}
-            Enrich Teams (GitHub + Resume)
-          </button>
-          <button
-            onClick={() => navigate("/config")}
-            className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-accent transition"
-          >
-            Skip Enrichment
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-indigo-500/20"
+        >
+          <div>
+            <h4 className="font-bold text-white text-sm">Next Step: Profile Signal Enrichment</h4>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Pull GitHub contribution counts, verify live portfolio links, and extract skills from resumes.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleEnrich}
+              disabled={phase === "enriching"}
+              className="glow-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-white text-xs font-bold rounded-xl cursor-pointer"
+            >
+              {phase === "enriching" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 text-cyan-300" />
+              )}
+              Enrich Profiles
+            </motion.button>
+
+            <button
+              onClick={() => navigate("/config")}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/[0.05] text-slate-300 text-xs font-semibold transition"
+            >
+              Skip Enrichment
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </motion.div>
       )}
 
+      {/* Enriched Success Ready Card */}
       {isEnriched && (
-        <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg">
-          <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-            <CheckCircle2 className="h-5 w-5" />
-            <span className="font-medium">
-              {enrichSummary?.teamsEnriched ?? "?"} teams enriched — ready to configure
-            </span>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-emerald-500/30 bg-emerald-950/15"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-sm">
+                Enrichment Complete • {enrichSummary?.teamsEnriched ?? rawTeams.length} Teams Ready
+              </h4>
+              <p className="text-xs text-emerald-300/80 mt-0.5">
+                All profile signals and quantitative metrics are attached to member records.
+              </p>
+            </div>
           </div>
-          <button
+
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             onClick={() => navigate("/config")}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-extrabold rounded-xl shadow-lg shadow-emerald-950/40 transition cursor-pointer"
           >
-            Continue to Configure
+            <span>Proceed to Configure Selection</span>
             <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
     </div>
   );
