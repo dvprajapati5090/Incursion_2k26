@@ -1,32 +1,51 @@
 /**
  * ResultsPage — Step 3
  *
- * Shows the ranked shortlist with:
- *   - Tab bar: Shortlisted / Waitlisted / Rejected
- *   - TanStack Table with columns: rank, team name, score, data coverage, flags
- *   - Clicking a row opens TeamDetailDrawer (breakdown chart + reasons)
- *   - Manual overrides: pin / exclude / waitlist from the row action menu
- *   - Run metadata (seed, topX, total teams, runtime)
+ * Leaderboard & Audit Dashboard:
+ *   - Executive KPI telemetry (Shortlisted, Waitlisted, Disqualified, Cutoff Score)
+ *   - Filterable tabs with accurate counts per category
+ *   - Interactive TanStack Leaderboard with score bars & action overrides
+ *   - Slide-in TeamDetailDrawer inspector
  */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, RefreshCw, AlertTriangle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowRight,
+  RefreshCw,
+  AlertTriangle,
+  Award,
+  Clock,
+  Ban,
+  Sliders,
+  Download,
+  Search,
+  Sparkles,
+} from "lucide-react";
 import useResultsStore from "@/stores/resultsStore";
 import useConfigStore from "@/stores/configStore";
 import ResultsTable from "@/components/results/ResultsTable";
 import TeamDetailDrawer from "@/components/results/TeamDetailDrawer";
 
 const TABS = [
-  { key: "shortlisted", label: "Shortlisted" },
-  { key: "waitlisted",  label: "Waitlisted"  },
-  { key: "rejected",    label: "Rejected"    },
-  { key: "all",         label: "All Teams"   },
+  { key: "shortlisted", label: "Shortlisted", badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+  { key: "waitlisted",  label: "Waitlisted",  badgeColor: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+  { key: "rejected",    label: "Rejected",    badgeColor: "text-rose-400 bg-rose-500/10 border-rose-500/20" },
+  { key: "all",         label: "All Teams",   badgeColor: "text-slate-300 bg-slate-800 border-white/10" },
 ];
 
 export default function ResultsPage() {
   const navigate = useNavigate();
-  const { running, shortlist, waitlist, rejected, rankedResults, cutoffScore, runMeta, error } =
-    useResultsStore();
+  const {
+    running,
+    shortlist = [],
+    waitlist = [],
+    rejected = [],
+    rankedResults = [],
+    cutoffScore,
+    runMeta,
+    error,
+  } = useResultsStore();
   const { config } = useConfigStore();
   const [activeTab, setActiveTab] = useState("shortlisted");
   const [selectedTeam, setSelectedTeam] = useState(null);
@@ -38,118 +57,190 @@ export default function ResultsPage() {
     all:         rankedResults,
   }[activeTab] ?? [];
 
+  const tabCounts = {
+    shortlisted: shortlist.length,
+    waitlisted:  waitlist.length,
+    rejected:    rejected.length,
+    all:         rankedResults.length,
+  };
+
   if (running) {
     return (
-      <div className="flex items-center justify-center h-64 gap-3 text-muted-foreground">
-        <RefreshCw className="h-5 w-5 animate-spin" />
-        <span>Running shortlisting engine…</span>
+      <div className="flex flex-col items-center justify-center h-80 gap-4 text-slate-400">
+        <RefreshCw className="h-8 w-8 animate-spin text-cyan-400" />
+        <p className="font-semibold text-white">Running selection engine…</p>
+        <p className="text-xs text-slate-500 font-mono">Applying normalization, weights, filters & ties</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center gap-3 p-6 bg-destructive/10 text-destructive rounded-xl">
-        <AlertTriangle className="h-5 w-5" />
-        <span>{error}</span>
+      <div className="flex items-center gap-3 p-6 bg-rose-950/30 text-rose-300 border border-rose-500/30 rounded-2xl max-w-2xl mx-auto">
+        <AlertTriangle className="h-6 w-6 text-rose-400 shrink-0" />
+        <div>
+          <h4 className="font-bold text-white">Engine Execution Error</h4>
+          <p className="text-xs text-rose-300/80 mt-1">{error}</p>
+        </div>
       </div>
     );
   }
 
   if (rankedResults.length === 0) {
     return (
-      <div className="text-center py-16 space-y-4">
-        <p className="text-muted-foreground">No results yet. Run the shortlisting from the Configure step.</p>
+      <div className="glass-panel text-center py-20 px-6 rounded-2xl max-w-xl mx-auto space-y-5 border border-white/10">
+        <div className="h-14 w-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto">
+          <Award className="h-7 w-7" />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-white">No Selection Results Yet</h3>
+          <p className="text-xs text-slate-400 mt-1.5 max-w-sm mx-auto">
+            Upload team registrations and tune your criteria weights in the Configure step to generate rankings.
+          </p>
+        </div>
         <button
           onClick={() => navigate("/config")}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
+          className="glow-btn inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white rounded-xl cursor-pointer"
         >
           Go to Configure
+          <ArrowRight className="h-3.5 w-3.5" />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Header bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">Results</h2>
-          <p className="text-muted-foreground mt-1">
-            Top {config.selection?.topX} of {runMeta?.totalTeams} teams · Cutoff score:{" "}
-            <strong>{cutoffScore?.toFixed(4)}</strong>
-            {runMeta?.durationMs && (
-              <span className="ml-2 text-xs">({runMeta.durationMs}ms)</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-semibold mb-2">
+            <Sparkles className="h-3 w-3 text-emerald-400" />
+            Stage 3 • Selection Shortlist & Leaderboard
+          </div>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white">
+            Shortlist Results
+          </h2>
+          <p className="text-slate-400 mt-1 text-xs">
+            Top <strong className="text-white font-mono">{config.selection?.topX}</strong> of{" "}
+            <strong className="text-white font-mono">{runMeta?.totalTeams ?? rankedResults.length}</strong> teams evaluated
+            {runMeta?.durationMs != null && (
+              <span className="ml-2 font-mono text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-500/20">
+                {runMeta.durationMs}ms
+              </span>
             )}
           </p>
         </div>
-        <div className="flex gap-2">
+
+        {/* Action buttons */}
+        <div className="flex items-center gap-2.5">
           <button
             onClick={() => navigate("/config")}
-            className="px-3 py-1.5 text-sm border rounded-lg hover:bg-accent transition"
+            className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-white/10 hover:bg-white/[0.05] text-slate-300 transition"
           >
-            Re-configure
+            <Sliders className="h-3.5 w-3.5" />
+            Re-tune Weights
           </button>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => navigate("/export")}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
+            className="glow-btn flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded-xl cursor-pointer"
           >
-            Export
-            <ArrowRight className="h-4 w-4" />
-          </button>
+            <Download className="h-3.5 w-3.5" />
+            Export Shortlist
+            <ArrowRight className="h-3.5 w-3.5" />
+          </motion.button>
         </div>
       </div>
 
-      {/* Stats strip */}
-      <div className="grid grid-cols-4 gap-4">
-        {[
-          { label: "Shortlisted", value: shortlist.length, color: "text-green-600" },
-          { label: "Waitlisted",  value: waitlist.length,  color: "text-yellow-600" },
-          { label: "Rejected",    value: rejected.length,  color: "text-red-500" },
-          { label: "Cutoff Score", value: cutoffScore?.toFixed(4) ?? "—", color: "text-primary" },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl border p-4 bg-card">
-            <p className="text-sm text-muted-foreground">{s.label}</p>
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+      {/* KPI Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Shortlisted */}
+        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/10 to-emerald-500/5 p-4 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(16,185,129,0.2)]">
+          <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+            <span>Shortlisted</span>
+            <Award className="h-4 w-4 text-emerald-400" />
           </div>
-        ))}
+          <p className="text-3xl font-extrabold font-mono text-emerald-400">{shortlist.length}</p>
+          <p className="text-[11px] text-slate-400 mt-1">Qualified within Top X</p>
+        </div>
+
+        {/* Waitlisted */}
+        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-b from-amber-500/10 to-amber-500/5 p-4 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(245,158,11,0.2)]">
+          <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+            <span>Waitlisted</span>
+            <Clock className="h-4 w-4 text-amber-400" />
+          </div>
+          <p className="text-3xl font-extrabold font-mono text-amber-400">{waitlist.length}</p>
+          <p className="text-[11px] text-slate-400 mt-1">On standby cushion</p>
+        </div>
+
+        {/* Rejected */}
+        <div className="rounded-2xl border border-rose-500/20 bg-gradient-to-b from-rose-500/10 to-rose-500/5 p-4 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(244,63,94,0.2)]">
+          <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+            <span>Disqualified / Excluded</span>
+            <Ban className="h-4 w-4 text-rose-400" />
+          </div>
+          <p className="text-3xl font-extrabold font-mono text-rose-400">{rejected.length}</p>
+          <p className="text-[11px] text-slate-400 mt-1">Below cutoff or filtered</p>
+        </div>
+
+        {/* Cutoff Score */}
+        <div className="rounded-2xl border border-cyan-500/20 bg-gradient-to-b from-cyan-500/10 to-cyan-500/5 p-4 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(6,182,212,0.2)]">
+          <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+            <span>Cutoff Threshold</span>
+            <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
+          </div>
+          <p className="text-3xl font-extrabold font-mono text-cyan-300">
+            {cutoffScore != null ? cutoffScore.toFixed(4) : "—"}
+          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Minimum score to qualify</p>
+        </div>
       </div>
 
-      {/* Tab bar */}
-      <div className="flex gap-1 border-b">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab.key
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {tab.label}
-            <span className="ml-1.5 text-xs text-muted-foreground">
-              ({tableData.length})
-            </span>
-          </button>
-        ))}
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-2 border-b border-white/10 pb-2">
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.key;
+          const count = tabCounts[tab.key] ?? 0;
+
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                isActive
+                  ? "bg-slate-800 text-white shadow-md border border-white/10"
+                  : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full border ${tab.badgeColor}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Results table */}
+      {/* Leaderboard TanStack Table */}
       <ResultsTable
         data={tableData}
         config={config}
         onRowClick={(team) => setSelectedTeam(team)}
       />
 
-      {/* Team detail drawer */}
-      {selectedTeam && (
-        <TeamDetailDrawer
-          team={selectedTeam}
-          config={config}
-          onClose={() => setSelectedTeam(null)}
-        />
-      )}
+      {/* Slide-out Drawer */}
+      <AnimatePresence>
+        {selectedTeam && (
+          <TeamDetailDrawer
+            team={selectedTeam}
+            config={config}
+            onClose={() => setSelectedTeam(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

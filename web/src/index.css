@@ -1,17 +1,35 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: #080c16;
+  --color-foreground: #f1f5f9;
+  --color-card: #0f172a;
+  --color-card-foreground: #f8fafc;
+  --color-primary: #6366f1;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1e293b;
+  --color-secondary-foreground: #e2e8f0;
+  --color-muted: #1e293b;
+  --color-muted-foreground: #94a3b8;
+  --color-accent: #334155;
+  --color-accent-foreground: #f8fafc;
+  --color-destructive: #f43f5e;
+  --color-destructive-foreground: #ffffff;
+  --color-border: rgba(255, 255, 255, 0.08);
+}
+
 :root {
   --background: #080c16;
   --foreground: #f1f5f9;
-  --card: rgba(15, 23, 42, 0.72);
+  --card: #0f172a;
   --card-foreground: #f8fafc;
   --primary: #6366f1;
   --primary-foreground: #ffffff;
-  --secondary: rgba(30, 41, 59, 0.7);
+  --secondary: #1e293b;
   --secondary-foreground: #e2e8f0;
-  --muted: rgba(30, 41, 59, 0.5);
+  --muted: #1e293b;
   --muted-foreground: #94a3b8;
-  --accent: rgba(51, 65, 85, 0.6);
+  --accent: #334155;
   --accent-foreground: #f8fafc;
   --destructive: #f43f5e;
   --destructive-foreground: #ffffff;
@@ -21,8 +39,8 @@
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: #080c16;
+  color: #f1f5f9;
   font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
@@ -62,7 +80,7 @@ body::after {
 
 /* Custom Glassmorphism Classes */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -70,7 +88,7 @@ body::after {
 }
 
 .glass-card {
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.07);
@@ -131,14 +149,14 @@ body::after {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(15, 23, 42, 0.5);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.35);
 }
