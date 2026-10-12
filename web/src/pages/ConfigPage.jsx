@@ -1,18 +1,29 @@
 /**
  * ConfigPage — Step 2
  *
- * Organizer sets:
- *   - topX (how many teams to shortlist) and waitlist size
- *   - Scoring criteria: metric, weight (slider), normalization, aggregation, onMissing
- *   - Hard filters / eligibility rules
- *   - Options: blind mode, seed
- *   - Preset save/load
- *
- * Every change triggers a live re-rank via the Web Worker.
+ * Command center for algorithmic selection configuration:
+ *   - Quota capacity (Top X & Waitlist)
+ *   - Tunable scoring criteria & weights
+ *   - Eligibility rules & hard filters
+ *   - Stealth blind evaluation mode
+ *   - Real-time Web Worker live re-ranking
  */
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Play, Save, Eye, EyeOff, ArrowRight, RotateCcw } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Play,
+  Save,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  RotateCcw,
+  Sparkles,
+  Zap,
+  Sliders,
+  ShieldCheck,
+  Activity,
+} from "lucide-react";
 import useConfigStore from "@/stores/configStore";
 import useImportStore from "@/stores/importStore";
 import useResultsStore from "@/stores/resultsStore";
@@ -25,7 +36,7 @@ import PresetManager from "@/components/config/PresetManager";
 export default function ConfigPage() {
   const navigate = useNavigate();
   const { config, setBlindMode, resetConfig } = useConfigStore();
-  const { enrichedTeams, rawTeams, phase } = useImportStore();
+  const { enrichedTeams, rawTeams } = useImportStore();
   const { setRunning, setResults, setError } = useResultsStore();
   const { logAction, savePreset } = usePresetsStore();
 
@@ -78,79 +89,110 @@ export default function ConfigPage() {
   const hasData = (enrichedTeams.length > 0 || rawTeams.length > 0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 max-w-7xl mx-auto pb-16">
+      {/* Header with control switches */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold">Configure Selection</h2>
-          <p className="text-muted-foreground mt-1">
-            Set criteria weights, filters, and rules. No code changes needed.
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-semibold mb-2">
+            <Sliders className="h-3.5 w-3.5 text-cyan-400" />
+            Stage 2 • Algorithmic Tuning & Governance
+          </div>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white">
+            Configure Selection Parameters
+          </h2>
+          <p className="text-slate-400 mt-1 text-xs max-w-2xl">
+            Weights are relative and normalized automatically. Zero code changes required to rebalance evaluation philosophies.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {/* Blind mode toggle */}
+
+        {/* Toolbar Pills */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Blind Mode Toggle */}
           <button
             onClick={() => setBlindMode(!config.options?.blindMode)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg hover:bg-accent transition"
-            title={config.options?.blindMode ? "Disable blind mode" : "Enable blind mode (hides names/emails)"}
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border transition cursor-pointer ${
+              config.options?.blindMode
+                ? "bg-amber-500/15 border-amber-500/30 text-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.3)]"
+                : "bg-slate-900/80 border-white/10 text-slate-400 hover:text-white"
+            }`}
+            title={config.options?.blindMode ? "Disable blind mode" : "Enable blind mode (anonymizes team and applicant names)"}
           >
-            {config.options?.blindMode ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            {config.options?.blindMode ? "Blind Mode ON" : "Blind Mode"}
+            {config.options?.blindMode ? <EyeOff className="h-3.5 w-3.5 text-amber-400" /> : <Eye className="h-3.5 w-3.5" />}
+            {config.options?.blindMode ? "Stealth Mode ON" : "Stealth Blind Mode"}
           </button>
 
-          {/* Live ranking toggle */}
+          {/* Live Ranking Toggle */}
           <button
             onClick={() => setLiveRanking((v) => !v)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg transition ${
-              liveRanking ? "bg-primary text-primary-foreground" : "hover:bg-accent"
-            }`}
             disabled={!hasData}
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border transition cursor-pointer ${
+              liveRanking
+                ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                : "bg-slate-900/80 border-white/10 text-slate-400 hover:text-white"
+            }`}
           >
-            Live Re-rank
+            <Activity className="h-3.5 w-3.5 text-cyan-400" />
+            Live Worker Ranking
           </button>
 
           <button
             onClick={handleSavePreset}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg hover:bg-accent transition"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-900/80 border border-white/10 text-slate-300 hover:text-white hover:bg-slate-800 transition cursor-pointer"
           >
-            <Save className="h-4 w-4" />
+            <Save className="h-3.5 w-3.5 text-indigo-400" />
             Save Preset
           </button>
 
           <button
             onClick={resetConfig}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg hover:bg-accent transition"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-900/80 border border-white/10 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition cursor-pointer"
           >
-            <RotateCcw className="h-4 w-4" />
+            <RotateCcw className="h-3.5 w-3.5" />
             Reset
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
-        {/* Left: Criteria + Filters */}
-        <div className="col-span-2 space-y-6">
+      {/* Main Grid: Criteria & Filters on Left, Presets on Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column (2 cols wide) */}
+        <div className="lg:col-span-2 space-y-6">
           <SelectionPanel />
           <CriteriaEditor />
           <FilterEditor />
         </div>
 
-        {/* Right: Presets + Options */}
+        {/* Right Column (1 col wide) */}
         <div className="space-y-6">
           <PresetManager />
         </div>
       </div>
 
-      {/* Run button */}
-      <div className="sticky bottom-4 flex justify-end">
-        <button
-          onClick={handleRun}
-          disabled={!hasData}
-          className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl shadow-lg hover:bg-primary/90 disabled:opacity-50 transition text-sm font-medium"
-        >
-          <Play className="h-4 w-4" />
-          Run Shortlisting
-          <ArrowRight className="h-4 w-4" />
-        </button>
+      {/* Floating Sticky Bottom Execution Banner */}
+      <div className="sticky bottom-6 z-30">
+        <div className="glass-panel rounded-2xl p-4 border border-indigo-500/30 bg-[#090e1a]/95 backdrop-blur-2xl shadow-2xl flex items-center justify-between gap-4 max-w-4xl mx-auto">
+          <div className="hidden sm:block">
+            <p className="text-xs font-bold text-white flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              Engine Configuration Ready
+            </p>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Evaluating Top {config.selection?.topX} teams with {config.criteria.filter((c) => c.enabled).length} scoring criteria
+            </p>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleRun}
+            disabled={!hasData}
+            className="glow-btn flex-1 sm:flex-none flex items-center justify-center gap-2.5 px-6 py-3 text-xs font-extrabold text-white rounded-xl shadow-xl shadow-indigo-600/30 transition cursor-pointer disabled:opacity-50"
+          >
+            <Play className="h-4 w-4 fill-white" />
+            Execute Shortlist Engine
+            <ArrowRight className="h-4 w-4" />
+          </motion.button>
+        </div>
       </div>
     </div>
   );
