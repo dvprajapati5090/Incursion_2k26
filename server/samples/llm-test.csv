@@ -1,0 +1,7 @@
+team_id,team_name,member_name,member_email,is_lead,resume_url,resume_text
+T-001,No Headings,Aarav,a@example.com,true,,"Aarav Shah - aarav@example.com - +91 98765 43210
+Final year B.Tech student at XYZ University.
+Built ShopEasy, an e-commerce app using React and Node. Also built a Weather Dashboard with Python and Flask.
+Won first prize at CodeFest 2025 hackathon. AWS Certified Cloud Practitioner (2025).
+Interned at TechNova as a backend developer, summer 2025.
+Skills: React, Node, Python, Flask, Docker"

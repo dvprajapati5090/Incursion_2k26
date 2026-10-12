@@ -1,11 +1,39 @@
+import pLimit from "p-limit";
+import { env } from "../../config/env.js";
 import {
   setMetric,
   notProvided,
   fetchFailed,
   STATUS,
 } from "../metrics/metricValue.js";
+import { REFINERS } from "./refiners/index.js";
+
+// An LLM value replaces an existing one only if it is more confident; the old value is kept for audit.
+function mergeRefined(member, refined) {
+  let updated = 0;
+  for (const [id, entry] of Object.entries(refined)) {
+    const old = member.metrics[id];
+    if (entry.confidence > (old?.confidence ?? 0)) {
+      if (old) {
+        entry.previous = {
+          value: old.value,
+          status: old.status,
+          origin: old.origin,
+          confidence: old.confidence ?? null,
+        };
+      }
+      setMetric(member, id, entry);
+      updated++;
+    }
+  }
+  return updated;
+}
 
 export async function enrichTeams(teams, enrichers) {
+  const limit = pLimit(env.enrichConcurrency);
+  const jobs = [];
+
+  // Pass 1: enrichers (GitHub, resume rules, ...)
   for (const team of teams) {
     for (const member of team.members) {
       for (const enr of enrichers) {
@@ -18,24 +46,69 @@ export async function enrichTeams(teams, enrichers) {
           continue;
         }
 
-        try {
-          const out = await enr.enrich(member);
-          for (const id of enr.metricIds) {
-            setMetric(
-              member,
-              id,
-              out[id] ?? fetchFailed(enr.name, "enricher_returned_no_value"),
-            );
-          }
-        } catch (e) {
-          enr.metricIds.forEach((id) =>
-            setMetric(member, id, fetchFailed(enr.name, e.message)),
-          );
-        }
+        jobs.push(
+          limit(async () => {
+            const t0 = Date.now();
+            try {
+              const out = await enr.enrich(member);
+              for (const id of enr.metricIds) {
+                setMetric(
+                  member,
+                  id,
+                  out[id] ??
+                    fetchFailed(enr.name, "enricher_returned_no_value"),
+                );
+              }
+            } catch (e) {
+              enr.metricIds.forEach((id) =>
+                setMetric(member, id, fetchFailed(enr.name, e.message)),
+              );
+            } finally {
+              const ms = Date.now() - t0;
+              if (ms > 2000)
+                console.log(
+                  `[enrich] slow: ${enr.name} ${member.memberId} took ${ms}ms`,
+                );
+            }
+          }),
+        );
       }
     }
   }
-  return { teams, summary: summarize(teams) };
+  await Promise.all(jobs);
+
+  // Pass 2: refiners (LLM) run on top of pass-1 results
+  const llm = { attempted: 0, failed: 0, metricsUpdated: 0 };
+  const llmLimit = pLimit(env.llm.concurrency);
+  const refineJobs = [];
+
+  for (const team of teams) {
+    for (const member of team.members) {
+      for (const ref of REFINERS) {
+        if (!ref.shouldRun(member)) continue;
+        refineJobs.push(
+          llmLimit(async () => {
+            llm.attempted++;
+            try {
+              llm.metricsUpdated += mergeRefined(
+                member,
+                await ref.refine(member),
+              );
+            } catch (e) {
+              llm.failed++;
+              member.flags.push({
+                code: "LLM_REFINE_FAILED",
+                detail: `${ref.name}: ${e.message}`,
+              });
+            }
+          }),
+        );
+      }
+    }
+  }
+  await Promise.all(refineJobs);
+
+  return { teams, summary: { ...summarize(teams), llm } };
 }
 
 function summarize(teams) {

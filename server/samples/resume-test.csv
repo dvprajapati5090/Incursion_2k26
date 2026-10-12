@@ -1,0 +1,19 @@
+team_id,team_name,member_name,member_email,is_lead,resume_url,resume_text
+T-001,Parser Test,Test One,t1@example.com,true,,"EDUCATION
+B.Tech in Computer Science, ABC Institute
+PROJECTS
+Chat App | Node, Socket.io
+- Built a realtime chat with rooms
+- Added message history
+Portfolio Site | React
+- Designed and deployed the site
+ACHIEVEMENTS
+- Winner, Smart Hackathon 2025
+- Rank 120, National Coding Contest
+CERTIFICATIONS
+- AWS Cloud Practitioner
+SKILLS
+Languages: JavaScript, Python, SQL
+Tools: Git, Docker"
+T-002,No Headings,Test Two,t2@example.com,true,,"I am a student who likes building things and learning new tools every week. I have done a few projects."
+T-003,Dead Link,Test Three,t3@example.com,true,https://drive.google.com/file/d/FAKEID123/view,
