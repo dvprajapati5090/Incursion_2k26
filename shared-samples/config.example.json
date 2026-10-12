@@ -1,0 +1,106 @@
+{
+  "_comment": "Example config matching the brief's scenario: top 50, GitHub contributions required, projects/achievements weighted above education.",
+  "schemaVersion": 1,
+  "name": "Projects-first preset",
+  "description": "Example from the brief: top 50, 50+ GitHub contributions required, projects and achievements weighted above education",
+  "selection": { "topX": 50, "waitlistSize": 10 },
+  "criteria": [
+    {
+      "id": "projects",
+      "label": "Projects",
+      "enabled": true,
+      "metric": "resume.project_count",
+      "weight": 4,
+      "normalization": { "type": "percentile" },
+      "aggregation": "top2_mean",
+      "sizeNormalization": "none",
+      "onMissing": "reweight",
+      "params": {}
+    },
+    {
+      "id": "achievements",
+      "label": "Achievements",
+      "enabled": true,
+      "metric": "resume.achievement_count",
+      "weight": 3,
+      "normalization": { "type": "cap", "cap": 5 },
+      "aggregation": "max",
+      "sizeNormalization": "none",
+      "onMissing": "reweight",
+      "params": {}
+    },
+    {
+      "id": "github_activity",
+      "label": "GitHub Activity",
+      "enabled": true,
+      "metric": "github.contributions_1y",
+      "weight": 2,
+      "normalization": { "type": "minmax" },
+      "aggregation": "sum",
+      "sizeNormalization": "per_member",
+      "onMissing": "zero",
+      "params": {}
+    },
+    {
+      "id": "education",
+      "label": "Education",
+      "enabled": true,
+      "metric": "resume.education_level",
+      "weight": 1,
+      "normalization": { "type": "minmax" },
+      "aggregation": "mean",
+      "sizeNormalization": "none",
+      "onMissing": "neutral",
+      "neutralValue": 0.5,
+      "params": {}
+    },
+    {
+      "id": "skill_match",
+      "label": "Skill Match",
+      "enabled": true,
+      "metric": "resume.keyword_match",
+      "weight": 3,
+      "normalization": { "type": "minmax" },
+      "aggregation": "max",
+      "sizeNormalization": "none",
+      "onMissing": "reweight",
+      "params": {
+        "keywords": ["react", "node", "docker", "postgres"],
+        "matchMode": "any_case_insensitive",
+        "fields": ["skills", "projects"],
+        "keywordWeights": { "docker": 2 }
+      }
+    }
+  ],
+  "filters": [
+    {
+      "id": "min_github",
+      "label": "At least one member with 50+ GitHub contributions in the past year",
+      "enabled": true,
+      "metric": "github.contributions_1y",
+      "op": ">=",
+      "value": 50,
+      "scope": { "type": "any_member" },
+      "onMissing": "flag",
+      "mode": "reject"
+    },
+    {
+      "id": "has_contact",
+      "label": "Team lead email present",
+      "enabled": true,
+      "metric": "field.lead_email",
+      "op": "exists",
+      "scope": { "type": "team" },
+      "onMissing": "fail",
+      "mode": "reject"
+    }
+  ],
+  "missingData": { "minCoverageToFlag": 0.5 },
+  "tieBreakers": [
+    { "by": "criterion", "criterionId": "projects", "direction": "desc" },
+    { "by": "data_coverage", "direction": "desc" },
+    { "by": "seeded_random" }
+  ],
+  "overrides": { "pin": [], "exclude": [], "waitlist": [] },
+  "options": { "seed": 42, "blindMode": false }
+}
