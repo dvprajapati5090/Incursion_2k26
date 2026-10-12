@@ -6,6 +6,9 @@ import { rankTeams } from "./scoring/rankTeams.js";
 import { generateExplanation } from "./explain/generateExplanation.js";
 import { compareTeams } from "./comparison/compareTeams.js";
 import { analyzeSensitivity } from "./sensitivity/analyzeSensitivity.js";
+import { PRESETS, getPreset, listPresets } from "./config/presets.js";
+import { exportShortlist } from "./export/exportShortlist.js";
+import { anonymizeTeams } from "./utils/anonymizeTeams.js";
 
 export function runEngine(teams, config, registry) {
   validateConfig(config, registry);
@@ -24,10 +27,18 @@ export function runEngine(teams, config, registry) {
     calculateTeamScore(team, config.criteria)
   );
 
-  const { rankedTeams, shortlist } = rankTeams(
+  const {
+    rankedTeams,
+    shortlist,
+    waitlistTeams = [],
+    excludedTeams = []
+  } = rankTeams(
     scoredTeams,
     config.topX,
-    { tieBreakers: config.tieBreakers }
+    {
+      tieBreakers: config.tieBreakers,
+      overrides: config.overrides
+    }
   );
 
   // Attach transparent explainability to all teams
@@ -51,9 +62,21 @@ export function runEngine(teams, config, registry) {
     explanation: generateExplanation(t, config)
   }));
 
+  const enrichedWaitlist = waitlistTeams.map((t) => ({
+    ...t,
+    explanation: generateExplanation(t, config)
+  }));
+
+  const enrichedExcluded = excludedTeams.map((t) => ({
+    ...t,
+    explanation: generateExplanation(t, config)
+  }));
+
   return {
     rankedTeams: enrichedRanked,
     shortlist: enrichedShortlist,
+    waitlistTeams: enrichedWaitlist,
+    excludedTeams: enrichedExcluded,
     rejectedTeams: enrichedRejected,
     reviewTeams: enrichedReview,
     summary: {
@@ -61,9 +84,11 @@ export function runEngine(teams, config, registry) {
       eligibleCount: eligibleTeams.length,
       rankedCount: rankedTeams.length,
       shortlistedCount: shortlist.length,
+      waitlistCount: waitlistTeams.length,
+      excludedCount: excludedTeams.length,
       rejectedCount: rejectedTeams.length,
       reviewCount: reviewTeams.length,
-      unscoredCount: eligibleTeams.length - rankedTeams.length
+      unscoredCount: eligibleTeams.length - rankedTeams.length - waitlistTeams.length - excludedTeams.length
     }
   };
 }
@@ -71,6 +96,12 @@ export function runEngine(teams, config, registry) {
 export {
   generateExplanation,
   compareTeams,
-  analyzeSensitivity
+  analyzeSensitivity,
+  PRESETS,
+  getPreset,
+  listPresets,
+  exportShortlist,
+  anonymizeTeams
 };
+
 
