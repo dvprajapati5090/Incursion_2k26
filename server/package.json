@@ -5,7 +5,10 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:enrichment": "vitest run tests/enrichment.test.js"
   },
   "keywords": [],
   "author": "",
@@ -21,5 +24,10 @@
     "papaparse": "^5.7.0",
     "unpdf": "^1.8.1",
     "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^5.0.4",
+    "supertest": "^7.3.1",
+    "vitest": "^5.0.4"
   }
 }
