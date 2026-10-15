@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
+    "validate": "node scripts/validate-enriched.js",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:enrichment": "vitest run tests/enrichment.test.js"
