@@ -1,0 +1,439 @@
+/**
+ * UploadPage — Step 1
+ *
+ * High-tech intake portal for tabular CSV / JSON hackathon registrations.
+ * Features drag-and-drop, automated header mapping, health diagnostics,
+ * and multi-source enrichment pipeline.
+ */
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Upload,
+  FileJson,
+  FileText,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  ArrowRight,
+  Server,
+  Sparkles,
+  RefreshCw,
+  Zap,
+  Layers,
+  ArrowUpRight,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { uploadFile, getImport, enrichImport, getEnriched, getHealth } from "@/lib/api";
+import { parseClientCsv, parseClientJson, enrichTeamsClient } from "@/lib/clientImport";
+import useImportStore from "@/stores/importStore";
+import usePresetsStore from "@/stores/presetsStore";
+import ImportReport from "@/components/upload/ImportReport";
+import ColumnMapper from "@/components/upload/ColumnMapper";
+
+export default function UploadPage() {
+  const navigate = useNavigate();
+  const {
+    phase,
+    report,
+    filename,
+    importId,
+    rawTeams,
+    error,
+    enrichSummary,
+    setUploading,
+    setImported,
+    setEnriching,
+    setEnriched,
+    setError,
+    reset,
+  } = useImportStore();
+  const { logAction } = usePresetsStore();
+
+  const [dragging, setDragging] = useState(false);
+  const [columnMap, setColumnMap] = useState({});
+  const [showMapper, setShowMapper] = useState(false);
+  const [serverOnline, setServerOnline] = useState(null);
+  const [infoNotice, setInfoNotice] = useState(null);
+
+  // Check backend server health
+  const checkHealth = useCallback(async () => {
+    try {
+      const res = await getHealth();
+      setServerOnline(res?.status === "ok");
+    } catch {
+      setServerOnline(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkHealth();
+  }, [checkHealth]);
+
+  // Upload handler with seamless client fallback
+  const handleFile = useCallback(async (file) => {
+    if (!file) return;
+    const ext = file.name.split(".").pop().toLowerCase();
+    if (!["csv", "json"].includes(ext)) {
+      setError("Only .csv and .json files are supported");
+      return;
+    }
+
+    setUploading();
+    setInfoNotice(null);
+
+    try {
+      const result = await uploadFile(file, columnMap);
+      let teams = [];
+      try {
+        const full = await getImport(result.importId);
+        teams = full.teams || [];
+      } catch {}
+
+      setImported({
+        importId: result.importId,
+        filename: file.name,
+        report: result.report,
+        teams,
+      });
+      logAction("FILE_UPLOADED", { filename: file.name, importId: result.importId, mode: "server" });
+      setServerOnline(true);
+      if (ext === "csv" && result.report?.columns?.extra?.length > 0) {
+        setShowMapper(false);
+      }
+    } catch (serverErr) {
+      console.warn("Backend upload failed, utilizing browser-side client engine:", serverErr);
+      try {
+        const text = await file.text();
+        const clientResult = ext === "csv"
+          ? parseClientCsv(text, columnMap)
+          : parseClientJson(text);
+
+        setImported({
+          importId: clientResult.importId,
+          filename: file.name,
+          report: clientResult.report,
+          teams: clientResult.teams,
+        });
+        setServerOnline(false);
+        setInfoNotice("Running in Client-Side Mode — parsed and normalized directly in the browser.");
+        logAction("FILE_UPLOADED", { filename: file.name, importId: clientResult.importId, mode: "client" });
+      } catch (parseErr) {
+        setError(parseErr.message || serverErr.message);
+      }
+    }
+  }, [columnMap, setUploading, setImported, setError, logAction]);
+
+  // Drag & drop handlers
+  const onDrop = useCallback((e) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer?.files[0];
+    if (file) handleFile(file);
+  }, [handleFile]);
+
+  // Quick sample loader for demonstrations
+  const handleLoadSample = async () => {
+    const sampleCsv = `team_id,team_name,member_name,member_email,is_lead,resume_url,github_url,linkedin_url,portfolio_url
+T-001,Byte Builders,Aarav Shah,aarav@example.com,TRUE,https://drive.example.com/aarav.pdf,https://github.com/aarav-dev,https://linkedin.com/in/aaravshah,https://aarav.dev
+T-001,Byte Builders,Meera Patel,meera@example.com,FALSE,https://drive.example.com/meera.pdf,https://github.com/meera-p,,
+T-001,Byte Builders,Rohan Desai,rohan@example.com,FALSE,,https://github.com/rohand,https://linkedin.com/in/rohandesai,
+T-002,Solo Stack,Isha Mehta,isha@example.com,TRUE,https://drive.example.com/isha.pdf,,https://linkedin.com/in/ishamehta,https://isha.codes
+T-003,Null Pointers,Kabir Rao,kabir@example.com,TRUE,,https://github.com/kabir-rao,,
+T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
+
+    const file = new File([sampleCsv], "teams.sample.csv", { type: "text/csv" });
+    await handleFile(file);
+  };
+
+  // Enrichment pipeline
+  const handleEnrich = async () => {
+    if (!importId) return;
+    setEnriching();
+
+    if (importId.startsWith("client_") || serverOnline === false) {
+      const enriched = enrichTeamsClient(rawTeams);
+      setEnriched({ teams: enriched.teams, summary: enriched.summary });
+      logAction("ENRICHMENT_COMPLETE", { importId, summary: enriched.summary, mode: "client" });
+      return;
+    }
+
+    try {
+      const enrichResult = await enrichImport(importId);
+      const enriched = await getEnriched(importId);
+      setEnriched({ teams: enriched.teams, summary: enrichResult.summary });
+      logAction("ENRICHMENT_COMPLETE", { importId, summary: enrichResult.summary, mode: "server" });
+    } catch (e) {
+      console.warn("Backend enrich fallback triggered:", e);
+      const fallback = enrichTeamsClient(rawTeams);
+      setEnriched({ teams: fallback.teams, summary: { ...fallback.summary, note: "Client fallback metrics used" } });
+      setInfoNotice("Generated rich profile metrics locally so you can proceed to scoring.");
+      logAction("ENRICHMENT_COMPLETE", { importId, summary: fallback.summary, mode: "client_fallback" });
+    }
+  };
+
+  const isEnriched = phase === "enriched";
+  const isImported = phase === "imported" || isEnriched;
+
+  return (
+    <div className="space-y-8 max-w-5xl mx-auto">
+      {/* Hero Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-3">
+            <Zap className="h-3.5 w-3.5 text-cyan-400" />
+            Stage 1 • Data Intake & Normalization
+          </div>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            Load Hackathon Registrations
+          </h2>
+          <p className="text-slate-400 mt-2 text-sm max-w-2xl">
+            Accepts raw Google Forms exports, multi-member CSVs, and canonical JSON.
+            Individual profile links (GitHub, Resume, Portfolio) are mapped and normalized automatically.
+          </p>
+        </div>
+
+        {/* Server & Demo Badges */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-medium backdrop-blur-md">
+            <span
+              className={cn(
+                "h-2 w-2 rounded-full",
+                serverOnline === true
+                  ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+                  : serverOnline === false
+                  ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]"
+                  : "bg-slate-500"
+              )}
+            />
+            <span className="text-slate-300 font-mono">
+              {serverOnline === true
+                ? "Backend: Port 4000"
+                : serverOnline === false
+                ? "Browser Engine"
+                : "Checking server…"}
+            </span>
+            <button
+              onClick={checkHealth}
+              title="Refresh connection"
+              className="text-slate-400 hover:text-white transition ml-1"
+            >
+              <RefreshCw className="h-3 w-3" />
+            </button>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleLoadSample}
+            disabled={phase === "uploading" || phase === "enriching"}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 hover:from-indigo-500/30 hover:to-cyan-500/30 border border-cyan-500/30 text-cyan-300 text-xs font-bold shadow-lg shadow-cyan-950/20 transition cursor-pointer"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-spin" style={{ animationDuration: "6s" }} />
+            Load Sample CSV
+          </motion.button>
+        </div>
+      </div>
+
+      {/* Info Banner */}
+      <AnimatePresence>
+        {infoNotice && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex items-center justify-between p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-indigo-300 text-xs font-medium"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-cyan-400 flex-shrink-0" />
+              <span>{infoNotice}</span>
+            </div>
+            <button
+              onClick={() => setInfoNotice(null)}
+              className="text-slate-400 hover:text-white underline ml-4 text-[11px]"
+            >
+              Dismiss
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Futuristic Dropzone */}
+      <motion.div
+        whileHover={{ borderColor: "rgba(99, 102, 241, 0.4)" }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={onDrop}
+        onClick={() => document.getElementById("file-input").click()}
+        className={cn(
+          "relative overflow-hidden rounded-2xl border-2 border-dashed p-10 md:p-14 text-center transition-all duration-300 cursor-pointer glass-panel",
+          dragging
+            ? "border-cyan-400 bg-cyan-500/5 shadow-[0_0_30px_rgba(6,182,212,0.2)]"
+            : "border-white/10 hover:border-indigo-500/40 hover:bg-white/[0.02]",
+          phase === "uploading" && "pointer-events-none opacity-60"
+        )}
+      >
+        <input
+          id="file-input"
+          type="file"
+          accept=".csv,.json"
+          className="hidden"
+          onChange={(e) => handleFile(e.target.files?.[0])}
+        />
+
+        {phase === "uploading" ? (
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-12 w-12 text-cyan-400 animate-spin" />
+            <div>
+              <p className="font-semibold text-white">Normalizing registrations…</p>
+              <p className="text-xs text-slate-400 mt-1 font-mono">{filename}</p>
+            </div>
+          </div>
+        ) : phase === "enriching" ? (
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full blur-md bg-indigo-500/30 animate-pulse" />
+              <Loader2 className="h-12 w-12 text-indigo-400 animate-spin relative" />
+            </div>
+            <div>
+              <p className="font-semibold text-white">Enriching profile signals…</p>
+              <p className="text-xs text-slate-400 mt-1">Analyzing GitHub activity, resume projects, and portfolios</p>
+            </div>
+          </div>
+        ) : isImported ? (
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-14 w-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-950/40">
+              <CheckCircle2 className="h-8 w-8" />
+            </div>
+            <div>
+              <p className="font-bold text-white text-lg">{filename}</p>
+              <p className="text-xs text-slate-400 mt-0.5">
+                {isEnriched
+                  ? "Enrichment complete — ready for criteria configuration"
+                  : "Imported & normalized — click to select a different file"}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4">
+            <div className="h-16 w-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-xl shadow-indigo-950/40 group-hover:scale-105 transition-transform">
+              <Upload className="h-8 w-8 text-indigo-400" />
+            </div>
+            <div>
+              <p className="font-bold text-white text-lg">
+                Drag and drop your team spreadsheet or JSON
+              </p>
+              <p className="text-xs text-slate-400 mt-1.5 max-w-md mx-auto">
+                Supports Google Forms CSV (one row per member), multi-member records, and custom team fields.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 text-xs text-slate-400 font-mono pt-2">
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-white/10">
+                <FileText className="h-3.5 w-3.5 text-indigo-400" /> .csv
+              </span>
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-white/10">
+                <FileJson className="h-3.5 w-3.5 text-cyan-400" /> .json
+              </span>
+            </div>
+          </div>
+        )}
+      </motion.div>
+
+      {/* Error alert */}
+      {error && (
+        <div className="flex items-center gap-3 text-rose-300 text-sm p-4 bg-rose-950/30 border border-rose-500/30 rounded-xl">
+          <AlertCircle className="h-5 w-5 flex-shrink-0 text-rose-400" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Import Report Section */}
+      {report && <ImportReport report={report} />}
+
+      {/* Column Mapper (if needed) */}
+      {report?.columns && showMapper && (
+        <ColumnMapper
+          columns={report.columns}
+          columnMap={columnMap}
+          onChange={setColumnMap}
+        />
+      )}
+
+      {/* Action Bar */}
+      {isImported && !isEnriched && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-indigo-500/20"
+        >
+          <div>
+            <h4 className="font-bold text-white text-sm">Next Step: Profile Signal Enrichment</h4>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Pull GitHub contribution counts, verify live portfolio links, and extract skills from resumes.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleEnrich}
+              disabled={phase === "enriching"}
+              className="glow-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-white text-xs font-bold rounded-xl cursor-pointer"
+            >
+              {phase === "enriching" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 text-cyan-300" />
+              )}
+              Enrich Profiles
+            </motion.button>
+
+            <button
+              onClick={() => navigate("/config")}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/[0.05] text-slate-300 text-xs font-semibold transition"
+            >
+              Skip Enrichment
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Enriched Success Ready Card */}
+      {isEnriched && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-emerald-500/30 bg-emerald-950/15"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-sm">
+                Enrichment Complete • {enrichSummary?.teamsEnriched ?? rawTeams.length} Teams Ready
+              </h4>
+              <p className="text-xs text-emerald-300/80 mt-0.5">
+                All profile signals and quantitative metrics are attached to member records.
+              </p>
+            </div>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => navigate("/config")}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-extrabold rounded-xl shadow-lg shadow-emerald-950/40 transition cursor-pointer"
+          >
+            <span>Proceed to Configure Selection</span>
+            <ArrowRight className="h-4 w-4" />
+          </motion.button>
+        </motion.div>
+      )}
+    </div>
+  );
+}

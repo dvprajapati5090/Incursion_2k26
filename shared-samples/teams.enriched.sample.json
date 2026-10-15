@@ -1,0 +1,58 @@
+[
+  {
+    "teamId": "T-001",
+    "teamName": "Byte Builders",
+    "fields": { "track_interest": "AI" },
+    "members": [
+      {
+        "memberId": "T-001-1",
+        "name": "Aarav Shah",
+        "email": "aarav@example.com",
+        "isLead": true,
+        "sources": {
+          "resume":    { "url": "https://drive.example.com/aarav.pdf" },
+          "github":    { "url": "https://github.com/aarav-dev" },
+          "linkedin":  { "url": "https://linkedin.com/in/aaravshah" },
+          "portfolio": { "url": "https://aarav.dev" }
+        },
+        "metrics": {
+          "github.contributions_1y": { "value": 112, "status": "ok", "origin": "github_api" },
+          "github.original_repos":   { "value": 9,   "status": "ok", "origin": "github_api" },
+          "github.forked_ratio":     { "value": 0.1, "status": "ok", "origin": "github_api" },
+          "github.languages":        { "value": ["TypeScript", "Python"], "status": "ok", "origin": "github_api" },
+
+          "resume.project_count":     { "value": 4,  "status": "ok", "origin": "llm", "confidence": 0.9 },
+          "resume.achievement_count": { "value": 2,  "status": "low_confidence", "origin": "llm", "confidence": 0.45 },
+          "resume.education_level":   { "value": 3,  "status": "ok", "origin": "rule_based", "confidence": 0.95 },
+          "resume.skills":            { "value": ["react", "node", "docker"], "status": "ok", "origin": "llm", "confidence": 0.85 },
+
+          "linkedin.post_count_1y":   { "value": null, "status": "not_provided", "origin": null },
+
+          "portfolio.is_reachable":   { "value": true, "status": "ok", "origin": "http_check" },
+          "portfolio.has_live_demo":  { "value": true, "status": "ok", "origin": "rule_based" }
+        },
+        "flags": []
+      },
+      {
+        "memberId": "T-001-2",
+        "name": "Meera Patel",
+        "email": "meera@example.com",
+        "isLead": false,
+        "sources": {
+          "resume":    { "url": "https://drive.example.com/meera.pdf" },
+          "github":    { "url": "https://github.com/meera-p" },
+          "linkedin":  null,
+          "portfolio": null
+        },
+        "metrics": {
+          "github.contributions_1y": { "value": null, "status": "fetch_failed", "origin": "github_api", "error": "rate_limited" },
+          "resume.project_count":    { "value": 2, "status": "ok", "origin": "llm", "confidence": 0.8 },
+          "linkedin.post_count_1y":  { "value": null, "status": "not_provided", "origin": null }
+        },
+        "flags": [
+          { "code": "DUPLICATE_RESUME_TEXT", "detail": "Resume text 92% similar to member T-014-2" }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,40 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:frontend": "vitest run tests/frontendImport.test.js tests/frontendSchema.test.js",
+    "test:scoring-engine": "vitest run tests/scoringEngine.test.js"
+  },
+  "dependencies": {
+    "@tanstack/react-table": "^8.21.2",
+    "clsx": "^2.1.1",
+    "framer-motion": "^14.1.0",
+    "lucide-react": "^0.475.0",
+    "papaparse": "^5.5.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.2.0",
+    "recharts": "^2.15.1",
+    "tailwind-merge": "^3.0.1",
+    "zod": "^3.24.2",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.6",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^5.0.4",
+    "jsdom": "^30.1.2",
+    "tailwindcss": "^4.0.6",
+    "vite": "^6.1.0",
+    "vitest": "^5.0.4"
+  }
+}

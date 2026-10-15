@@ -1,0 +1,22 @@
+{
+  "name": "engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:scoring": "vitest run tests/comprehensiveScoring.test.js tests/scoreCriterion.test.js tests/calculateTeamScore.test.js tests/normalize.test.js tests/aggregateMetric.test.js tests/rankTeams.test.js tests/tieBreakers.test.js tests/overrides.test.js",
+    "test:config": "vitest run tests/validateConfig.test.js",
+    "test:integration": "vitest run tests/index.test.js tests/comprehensiveScoring.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^5.0.4",
+    "vitest": "^5.0.4"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "_comment": "Example per-team result object. feedbackSchema.js content converted to JSON.",
+  "teamId": "T-102",
+  "teamName": "Example Team",
+  "status": "rejected",
+  "rank": 63,
+  "score": 0.58,
+  "cutoffScore": 0.62,
+  "margin": -0.04,
+  "filterResults": [{ "id": "min_github", "label": "50+ GitHub contributions", "result": "pass" }],
+  "breakdown": [
+    {
+      "criterionId": "projects",
+      "label": "Projects",
+      "metric": "resume.project_count",
+      "raw": 3,
+      "normalized": 0.7,
+      "effectiveWeight": 0.4,
+      "contribution": 0.28,
+      "status": "ok"
+    },
+    {
+      "criterionId": "achievements",
+      "label": "Achievements",
+      "metric": "resume.achievement_count",
+      "raw": null,
+      "normalized": null,
+      "effectiveWeight": 0.0,
+      "contribution": 0,
+      "status": "missing",
+      "handling": "reweight"
+    }
+  ],
+  "dataCoverage": 0.5,
+  "flags": ["incomplete_data"],
+  "reasons": [
+    { "code": "STRENGTH", "criterionId": "projects" },
+    { "code": "MISSING_DATA", "criterionId": "achievements", "handling": "reweight" },
+    { "code": "BELOW_CUTOFF", "margin": -0.04 }
+  ]
+}
