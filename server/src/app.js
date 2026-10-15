@@ -6,14 +6,15 @@ import { notFound } from "./middleware/notFound.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import importRoutes from "./routes/import.routes.js";
 import registryRoutes from "./routes/registry.routes.js";
+import jobsRoutes from "./routes/jobs.routes.js";
 import enrichRoutes from "./routes/enrich.routes.js";
 // ...
-
+// ...
 const app = express();
 
 app.use(cors({ origin: env.corsOrigin }));
 app.use(express.json({ limit: "10mb" })); // team data can be large
-
+app.use("/api/jobs", jobsRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/imports", importRoutes);
 app.use("/api/registry", registryRoutes);

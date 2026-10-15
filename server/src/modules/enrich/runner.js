@@ -7,6 +7,7 @@ import {
   STATUS,
 } from "../metrics/metricValue.js";
 import { REFINERS } from "./refiners/index.js";
+import { detectFlags } from "../flags/index.js";
 
 // An LLM value replaces an existing one only if it is more confident; the old value is kept for audit.
 function mergeRefined(member, refined) {
@@ -29,11 +30,15 @@ function mergeRefined(member, refined) {
   return updated;
 }
 
-export async function enrichTeams(teams, enrichers) {
-  const limit = pLimit(env.enrichConcurrency);
-  const jobs = [];
+export async function enrichTeams(teams, enrichers, { onProgress } = {}) {
+  const report = (phase, done, total) => onProgress?.({ phase, done, total });
 
   // Pass 1: enrichers (GitHub, resume rules, ...)
+  const limit = pLimit(env.enrichConcurrency);
+  const jobs = [];
+  let done1 = 0;
+  let total1 = 0;
+
   for (const team of teams) {
     for (const member of team.members) {
       for (const enr of enrichers) {
@@ -69,18 +74,23 @@ export async function enrichTeams(teams, enrichers) {
                 console.log(
                   `[enrich] slow: ${enr.name} ${member.memberId} took ${ms}ms`,
                 );
+              report("enrich", ++done1, total1);
             }
           }),
         );
       }
     }
   }
+  total1 = jobs.length;
+  report("enrich", 0, total1);
   await Promise.all(jobs);
 
   // Pass 2: refiners (LLM) run on top of pass-1 results
   const llm = { attempted: 0, failed: 0, metricsUpdated: 0 };
   const llmLimit = pLimit(env.llm.concurrency);
   const refineJobs = [];
+  let done2 = 0;
+  let total2 = 0;
 
   for (const team of teams) {
     for (const member of team.members) {
@@ -90,25 +100,33 @@ export async function enrichTeams(teams, enrichers) {
           llmLimit(async () => {
             llm.attempted++;
             try {
-              llm.metricsUpdated += mergeRefined(
-                member,
-                await ref.refine(member),
-              );
+              const refined = await ref.refine(member);
+              llm.metricsUpdated += mergeRefined(member, refined); // read-modify-write after the await, so no lost updates
             } catch (e) {
               llm.failed++;
               member.flags.push({
                 code: "LLM_REFINE_FAILED",
+                severity: "warn",
                 detail: `${ref.name}: ${e.message}`,
               });
+            } finally {
+              report("llm", ++done2, total2);
             }
           }),
         );
       }
     }
   }
+  total2 = refineJobs.length;
+  report("llm", 0, total2);
   await Promise.all(refineJobs);
 
-  return { teams, summary: { ...summarize(teams), llm } };
+  // Pass 3: suspicious-profile flags (fast, deterministic)
+  report("flags", 0, 1);
+  const flags = detectFlags(teams);
+  report("flags", 1, 1);
+
+  return { teams, summary: { ...summarize(teams), llm, flags } };
 }
 
 function summarize(teams) {
