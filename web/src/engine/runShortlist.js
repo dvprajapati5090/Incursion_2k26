@@ -117,12 +117,28 @@ function adaptFilters(filters = []) {
     .map((f) => {
       const field = f.field || f.metric || "team.size";
       const op = OP_MAP[f.op || f.operator] || "gte";
-      const scope = f.scope?.type || f.scope || "any_member";
+      const isTeamLevel = field === "team.size" || field.startsWith("field.");
+      const rawScope = f.scope?.type || f.scope;
+      const scope = isTeamLevel
+        ? "team"
+        : rawScope === "all_members"
+        ? "all_members"
+        : "any_member";
+
+      let val = f.value ?? 0;
+      if (typeof val === "string" && !isNaN(Number(val)) && val.trim() !== "") {
+        val = Number(val);
+      } else if (val === "true" || val === true) {
+        val = true;
+      } else if (val === "false" || val === false) {
+        val = false;
+      }
+
       return {
         field,
         operator: op,
         scope,
-        value: f.value ?? 0,
+        value: val,
       };
     });
 }
