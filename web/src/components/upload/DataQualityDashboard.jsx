@@ -58,29 +58,29 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
   });
 
   const getSourceBadge = (id) => {
-    if (id.startsWith("github")) return { label: "GitHub", color: "bg-[#415A77]/20 text-[#778DA9] border-[#415A77]/45" };
-    if (id.startsWith("resume")) return { label: "Resume", color: "bg-[#415A77]/15 text-[#778DA9] border-[#415A77]/45" };
-    if (id.startsWith("linkedin")) return { label: "LinkedIn", color: "bg-sky-500/15 text-sky-300 border-sky-500/30" };
-    if (id.startsWith("portfolio")) return { label: "Portfolio", color: "bg-emerald-500/15 text-emerald-300 border-[#415A77]/40" };
-    return { label: "Computed", color: "bg-purple-500/15 text-purple-300 border-purple-500/30" };
+    if (id.startsWith("github")) return { label: "GitHub", color: "bg-[#415A77]/35 text-[#E0E1DD] border border-[#778DA9]/40" };
+    if (id.startsWith("resume")) return { label: "Resume", color: "bg-[#778DA9]/25 text-[#E0E1DD] border border-[#778DA9]/40" };
+    if (id.startsWith("linkedin")) return { label: "LinkedIn", color: "bg-sky-500/20 text-sky-200 border border-sky-400/40" };
+    if (id.startsWith("portfolio")) return { label: "Portfolio", color: "bg-emerald-500/20 text-emerald-200 border border-emerald-400/40" };
+    return { label: "Computed", color: "bg-[#415A77]/25 text-[#E0E1DD] border border-[#415A77]/50" };
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-6 border border-[#415A77]/30 space-y-6">
+    <div className="glass-panel rounded-2xl p-6 border border-[#415A77]/45 space-y-6 shadow-xl">
       {/* Header with expand toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#415A77]/20 to-[#415A77]/20 border border-[#415A77]/45 text-[#778DA9]">
+          <div className="p-2.5 rounded-xl bg-[#415A77]/30 border border-[#778DA9]/40 text-[#E0E1DD] shadow-sm">
             <Activity className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-base text-white">Cohort Data Quality & Signal Coverage</h3>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#415A77]/15 text-[#778DA9] border border-[#415A77]/45">
+              <h3 className="font-bold text-base text-white">Cohort Data Quality &amp; Signal Coverage</h3>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#1B263B] text-[#E0E1DD] border border-[#415A77]/60">
                 Pre-Ranking Audit
               </span>
             </div>
-            <p className="text-xs text-[#778DA9]/80 mt-0.5">
+            <p className="text-xs text-[#778DA9] mt-0.5">
               Verified metric completeness across {members} applicant profile{members !== 1 ? "s" : ""} in {teams} team{teams !== 1 ? "s" : ""}.
             </p>
           </div>

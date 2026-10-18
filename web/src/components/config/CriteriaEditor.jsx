@@ -86,12 +86,12 @@ export default function CriteriaEditor() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <Sliders className="h-5 w-5 text-[#415A77]" />
-            <h3 className="font-bold text-base text-white">Scoring Criteria & Weight Distribution</h3>
+            <Sliders className="h-5 w-5 text-[#778DA9]" />
+            <h3 className="font-bold text-base text-[#E0E1DD]">Scoring Criteria & Weight Distribution</h3>
           </div>
           <p className="text-xs text-[#778DA9]/80 mt-0.5">
             Weights are automatically normalized into relative percentage contributions. Total enabled weight:{" "}
-            <span className="font-mono text-[#778DA9] font-bold">{totalWeight.toFixed(1)}</span>
+            <span className="font-mono text-[#E0E1DD] font-bold">{totalWeight.toFixed(1)}</span>
           </p>
         </div>
 
@@ -99,9 +99,9 @@ export default function CriteriaEditor() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleAdd}
-          className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl bg-[#415A77]/20 hover:bg-[#415A77]/25 border border-[#415A77]/45 text-[#778DA9] transition cursor-pointer self-start sm:self-auto"
+          className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl bg-[#415A77]/25 hover:bg-[#415A77]/40 border border-[#415A77]/50 text-[#E0E1DD] hover:text-white transition cursor-pointer self-start sm:self-auto"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-3.5 w-3.5 text-[#778DA9]" />
           Add Criterion
         </motion.button>
       </div>

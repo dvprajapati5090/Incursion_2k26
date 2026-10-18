@@ -649,18 +649,18 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
               </div>
 
               {/* Signal Domain Filter Tabs */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#1B263B]/80 border border-[#415A77]/30">
+              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#1B263B] border border-[#415A77]/50 shadow-inner">
                 <button
                   type="button"
                   onClick={() => setActiveSignalTab("all")}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
                     activeSignalTab === "all"
-                      ? "bg-[#415A77] text-white shadow-sm"
-                      : "text-[#778DA9]/80 hover:text-white hover:bg-white/5"
+                      ? "bg-[#415A77] text-white shadow-md border border-[#778DA9]/50"
+                      : "text-[#778DA9] hover:text-white hover:bg-white/5"
                   }`}
                 >
                   <Layers className="h-3.5 w-3.5" />
-                  All Categories
+                  <span>All Categories</span>
                 </button>
                 {SIGNAL_DOMAINS.map((domain) => {
                   const DomainIcon = domain.icon;
@@ -670,14 +670,14 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                       key={domain.id}
                       type="button"
                       onClick={() => setActiveSignalTab(domain.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
                         isActive
-                          ? "bg-[#415A77] text-white shadow-sm"
-                          : "text-[#778DA9]/80 hover:text-white hover:bg-white/5"
+                          ? "bg-[#415A77] text-white shadow-md border border-[#778DA9]/50"
+                          : "text-[#778DA9] hover:text-white hover:bg-white/5"
                       }`}
                     >
-                      <DomainIcon className={`h-3.5 w-3.5 ${domain.color}`} />
-                      {domain.name.split(" ")[0]} ({domain.metrics.length})
+                      <DomainIcon className="h-3.5 w-3.5 text-[#E0E1DD]" />
+                      <span>{domain.name.split(" ")[0]} ({domain.metrics.length})</span>
                     </button>
                   );
                 })}
@@ -709,10 +709,10 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   return (
                     <div
                       key={m.memberId || mIdx}
-                      className={`p-4 rounded-xl border transition-all space-y-3 ${
+                      className={`p-4 rounded-xl border transition-all space-y-3 shadow-md ${
                         isHighlighted
-                          ? "bg-[#0D1B2A]/40 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.3)]"
-                          : "bg-[#1B263B]/70 border-[#415A77]/30 hover:border-[#778DA9]/40"
+                          ? "bg-[#1B263B] border-[#778DA9] shadow-[0_0_20px_rgba(119,141,169,0.35)]"
+                          : "bg-[#1B263B] border-[#415A77]/50 hover:border-[#778DA9]/60"
                       }`}
                     >
                       {/* Member Identity & Lead Badge */}
@@ -722,12 +722,12 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                             {displayName}
                           </span>
                           {m.isLead && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#415A77]/15 text-[#778DA9] border border-[#415A77]/45">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#415A77]/35 text-[#E0E1DD] border border-[#778DA9]/40 shadow-sm">
                               Lead
                             </span>
                           )}
                         </div>
-                        <span className="text-[11px] font-mono text-[#415A77]">
+                        <span className="text-[11px] font-mono text-[#778DA9]">
                           {blindMode ? `ID-${mIdx + 1}` : m.memberId}
                         </span>
                       </div>

@@ -196,14 +196,9 @@ export default function ExportPage() {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleExportCsv}
                 disabled={rankedResults.length === 0}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold disabled:opacity-40 cursor-pointer transition"
-                style={{
-                  background: `rgba(65, 90, 119, 0.15)`,
-                  border: `1px solid rgba(65, 90, 119, 0.40)`,
-                  color: LAVENDER,
-                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-[#415A77]/25 hover:bg-[#415A77]/40 border border-[#415A77]/50 text-[#E0E1DD] hover:text-white disabled:opacity-40 cursor-pointer transition"
               >
-                <FileText className="h-4 w-4" />
+                <FileText className="h-4 w-4 text-[#778DA9]" />
                 Download shortlist.csv + config.json
               </motion.button>
             </div>
@@ -283,12 +278,7 @@ export default function ExportPage() {
                   <div className="flex gap-2 shrink-0">
                     <button
                       onClick={() => alert("Load preset: " + p.name)}
-                      className="px-3 py-1.5 text-xs font-semibold rounded-lg transition cursor-pointer"
-                      style={{
-                        background: `rgba(65, 90, 119, 0.15)`,
-                        border: `1px solid rgba(65, 90, 119, 0.35)`,
-                        color: LAVENDER,
-                      }}
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[#415A77]/25 hover:bg-[#415A77]/40 border border-[#415A77]/45 text-[#E0E1DD] transition cursor-pointer"
                     >
                       Load
                     </button>

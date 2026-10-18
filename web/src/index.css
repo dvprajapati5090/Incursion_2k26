@@ -1,204 +1,277 @@
 @import "tailwindcss";
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   INCURSION 2k26 — Color Palette
-   Ink Black   #0D1B2A  ← deepest background
-   Prussian    #1B263B  ← panels / cards
-   Dusk Blue   #415A77  ← accent borders / highlights
-   Lavender    #778DA9  ← secondary text / icons
-   Alabaster   #E0E1DD  ← primary text / light surfaces
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   INCURSION 2k26 — Executive Color Palette & Visual System
+   
+   Color 1 (~Ink Black):      #0D1B2A (Deep space canvas, void, ultra-dark)
+   Color 2 (~Prussian Blue):  #1B263B (Elevated surfaces, card panels, nav)
+   Color 3 (~Dusk Blue):      #415A77 (Structural borders, active tabs, buttons)
+   Color 4 (~Lavender Grey):  #778DA9 (Secondary text, metadata, subtle icons)
+   Color 5 (~Alabaster Grey): #E0E1DD (Primary headings, high-contrast CTAs)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 @theme {
-  --color-background:           #0D1B2A;
-  --color-foreground:           #E0E1DD;
-  --color-card:                 #1B263B;
-  --color-card-foreground:      #E0E1DD;
-  --color-primary:              #415A77;
-  --color-primary-foreground:   #E0E1DD;
-  --color-secondary:            #1B263B;
+  --color-ink: #0D1B2A;
+  --color-ink-deep: #08101a;
+  --color-prussian: #1B263B;
+  --color-prussian-light: #22324d;
+  --color-dusk: #415A77;
+  --color-dusk-light: #526f92;
+  --color-lavender: #778DA9;
+  --color-lavender-light: #98abc2;
+  --color-alabaster: #E0E1DD;
+
+  --color-background: #0D1B2A;
+  --color-foreground: #E0E1DD;
+  --color-card: #1B263B;
+  --color-card-foreground: #E0E1DD;
+  --color-primary: #415A77;
+  --color-primary-foreground: #E0E1DD;
+  --color-secondary: #1B263B;
   --color-secondary-foreground: #778DA9;
-  --color-muted:                #1B263B;
-  --color-muted-foreground:     #778DA9;
-  --color-accent:               #415A77;
-  --color-accent-foreground:    #E0E1DD;
-  --color-destructive:          #c0392b;
+  --color-muted: #1B263B;
+  --color-muted-foreground: #778DA9;
+  --color-accent: #415A77;
+  --color-accent-foreground: #E0E1DD;
+  --color-destructive: #e63946;
   --color-destructive-foreground: #E0E1DD;
-  --color-border:               rgba(65, 90, 119, 0.35);
+  --color-border: rgba(65, 90, 119, 0.35);
 }
 
 :root {
-  --ink:       #0D1B2A;
-  --prussian:  #1B263B;
-  --dusk:      #415A77;
-  --lavender:  #778DA9;
+  --ink: #0D1B2A;
+  --prussian: #1B263B;
+  --dusk: #415A77;
+  --lavender: #778DA9;
   --alabaster: #E0E1DD;
 
-  --background:             #0D1B2A;
-  --foreground:             #E0E1DD;
-  --card:                   #1B263B;
-  --card-foreground:        #E0E1DD;
-  --primary:                #415A77;
-  --primary-foreground:     #E0E1DD;
-  --secondary:              #1B263B;
-  --secondary-foreground:   #778DA9;
-  --muted:                  #1B263B;
-  --muted-foreground:       #778DA9;
-  --accent:                 #415A77;
-  --accent-foreground:      #E0E1DD;
-  --destructive:            #c0392b;
-  --destructive-foreground: #E0E1DD;
-  --border:                 rgba(65, 90, 119, 0.35);
-  --border-hover:           rgba(119, 141, 169, 0.55);
-  --ring:                   #415A77;
+  --background: #0D1B2A;
+  --foreground: #E0E1DD;
+  --card: #1B263B;
+  --card-foreground: #E0E1DD;
+  --primary: #415A77;
+  --primary-foreground: #E0E1DD;
+  --secondary: #1B263B;
+  --secondary-foreground: #778DA9;
+  --muted: #1B263B;
+  --muted-foreground: #778DA9;
+  --accent: #415A77;
+  --accent-foreground: #E0E1DD;
+  --border: rgba(65, 90, 119, 0.35);
+  --border-hover: rgba(119, 141, 169, 0.55);
 }
 
-/* ─── Body ──────────────────────────────────────────────── */
+/* ─── Global Body & Atmosphere ─────────────────────────────────── */
 body {
   background-color: #0D1B2A;
   color: #E0E1DD;
   font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  selection-background-color: #415A77;
+  selection-color: #E0E1DD;
 }
 
-/* ─── Ambient depth background ──────────────────────────── */
+/* Ambient twilight illumination */
 body::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background:
-    radial-gradient(ellipse at 10% 10%,  rgba(65,  90, 119, 0.18) 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 15%,  rgba(27,  38,  59, 0.30) 0%, transparent 45%),
-    radial-gradient(ellipse at 55% 85%,  rgba(119,141, 169, 0.10) 0%, transparent 55%),
-    radial-gradient(ellipse at 80% 70%,  rgba(65,  90, 119, 0.10) 0%, transparent 40%);
+    radial-gradient(ellipse 90% 50% at 50% -10%, rgba(65, 90, 119, 0.28) 0%, transparent 70%),
+    radial-gradient(circle 800px at 90% 20%, rgba(27, 38, 59, 0.45) 0%, transparent 60%),
+    radial-gradient(circle 700px at 10% 85%, rgba(65, 90, 119, 0.18) 0%, transparent 50%),
+    radial-gradient(circle 500px at 80% 90%, rgba(119, 141, 169, 0.12) 0%, transparent 45%);
   pointer-events: none;
   z-index: -1;
 }
 
-/* ─── Subtle grid overlay ───────────────────────────────── */
+/* Tech dot matrix pattern */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(to right,  rgba(119, 141, 169, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(119, 141, 169, 0.04) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-image: 
+    radial-gradient(rgba(119, 141, 169, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
   pointer-events: none;
   z-index: -1;
 }
 
-/* ─── Glass Panels ──────────────────────────────────────── */
+/* ─── Premium Glassmorphism & Elevation ───────────────────────── */
 .glass-panel {
-  background: rgba(27, 38, 59, 0.80);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(65, 90, 119, 0.35);
+  background: rgba(27, 38, 59, 0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(65, 90, 119, 0.40);
   box-shadow:
-    0 8px 32px -8px rgba(13, 27, 42, 0.7),
-    inset 0 1px 0 rgba(224, 225, 221, 0.04);
+    0 12px 36px -8px rgba(13, 27, 42, 0.8),
+    inset 0 1px 0 rgba(224, 225, 221, 0.08);
 }
 
 .glass-card {
-  background: rgba(27, 38, 59, 0.60);
+  background: rgba(27, 38, 59, 0.55);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(65, 90, 119, 0.28);
+  border: 1px solid rgba(65, 90, 119, 0.30);
+  box-shadow: 0 4px 20px -4px rgba(13, 27, 42, 0.5);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
-  border-color: rgba(119, 141, 169, 0.50);
-  transform: translateY(-1px);
-  box-shadow: 0 12px 28px -8px rgba(13, 27, 42, 0.6);
-  background: rgba(65, 90, 119, 0.18);
+  background: rgba(41, 56, 82, 0.65);
+  border-color: rgba(119, 141, 169, 0.55);
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 32px -8px rgba(13, 27, 42, 0.75),
+    0 0 20px -4px rgba(65, 90, 119, 0.4),
+    inset 0 1px 0 rgba(224, 225, 221, 0.12);
 }
 
-/* ─── Gradient text ─────────────────────────────────────── */
+/* ─── Typography Accents ───────────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #E0E1DD 0%, #778DA9 50%, #415A77 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #E0E1DD 50%, #778DA9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.gradient-text-blue {
-  background: linear-gradient(135deg, #E0E1DD 0%, #778DA9 60%, #415A77 100%);
+.gradient-title {
+  background: linear-gradient(135deg, #FFFFFF 0%, #E0E1DD 40%, #778DA9 80%, #415A77 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* ─── Primary Glow Button ───────────────────────────────── */
+/* ─── Buttons & Controls ───────────────────────────────────────── */
+/* Primary High-Impact CTA (Luminous Alabaster on Dark Canvas) */
+.btn-primary {
+  background: linear-gradient(135deg, #E0E1DD 0%, #c8cbc4 100%);
+  color: #0D1B2A;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 0 24px -2px rgba(224, 225, 221, 0.4),
+    0 4px 14px rgba(13, 27, 42, 0.6);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #FFFFFF;
+  box-shadow:
+    0 0 32px 0px rgba(224, 225, 221, 0.65),
+    0 6px 18px rgba(13, 27, 42, 0.8);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Dusk-to-Prussian Tech Action Button */
 .glow-btn {
   position: relative;
-  background: linear-gradient(135deg, #415A77 0%, #1B263B 100%);
-  border: 1px solid rgba(119, 141, 169, 0.40);
-  box-shadow:
-    0 0 18px -4px rgba(65, 90, 119, 0.55),
-    inset 0 1px 0 rgba(224, 225, 221, 0.08);
-  transition: all 0.2s ease;
+  background: linear-gradient(135deg, #415A77 0%, #202e42 100%);
   color: #E0E1DD;
+  font-weight: 700;
+  border: 1px solid rgba(119, 141, 169, 0.45);
+  box-shadow:
+    0 0 20px -3px rgba(65, 90, 119, 0.6),
+    inset 0 1px 0 rgba(224, 225, 221, 0.15);
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .glow-btn:hover {
-  background: linear-gradient(135deg, #4e6b8a 0%, #273550 100%);
+  background: linear-gradient(135deg, #4d6a8c 0%, #293a52 100%);
+  border-color: rgba(224, 225, 221, 0.6);
   box-shadow:
-    0 0 26px -2px rgba(65, 90, 119, 0.75),
-    inset 0 1px 0 rgba(224, 225, 221, 0.12);
+    0 0 28px -1px rgba(119, 141, 169, 0.65),
+    inset 0 1px 0 rgba(224, 225, 221, 0.25);
   transform: translateY(-1px);
-  border-color: rgba(119, 141, 169, 0.65);
 }
 
-/* ─── Status glow helpers ───────────────────────────────── */
-.glow-emerald {
-  box-shadow: 0 0 18px -4px rgba(46, 160, 120, 0.40);
+.glow-btn:active {
+  transform: translateY(0);
 }
 
-.glow-dusk {
-  box-shadow: 0 0 18px -4px rgba(65, 90, 119, 0.50);
+/* Secondary Translucent Pill Button */
+.btn-secondary {
+  background: rgba(27, 38, 59, 0.7);
+  color: #E0E1DD;
+  border: 1px solid rgba(65, 90, 119, 0.45);
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.glow-lavender {
-  box-shadow: 0 0 18px -4px rgba(119, 141, 169, 0.40);
+.btn-secondary:hover {
+  background: rgba(65, 90, 119, 0.35);
+  border-color: rgba(119, 141, 169, 0.6);
+  color: #FFFFFF;
+  transform: translateY(-1px);
 }
 
-.glow-amber {
-  box-shadow: 0 0 18px -4px rgba(210, 160, 60, 0.35);
+/* ─── Range Slider Styling ─────────────────────────────────────── */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
 }
 
-.glow-rose {
-  box-shadow: 0 0 18px -4px rgba(192, 57, 43, 0.35);
+input[type="range"]::-webkit-slider-runnable-track {
+  background: rgba(13, 27, 42, 0.85);
+  border: 1px solid rgba(65, 90, 119, 0.4);
+  border-radius: 9999px;
+  height: 8px;
 }
 
-/* ─── Scrollbars ────────────────────────────────────────── */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -5px;
+  background: linear-gradient(135deg, #E0E1DD 0%, #778DA9 100%);
+  border: 2px solid #0D1B2A;
+  border-radius: 9999px;
+  height: 18px;
+  width: 18px;
+  box-shadow: 0 0 12px rgba(119, 141, 169, 0.8);
+  transition: all 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #FFFFFF;
+  box-shadow: 0 0 16px rgba(224, 225, 221, 1);
+}
+
+/* ─── Scrollbars ───────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(13, 27, 42, 0.60);
+  background: rgba(13, 27, 42, 0.75);
 }
 
 ::-webkit-scrollbar-thumb {
   background: rgba(65, 90, 119, 0.55);
   border-radius: 9999px;
+  border: 1px solid rgba(13, 27, 42, 0.3);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(119, 141, 169, 0.70);
+  background: rgba(119, 141, 169, 0.8);
 }
 
-/* ─── Selection ─────────────────────────────────────────── */
+/* ─── Selection Highlight ──────────────────────────────────────── */
 ::selection {
-  background: rgba(65, 90, 119, 0.45);
-  color: #E0E1DD;
+  background: rgba(65, 90, 119, 0.6);
+  color: #FFFFFF;
 }

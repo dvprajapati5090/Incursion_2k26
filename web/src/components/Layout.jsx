@@ -9,6 +9,8 @@ import {
   ChevronRight,
   Cpu,
   Layers,
+  Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import useImportStore from "@/stores/importStore";
 import useResultsStore from "@/stores/resultsStore";
@@ -29,19 +31,9 @@ export default function Layout({ children }) {
   const totalLoaded = enrichedTeams.length || rawTeams.length;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ color: "#E0E1DD", background: "#0D1B2A" }}>
-
+    <div className="min-h-screen flex flex-col bg-[#0D1B2A] text-[#E0E1DD]">
       {/* ── Top Header ─────────────────────────────────────────── */}
-      <header
-        className="sticky top-0 z-40 px-4 lg:px-8 py-3.5 transition-all"
-        style={{
-          background: "rgba(13, 27, 42, 0.92)",
-          borderBottom: "1px solid rgba(65, 90, 119, 0.30)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          boxShadow: "0 1px 24px -6px rgba(13,27,42,0.8)",
-        }}
-      >
+      <header className="sticky top-0 z-40 px-4 lg:px-8 py-3 bg-[#0D1B2A]/90 border-b border-[#415A77]/35 backdrop-blur-2xl shadow-xl shadow-[#0D1B2A]/50 transition-all">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
 
           {/* Brand Identity */}
@@ -49,51 +41,31 @@ export default function Layout({ children }) {
             <motion.div
               whileHover={{ rotate: 180, scale: 1.05 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="h-10 w-10 rounded-xl p-[1.5px] cursor-pointer"
-              style={{
-                background: "linear-gradient(135deg, #415A77 0%, #778DA9 100%)",
-                boxShadow: "0 0 20px -4px rgba(65,90,119,0.6)",
-              }}
+              className="h-10 w-10 rounded-xl p-[1px] bg-gradient-to-tr from-[#415A77] via-[#778DA9] to-[#E0E1DD] shadow-lg shadow-[#415A77]/40 flex items-center justify-center cursor-pointer"
             >
-              <div
-                className="h-full w-full rounded-[10px] flex items-center justify-center"
-                style={{ background: "#0D1B2A" }}
-              >
-                <Cpu className="h-5 w-5" style={{ color: "#778DA9" }} />
+              <div className="h-full w-full bg-[#1B263B] rounded-[11px] flex items-center justify-center">
+                <Cpu className="h-5 w-5 text-[#E0E1DD]" />
               </div>
             </motion.div>
 
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold tracking-tight" style={{ color: "#E0E1DD" }}>
+                <h1 className="text-lg font-black tracking-wider text-white">
                   INCURSION{" "}
-                  <span className="font-extrabold" style={{ color: "#778DA9" }}>2k26</span>
+                  <span className="font-extrabold text-[#778DA9]">2k26</span>
                 </h1>
-                <span
-                  className="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full"
-                  style={{
-                    background: "rgba(65, 90, 119, 0.20)",
-                    border: "1px solid rgba(65, 90, 119, 0.50)",
-                    color: "#778DA9",
-                  }}
-                >
+                <span className="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full bg-[#415A77]/25 text-[#E0E1DD] border border-[#778DA9]/40">
                   Track 3
                 </span>
               </div>
-              <p className="text-xs font-medium" style={{ color: "#778DA9" }}>
+              <p className="text-xs text-[#778DA9] font-medium tracking-tight">
                 Automated Team Recruiter &amp; Explainable Shortlisting
               </p>
             </div>
           </div>
 
           {/* Stepper Navigation */}
-          <nav
-            className="flex items-center p-1 rounded-xl"
-            style={{
-              background: "rgba(27, 38, 59, 0.70)",
-              border: "1px solid rgba(65, 90, 119, 0.30)",
-            }}
-          >
+          <nav className="flex items-center bg-[#1B263B]/80 p-1 rounded-xl border border-[#415A77]/40 shadow-inner">
             {steps.map((step, i) => {
               const Icon = step.icon;
               const isActive = location.pathname.startsWith(step.path);
@@ -103,46 +75,35 @@ export default function Layout({ children }) {
                 <div key={step.path} className="flex items-center">
                   <NavLink
                     to={step.path}
-                    className="relative flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
-                    style={{
-                      color: isActive
-                        ? "#E0E1DD"
+                    className={cn(
+                      "relative flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer",
+                      isActive
+                        ? "text-white"
                         : isPast
-                        ? "#778DA9"
-                        : "rgba(119, 141, 169, 0.45)",
-                    }}
+                        ? "text-[#E0E1DD]/80 hover:text-white hover:bg-white/[0.04]"
+                        : "text-[#778DA9]/60 hover:text-[#778DA9]"
+                    )}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="activeStepperTab"
-                        className="absolute inset-0 rounded-lg -z-10"
-                        style={{
-                          background: "linear-gradient(135deg, #415A77 0%, #2d445e 100%)",
-                          boxShadow: "0 4px 14px -4px rgba(65,90,119,0.60)",
-                          border: "1px solid rgba(119, 141, 169, 0.25)",
-                        }}
+                        className="absolute inset-0 bg-gradient-to-r from-[#415A77] to-[#2b3c52] rounded-lg -z-10 shadow-lg shadow-[#415A77]/40 border border-[#778DA9]/30"
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
                     <Icon
-                      className="h-3.5 w-3.5"
-                      style={{
-                        color: isActive
-                          ? "#E0E1DD"
-                          : isPast
-                          ? "#778DA9"
-                          : "rgba(119, 141, 169, 0.40)",
-                      }}
+                      className={cn(
+                        "h-3.5 w-3.5",
+                        isActive ? "text-[#E0E1DD]" : isPast ? "text-[#778DA9]" : "text-[#415A77]"
+                      )}
                     />
                     <span>{step.label}</span>
                     {step.stepNumber && (
                       <span
-                        className="text-[10px] font-mono px-1 rounded"
-                        style={{
-                          opacity: 0.7,
-                          background: isActive ? "rgba(13,27,42,0.30)" : "transparent",
-                          color: isActive ? "#E0E1DD" : "inherit",
-                        }}
+                        className={cn(
+                          "text-[10px] font-mono px-1 rounded opacity-75",
+                          isActive ? "bg-black/25 text-[#E0E1DD]" : "text-[#778DA9]"
+                        )}
                       >
                         {step.stepNumber}
                       </span>
@@ -150,7 +111,7 @@ export default function Layout({ children }) {
                   </NavLink>
 
                   {i < steps.length - 1 && (
-                    <ChevronRight className="h-3 w-3 mx-0.5 opacity-30" style={{ color: "#778DA9" }} />
+                    <ChevronRight className="h-3 w-3 text-[#415A77] mx-0.5 opacity-60" />
                   )}
                 </div>
               );
@@ -159,32 +120,20 @@ export default function Layout({ children }) {
 
           {/* Live Status Badge */}
           <div className="hidden lg:flex items-center gap-3">
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium"
-              style={{
-                background: "rgba(27, 38, 59, 0.80)",
-                border: "1px solid rgba(65, 90, 119, 0.28)",
-              }}
-            >
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#1B263B]/90 border border-[#415A77]/35 text-xs font-medium">
               <span className="relative flex h-2 w-2">
-                <span
-                  className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                  style={{ background: "#778DA9" }}
-                />
-                <span
-                  className="relative inline-flex rounded-full h-2 w-2"
-                  style={{ background: totalLoaded > 0 ? "#778DA9" : "#415A77" }}
-                />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span style={{ color: "#778DA9" }}>
-                {totalLoaded > 0 ? `${totalLoaded} Teams Active` : "Engine Ready"}
+              <span className="text-[#E0E1DD] font-medium">
+                {totalLoaded > 0 ? `${totalLoaded} Teams Loaded` : "Engine Ready"}
               </span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* ── Main Content ────────────────────────────────────────── */}
+      {/* ── Main View Container ─────────────────────────────────── */}
       <motion.main
         key={location.pathname}
         initial={{ opacity: 0, y: 8 }}
@@ -197,22 +146,12 @@ export default function Layout({ children }) {
       </motion.main>
 
       {/* ── Footer ──────────────────────────────────────────────── */}
-      <footer
-        className="py-4 px-6 text-center text-xs flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto w-full gap-2"
-        style={{
-          borderTop: "1px solid rgba(65, 90, 119, 0.20)",
-          background: "rgba(13, 27, 42, 0.50)",
-          color: "#415A77",
-        }}
-      >
+      <footer className="border-t border-[#415A77]/25 bg-[#0D1B2A]/80 py-4 px-6 text-center text-xs text-[#778DA9] flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto w-full gap-2">
         <div className="flex items-center gap-2">
-          <Layers className="h-3.5 w-3.5" style={{ color: "#415A77" }} />
+          <Layers className="h-3.5 w-3.5 text-[#778DA9]" />
           <span>Incursion 2k26 • Tunable Hackathon Shortlist Engine</span>
         </div>
-        <div
-          className="flex items-center gap-4 font-mono text-[11px]"
-          style={{ color: "#415A77" }}
-        >
+        <div className="flex items-center gap-4 text-[#778DA9]/80 font-mono text-[11px]">
           <span>Pure Web Worker Execution</span>
           <span>•</span>
           <span>Auditable &amp; Blind Compliant</span>
