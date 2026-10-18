@@ -20,6 +20,7 @@ import {
   Linkedin,
   Globe,
   Info,
+  Sparkles,
 } from "lucide-react";
 import {
   BarChart,
@@ -74,9 +75,9 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
   const statusCfg = STATUS_CONFIG[team.status] || STATUS_CONFIG.shortlisted;
 
   const chartData = (team.breakdown ?? []).map((b) => ({
-    name: b.label ?? b.criterionId,
-    contribution: Number((b.contribution ?? 0).toFixed(4)),
-    status: b.status,
+    name: b.label ?? b.metric ?? b.criterionId,
+    contribution: Number((b.score ?? b.contribution ?? 0).toFixed(2)),
+    status: b.status ?? (b.score != null ? "ok" : "missing"),
   }));
 
   const margin = team.margin ?? (team.score != null && team.cutoffScore != null ? team.score - team.cutoffScore : null);
@@ -274,6 +275,57 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
               </table>
             </div>
           </div>
+
+          {/* Engine Explanation Breakdown */}
+          {team.explanation && (
+            <div className="space-y-3 p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/20">
+              <h4 className="font-bold text-sm text-indigo-300 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-indigo-400" />
+                Executive Decision Summary
+              </h4>
+              {team.explanation.summary && (
+                <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                  {team.explanation.summary}
+                </p>
+              )}
+              {team.explanation.strengths?.length > 0 && (
+                <div className="space-y-1 pt-1">
+                  <p className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3 w-3" /> Key Strengths
+                  </p>
+                  <ul className="list-disc list-inside text-xs text-slate-300 space-y-0.5">
+                    {team.explanation.strengths.map((str, idx) => (
+                      <li key={idx} className="text-slate-300">{str}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {team.explanation.growthAreas?.length > 0 && (
+                <div className="space-y-1 pt-1">
+                  <p className="text-[11px] font-semibold text-amber-400 flex items-center gap-1.5">
+                    <AlertTriangle className="h-3 w-3" /> Growth Opportunities
+                  </p>
+                  <ul className="list-disc list-inside text-xs text-slate-300 space-y-0.5">
+                    {team.explanation.growthAreas.map((ga, idx) => (
+                      <li key={idx} className="text-slate-300">{ga}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {team.explanation.missingDataNotes?.length > 0 && (
+                <div className="space-y-1 pt-1">
+                  <p className="text-[11px] font-semibold text-rose-400 flex items-center gap-1.5">
+                    <Flag className="h-3 w-3" /> Missing Data Advisories
+                  </p>
+                  <ul className="list-disc list-inside text-xs text-slate-400 space-y-0.5">
+                    {team.explanation.missingDataNotes.map((note, idx) => (
+                      <li key={idx} className="text-slate-400">{note}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Explainability Audit Trail */}
           {team.reasons?.length > 0 && (
