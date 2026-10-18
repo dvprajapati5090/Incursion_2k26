@@ -12,7 +12,11 @@ export async function fetchResumeText(url) {
       accept: "application/pdf,*/*",
     });
   } catch (e) {
-    throw new Error(`resume_${e.message}`);
+    const renamed = {
+      timeout: "fetch_timeout",
+      network_error: "fetch_network_error",
+    };
+    throw new Error(`resume_${renamed[e.message] ?? e.message}`);
   }
   if (result.truncated) throw new Error("resume_too_large"); // a cut-off PDF is unreadable
 
