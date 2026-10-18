@@ -26,6 +26,7 @@ export function calculateTeamScore(team, criteria) {
   }
 
   return {
+    ...team,
     teamId: team.teamId,
     teamName: team.teamName,
     score:
