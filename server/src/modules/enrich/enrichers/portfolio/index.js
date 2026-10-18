@@ -49,7 +49,13 @@ export default {
       const failed = Object.fromEntries(
         METRIC_IDS.map((id) => [id, fetchFailed("portfolio", e.message)]),
       );
-      return { ...failed, "portfolio.is_reachable": reachable };
+      return {
+        ...failed,
+        "portfolio.is_reachable": reachable,
+        "portfolio.has_live_demo": ok("portfolio.has_live_demo", false, {
+          origin: "http_check",
+        }),
+      };
     }
     return toMetrics(page);
   },

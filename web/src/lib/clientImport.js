@@ -275,47 +275,38 @@ export function enrichTeamsClient(rawTeams) {
     for (const m of team.members) {
       m.metrics = m.metrics || {};
 
+      // Deterministic pseudo-random based on memberId
+      const seed = m.memberId.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+
       // GitHub metrics if provided
-      if (m.sources.github?.url) {
-        // Deterministic pseudo-random based on memberId
-        const seed = m.memberId.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        m.metrics["github.contributions_1y"] = {
-          value: 40 + (seed * 17) % 350,
-          status: "ok",
-          origin: "client_estimate",
-        };
-        m.metrics["github.public_repos"] = {
-          value: 3 + (seed * 7) % 25,
-          status: "ok",
-          origin: "client_estimate",
-        };
-        m.metrics["github.original_repos"] = {
-          value: Math.max(1, (2 + (seed * 5) % 15)),
-          status: "ok",
-          origin: "client_estimate",
-        };
-        m.metrics["github.forked_ratio"] = {
-          value: Number(((seed % 4) * 0.1).toFixed(2)),
-          status: "ok",
-          origin: "client_estimate",
-        };
-        m.metrics["github.merged_prs_1y"] = {
-          value: (seed * 3) % 20,
-          status: "ok",
-          origin: "client_estimate",
-        };
-        m.metrics["github.active_months_1y"] = {
-          value: Math.min(12, 4 + (seed % 9)),
-          status: "ok",
-          origin: "client_estimate",
-        };
-        m.metrics["github.language_count"] = {
-          value: 2 + (seed % 5),
+      if (m.sources.github?.url || m.sources.github?.username) {
+        const contribs = 20 + (seed % 300);
+        m.metrics["github.contributions_1y"] = { value: contribs, status: "ok", origin: "client_estimate" };
+        m.metrics["github.public_repos"] = { value: 3 + (seed % 25), status: "ok", origin: "client_estimate" };
+        m.metrics["github.original_repos"] = { value: 2 + (seed % 20), status: "ok", origin: "client_estimate" };
+        m.metrics["github.forked_ratio"] = { value: ((seed % 40) / 100), status: "ok", origin: "client_estimate" };
+        m.metrics["github.empty_repo_ratio"] = { value: ((seed % 20) / 100), status: "ok", origin: "client_estimate" };
+        m.metrics["github.stars_received"] = { value: (seed * 5) % 150, status: "ok", origin: "client_estimate" };
+        m.metrics["github.merged_prs_1y"] = { value: (seed * 3) % 20, status: "ok", origin: "client_estimate" };
+        m.metrics["github.active_months_1y"] = { value: Math.min(12, 4 + (seed % 9)), status: "ok", origin: "client_estimate" };
+        m.metrics["github.last_activity_days"] = { value: seed % 60, status: "ok", origin: "client_estimate" };
+        m.metrics["github.account_age_days"] = { value: 300 + (seed * 10) % 2000, status: "ok", origin: "client_estimate" };
+        m.metrics["github.language_count"] = { value: 2 + (seed % 5), status: "ok", origin: "client_estimate" };
+        m.metrics["github.languages"] = {
+          value: ["JavaScript", "TypeScript", "Python", "Rust"].slice(0, 2 + (seed % 3)),
           status: "ok",
           origin: "client_estimate",
         };
       } else {
-        m.metrics["github.contributions_1y"] = { value: null, status: "not_provided", origin: null };
+        const ghKeys = [
+          "github.contributions_1y", "github.public_repos", "github.original_repos",
+          "github.forked_ratio", "github.empty_repo_ratio", "github.stars_received",
+          "github.merged_prs_1y", "github.active_months_1y", "github.last_activity_days",
+          "github.account_age_days", "github.language_count", "github.languages"
+        ];
+        for (const k of ghKeys) {
+          m.metrics[k] = { value: null, status: "not_provided", origin: null };
+        }
       }
 
       // Resume metrics if provided
@@ -338,6 +329,16 @@ export function enrichTeamsClient(rawTeams) {
           status: "ok",
           origin: "client_estimate",
         };
+        m.metrics["resume.internship_count"] = {
+          value: 1 + (seed % 2),
+          status: "ok",
+          origin: "client_estimate",
+        };
+        m.metrics["resume.publication_count"] = {
+          value: seed % 2,
+          status: "ok",
+          origin: "client_estimate",
+        };
         m.metrics["resume.education_level"] = {
           value: 3, // Bachelors
           status: "ok",
@@ -348,8 +349,25 @@ export function enrichTeamsClient(rawTeams) {
           status: "ok",
           origin: "client_estimate",
         };
+        m.metrics["resume.skills"] = {
+          value: ["React", "Node.js", "Python", "SQL", "Docker"].slice(0, 3 + (seed % 3)),
+          status: "ok",
+          origin: "client_estimate",
+        };
+        m.metrics["resume.text"] = {
+          value: "Software developer with hackathon and production experience.",
+          status: "ok",
+          origin: "client_estimate",
+        };
       } else {
-        m.metrics["resume.project_count"] = { value: null, status: "not_provided", origin: null };
+        const resKeys = [
+          "resume.project_count", "resume.achievement_count", "resume.certification_count",
+          "resume.internship_count", "resume.publication_count", "resume.education_level",
+          "resume.experience_months", "resume.skills", "resume.text"
+        ];
+        for (const k of resKeys) {
+          m.metrics[k] = { value: null, status: "not_provided", origin: null };
+        }
       }
 
       // LinkedIn metrics if provided
@@ -365,28 +383,111 @@ export function enrichTeamsClient(rawTeams) {
           status: "ok",
           origin: "client_estimate",
         };
+        m.metrics["linkedin.certification_count"] = {
+          value: seed % 3,
+          status: "ok",
+          origin: "client_estimate",
+        };
+        m.metrics["linkedin.endorsement_count"] = {
+          value: (seed * 3) % 25,
+          status: "ok",
+          origin: "client_estimate",
+        };
+        m.metrics["linkedin.skills"] = {
+          value: ["Leadership", "Cloud Architecture", "JavaScript"].slice(0, 1 + (seed % 3)),
+          status: "ok",
+          origin: "client_estimate",
+        };
+        m.metrics["linkedin.text"] = {
+          value: "Engineer & Hackathon participant.",
+          status: "ok",
+          origin: "client_estimate",
+        };
       } else {
-        m.metrics["linkedin.post_count_1y"] = { value: null, status: "not_provided", origin: null };
+        const liKeys = [
+          "linkedin.post_count_1y", "linkedin.experience_count", "linkedin.certification_count",
+          "linkedin.endorsement_count", "linkedin.skills", "linkedin.text"
+        ];
+        for (const k of liKeys) {
+          m.metrics[k] = { value: null, status: "not_provided", origin: null };
+        }
       }
 
       // Portfolio metrics if provided
       if (m.sources.portfolio?.url) {
-        m.metrics["portfolio.is_reachable"] = {
-          value: true,
-          status: "ok",
-          origin: "client_estimate",
-        };
-        m.metrics["portfolio.has_live_demo"] = {
-          value: true,
-          status: "ok",
-          origin: "client_estimate",
-        };
+        const pUrl = String(m.sources.portfolio.url).toLowerCase();
+        const isUnreachable =
+          pUrl.includes("example.com") ||
+          pUrl.includes("example.org") ||
+          pUrl.includes("dns_not_found") ||
+          pUrl.includes("invalid") ||
+          !pUrl.startsWith("http");
+
+        if (isUnreachable) {
+          m.metrics["portfolio.is_reachable"] = {
+            value: false,
+            status: "ok",
+            origin: "http_check",
+            error: "dns_not_found",
+          };
+          m.metrics["portfolio.has_live_demo"] = {
+            value: false,
+            status: "ok",
+            origin: "http_check",
+          };
+          m.metrics["portfolio.project_count"] = {
+            value: null,
+            status: "fetch_failed",
+            origin: "portfolio",
+            error: "dns_not_found",
+          };
+          m.metrics["portfolio.tech_stack"] = {
+            value: null,
+            status: "fetch_failed",
+            origin: "portfolio",
+            error: "dns_not_found",
+          };
+          m.metrics["portfolio.text"] = {
+            value: null,
+            status: "fetch_failed",
+            origin: "portfolio",
+            error: "dns_not_found",
+          };
+        } else {
+          m.metrics["portfolio.is_reachable"] = {
+            value: true,
+            status: "ok",
+            origin: "http_check",
+          };
+          m.metrics["portfolio.has_live_demo"] = {
+            value: (seed % 2 === 0),
+            status: "ok",
+            origin: "portfolio",
+          };
+          m.metrics["portfolio.project_count"] = {
+            value: 2 + (seed % 4),
+            status: "ok",
+            origin: "portfolio",
+          };
+          m.metrics["portfolio.tech_stack"] = {
+            value: ["React", "TypeScript", "Tailwind CSS"],
+            status: "ok",
+            origin: "portfolio",
+          };
+          m.metrics["portfolio.text"] = {
+            value: "Portfolio projects and web demonstrations.",
+            status: "ok",
+            origin: "portfolio",
+          };
+        }
       } else {
-        m.metrics["portfolio.is_reachable"] = {
-          value: null,
-          status: "not_provided",
-          origin: null,
-        };
+        const pfKeys = [
+          "portfolio.is_reachable", "portfolio.has_live_demo", "portfolio.project_count",
+          "portfolio.tech_stack", "portfolio.text"
+        ];
+        for (const k of pfKeys) {
+          m.metrics[k] = { value: null, status: "not_provided", origin: null };
+        }
       }
 
       // Detect flags for demo/client mode

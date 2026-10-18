@@ -197,7 +197,7 @@ export function getSafeFlagDetail(flag, blindMode = false) {
 /**
  * Formats a metric value for display, handling all edge cases from Sections 5, 7, and 8.
  */
-export function formatMetricValue(metricId, entry) {
+export function formatMetricValue(metricId, entry, allMemberMetrics = {}) {
   if (!entry) return { display: "—", status: "not_provided" };
 
   const { value, status, note } = entry;
@@ -219,6 +219,62 @@ export function formatMetricValue(metricId, entry) {
     };
   }
 
+  // Safety guard: if portfolio is unreachable, live demo cannot be true or available
+  if (metricId === "portfolio.has_live_demo") {
+    const reachable = allMemberMetrics?.["portfolio.is_reachable"];
+    if (reachable && reachable.value === false) {
+      return {
+        display: "No",
+        status: "ok",
+        tooltip: reachable.error
+          ? `Site unreachable (${formatFailureReason(reachable.error)}): live demo not available`
+          : "Portfolio website is unreachable; no live demo available",
+      };
+    }
+  }
+
+  // Portfolio reachability explicit display
+  if (metricId === "portfolio.is_reachable" && value === false) {
+    return {
+      display: "Unreachable",
+      status: status || "ok",
+      tooltip: entry.error ? formatFailureReason(entry.error) : "Website could not be reached",
+    };
+  }
+
+  // Resume / LinkedIn Education Level ordinal formatting
+  if (metricId === "resume.education_level" || metricId === "linkedin.education_level") {
+    if (typeof value === "number") {
+      const EDU_MAP = {
+        0: "None / Unspecified",
+        1: "High School",
+        2: "Associate / Diploma",
+        3: "Bachelor's Degree",
+        4: "Master's Degree",
+        5: "Doctorate / Ph.D.",
+      };
+      return {
+        display: EDU_MAP[value] || `Level ${value}`,
+        status: status || "ok",
+        tooltip: `Education level ordinal: ${value}`,
+      };
+    }
+  }
+
+  // Resume / LinkedIn Experience Months formatting
+  if (
+    (metricId === "resume.experience_months" || metricId === "linkedin.experience_months") &&
+    typeof value === "number"
+  ) {
+    const years = (value / 12).toFixed(1);
+    const display = value >= 12 ? `${value} mos (${years} yrs)` : `${value} mos`;
+    return {
+      display,
+      status: status || "ok",
+      tooltip: `${value} months professional experience`,
+    };
+  }
+
   // Rule: Never show low-confidence 0 as real zero
   if (status === "low_confidence" && (value === 0 || value === "0")) {
     return {
@@ -234,6 +290,16 @@ export function formatMetricValue(metricId, entry) {
       display: "365+ days",
       status: status || "ok",
       tooltip: "No public contributions detected in past 12 months",
+    };
+  }
+
+  // Raw text metrics (e.g. resume.text, linkedin.text, portfolio.text)
+  if (metricId.endsWith(".text") && typeof value === "string") {
+    const charCount = value.length;
+    return {
+      display: charCount > 0 ? `${charCount.toLocaleString()} chars text` : "Empty",
+      status: status || "ok",
+      tooltip: value.slice(0, 160) + (charCount > 160 ? "..." : ""),
     };
   }
 
