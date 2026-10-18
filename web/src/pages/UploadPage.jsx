@@ -16,13 +16,9 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
-  Server,
   Sparkles,
   RefreshCw,
   Zap,
-  Layers,
-  Activity,
-  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { uploadFile, getImport, enrichImport, getJob, getEnriched, getHealth } from "@/lib/api";
@@ -169,21 +165,8 @@ export default function UploadPage() {
     if (file) handleFile(file);
   }, [handleFile]);
 
-  // Quick sample loader for demonstrations
-  const handleLoadSample = async () => {
-    const sampleCsv = `team_id,team_name,member_name,member_email,is_lead,resume_url,github_url,linkedin_url,portfolio_url
-T-001,Byte Builders,Aarav Shah,aarav@example.com,TRUE,https://drive.example.com/aarav.pdf,https://github.com/aarav-dev,https://linkedin.com/in/aaravshah,https://aarav.dev
-T-001,Byte Builders,Meera Patel,meera@example.com,FALSE,https://drive.example.com/meera.pdf,https://github.com/meera-p,,
-T-001,Byte Builders,Rohan Desai,rohan@example.com,FALSE,,https://github.com/rohand,https://linkedin.com/in/rohandesai,
-T-002,Solo Stack,Isha Mehta,isha@example.com,TRUE,https://drive.example.com/isha.pdf,,https://linkedin.com/in/ishamehta,https://isha.codes
-T-003,Null Pointers,Kabir Rao,kabir@example.com,TRUE,,https://github.com/kabir-rao,,
-T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
-
-    const file = new File([sampleCsv], "teams.sample.csv", { type: "text/csv" });
-    await handleFile(file);
-  };
-
   // Re-upload with mapping chosen from ColumnMapper
+
   const handleApplyMapping = async () => {
     if (lastFile) {
       await handleFile(lastFile, columnMap);
@@ -299,7 +282,7 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
           </p>
         </div>
 
-        {/* Server & Demo Badges */}
+        {/* Server Status Badge */}
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-medium backdrop-blur-md">
             <span
@@ -327,17 +310,6 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
               <RefreshCw className="h-3 w-3" />
             </button>
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleLoadSample}
-            disabled={phase === "uploading" || phase === "enriching"}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 hover:from-indigo-500/30 hover:to-cyan-500/30 border border-cyan-500/30 text-cyan-300 text-xs font-bold shadow-lg shadow-cyan-950/20 transition cursor-pointer"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-spin" style={{ animationDuration: "6s" }} />
-            Load Sample CSV
-          </motion.button>
         </div>
       </div>
 
@@ -526,14 +498,6 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
               )}
               Enrich Profiles
             </motion.button>
-
-            <button
-              onClick={() => navigate("/config")}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/[0.05] text-slate-300 text-xs font-semibold transition cursor-pointer"
-            >
-              Skip Enrichment
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
           </div>
         </motion.div>
       )}
