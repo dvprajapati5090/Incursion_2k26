@@ -26,37 +26,37 @@ export default function ImportReport({ report }) {
       label: "Teams Identified",
       value: teamsFound ?? 0,
       icon: Layers,
-      color: "from-indigo-500/20 to-indigo-500/5",
-      border: "border-indigo-500/30",
-      textColor: "text-indigo-400",
-      glow: "glow-subtle",
+      color: "from-[#415A77]/25 to-[#1B263B]/60",
+      border: "border-[#415A77]/60",
+      textColor: "text-[#E0E1DD]",
+      glow: "shadow-lg shadow-[#0D1B2A]/50",
     },
     {
       label: "Total Applicants",
       value: membersFound ?? 0,
       icon: Users,
-      color: "from-cyan-500/20 to-cyan-500/5",
-      border: "border-cyan-500/30",
-      textColor: "text-cyan-400",
-      glow: "glow-cyan",
+      color: "from-[#415A77]/25 to-[#1B263B]/60",
+      border: "border-[#415A77]/60",
+      textColor: "text-[#E0E1DD]",
+      glow: "shadow-lg shadow-[#0D1B2A]/50",
     },
     {
       label: "Integrity Errors",
       value: issueCounts?.error ?? 0,
       icon: AlertTriangle,
-      color: (issueCounts?.error > 0) ? "from-rose-500/20 to-rose-500/5" : "from-slate-800/40 to-slate-800/10",
-      border: (issueCounts?.error > 0) ? "border-rose-500/40" : "border-white/10",
-      textColor: (issueCounts?.error > 0) ? "text-rose-400" : "text-slate-400",
-      glow: (issueCounts?.error > 0) ? "glow-rose" : "",
+      color: (issueCounts?.error > 0) ? "from-rose-500/25 to-rose-950/30" : "from-[#1B263B]/50 to-[#1B263B]/20",
+      border: (issueCounts?.error > 0) ? "border-rose-500/50" : "border-[#415A77]/40",
+      textColor: (issueCounts?.error > 0) ? "text-rose-400" : "text-[#778DA9]",
+      glow: (issueCounts?.error > 0) ? "shadow-lg shadow-rose-950/40" : "",
     },
     {
       label: "Format Warnings",
       value: issueCounts?.warning ?? 0,
       icon: ShieldCheck,
-      color: (issueCounts?.warning > 0) ? "from-amber-500/20 to-amber-500/5" : "from-emerald-500/20 to-emerald-500/5",
-      border: (issueCounts?.warning > 0) ? "border-amber-500/30" : "border-emerald-500/30",
+      color: (issueCounts?.warning > 0) ? "from-amber-500/25 to-amber-950/30" : "from-emerald-500/20 to-emerald-950/30",
+      border: (issueCounts?.warning > 0) ? "border-amber-500/50" : "border-emerald-500/40",
       textColor: (issueCounts?.warning > 0) ? "text-amber-400" : "text-emerald-400",
-      glow: (issueCounts?.warning > 0) ? "glow-amber" : "glow-emerald",
+      glow: (issueCounts?.warning > 0) ? "shadow-lg shadow-amber-950/40" : "shadow-lg shadow-emerald-950/40",
     },
   ];
 
@@ -72,19 +72,19 @@ export default function ImportReport({ report }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="glass-panel rounded-2xl p-6 border border-white/10 space-y-6"
+      className="glass-panel rounded-2xl p-6 border border-[#415A77]/30 space-y-6"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+          <div className="p-2 rounded-xl bg-[#415A77]/15 border border-[#415A77]/35 text-[#415A77]">
             <FileCheck2 className="h-5 w-5" />
           </div>
           <div>
             <h3 className="font-bold text-base text-white tracking-wide">Data Telemetry & Audit Report</h3>
-            <p className="text-xs text-slate-400">Verified tabular data normalized into canonical team structures</p>
+            <p className="text-xs text-[#778DA9]/80">Verified tabular data normalized into canonical team structures</p>
           </div>
         </div>
-        <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+        <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-[#415A77]/40 flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Parsed Successfully
         </span>
@@ -102,7 +102,7 @@ export default function ImportReport({ report }) {
               transition={{ delay: idx * 0.05 }}
               className={`relative overflow-hidden rounded-xl border ${item.border} bg-gradient-to-b ${item.color} p-4 backdrop-blur-md ${item.glow}`}
             >
-              <div className="flex items-center justify-between text-slate-400 mb-2">
+              <div className="flex items-center justify-between text-[#778DA9]/80 mb-2">
                 <span className="text-xs font-medium">{item.label}</span>
                 <Icon className={`h-4 w-4 ${item.textColor}`} />
               </div>
@@ -116,13 +116,13 @@ export default function ImportReport({ report }) {
 
       {/* Source Coverage Section */}
       {sourceCoverage && (
-        <div className="space-y-3 bg-slate-900/40 rounded-xl p-4 border border-white/[0.05]">
+        <div className="space-y-3 bg-[#1B263B]/40 rounded-xl p-4 border border-[#415A77]/18">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+            <span className="font-semibold text-[#778DA9] flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-[#778DA9]" />
               Multi-Source Profile Signal Coverage
             </span>
-            <span className="text-slate-400 font-mono">
+            <span className="text-[#778DA9]/80 font-mono">
               Evaluated across {sourceCoverage.members} applicants
             </span>
           </div>
@@ -135,23 +135,23 @@ export default function ImportReport({ report }) {
                 : 0;
 
               return (
-                <div key={source} className="bg-slate-950/50 rounded-lg p-3 border border-white/[0.06] space-y-2">
+                <div key={source} className="bg-[#0D1B2A]/50 rounded-lg p-3 border border-[#415A77]/20 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="capitalize font-medium text-slate-300 flex items-center gap-1.5">
-                      <Icon className="h-3.5 w-3.5 text-indigo-400" />
+                    <span className="capitalize font-medium text-[#778DA9] flex items-center gap-1.5">
+                      <Icon className="h-3.5 w-3.5 text-[#415A77]" />
                       {source}
                     </span>
-                    <span className="font-mono font-bold text-cyan-300">{pct}%</span>
+                    <span className="font-mono font-bold text-[#778DA9]">{pct}%</span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                  <div className="h-1.5 rounded-full bg-[#1B263B] overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${pct}%` }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
-                      className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full"
+                      className="h-full bg-gradient-to-r from-[#415A77] to-[#778DA9] rounded-full"
                     />
                   </div>
-                  <p className="text-[10px] text-slate-500 font-mono">
+                  <p className="text-[10px] text-[#415A77] font-mono">
                     {count} of {sourceCoverage.members} provided
                   </p>
                 </div>
@@ -164,18 +164,18 @@ export default function ImportReport({ report }) {
       {/* Team Size Distribution */}
       {teamSizes && Object.keys(teamSizes).length > 0 && (
         <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
-          <span className="text-slate-400 font-medium flex items-center gap-1.5 mr-2">
-            <Users className="h-3.5 w-3.5 text-indigo-400" /> Team Size Distribution:
+          <span className="text-[#778DA9]/80 font-medium flex items-center gap-1.5 mr-2">
+            <Users className="h-3.5 w-3.5 text-[#415A77]" /> Team Size Distribution:
           </span>
           {Object.entries(teamSizes)
             .sort(([a], [b]) => Number(a) - Number(b))
             .map(([size, count]) => (
               <span
                 key={size}
-                className="px-3 py-1 rounded-lg bg-slate-800/80 border border-white/[0.08] text-slate-200 text-xs font-medium flex items-center gap-1.5"
+                className="px-3 py-1 rounded-lg bg-[#1B263B]/80 border border-[#415A77]/25 text-[#E0E1DD] text-xs font-medium flex items-center gap-1.5"
               >
-                <span className="text-slate-400 font-mono">{size}p:</span>
-                <strong className="text-cyan-300 font-mono">{count}</strong> teams
+                <span className="text-[#778DA9]/80 font-mono">{size}p:</span>
+                <strong className="text-[#778DA9] font-mono">{count}</strong> teams
               </span>
             ))}
         </div>
@@ -183,13 +183,13 @@ export default function ImportReport({ report }) {
 
       {/* Issues list (if any) — Must-do rule: Show every issue to the organizer; nothing dropped silently */}
       {issues?.length > 0 && (
-        <div className="border border-white/10 bg-slate-900/60 rounded-xl p-4 space-y-3 text-xs">
+        <div className="border border-[#415A77]/30 bg-[#1B263B]/60 rounded-xl p-4 space-y-3 text-xs">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-white flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-400" />
               Import Data Hygiene & Integrity Log ({issues.length} item{issues.length !== 1 ? "s" : ""})
             </span>
-            <span className="text-[11px] font-mono text-slate-400">
+            <span className="text-[11px] font-mono text-[#778DA9]/80">
               {issueCounts?.error || 0} errors • {issueCounts?.warning || 0} warnings
             </span>
           </div>
@@ -208,9 +208,9 @@ export default function ImportReport({ report }) {
                     {iss.severity}
                   </span>
                   <div>
-                    <p className="text-slate-200">{iss.message}</p>
+                    <p className="text-[#E0E1DD]">{iss.message}</p>
                     {iss.code && (
-                      <span className="text-[10px] font-mono text-slate-500 mr-2">
+                      <span className="text-[10px] font-mono text-[#415A77] mr-2">
                         code: {iss.code}
                       </span>
                     )}
@@ -218,7 +218,7 @@ export default function ImportReport({ report }) {
                 </div>
 
                 {(iss.row != null || iss.column) && (
-                  <div className="text-[10px] font-mono text-slate-400 shrink-0 text-right">
+                  <div className="text-[10px] font-mono text-[#778DA9]/80 shrink-0 text-right">
                     {iss.row != null && <span>row {iss.row}</span>}
                     {iss.row != null && iss.column && <span> • </span>}
                     {iss.column && <span>col "{iss.column}"</span>}

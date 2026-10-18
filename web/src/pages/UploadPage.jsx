@@ -16,13 +16,9 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
-  Server,
   Sparkles,
   RefreshCw,
   Zap,
-  Layers,
-  Activity,
-  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { uploadFile, getImport, enrichImport, getJob, getEnriched, getHealth } from "@/lib/api";
@@ -169,21 +165,8 @@ export default function UploadPage() {
     if (file) handleFile(file);
   }, [handleFile]);
 
-  // Quick sample loader for demonstrations
-  const handleLoadSample = async () => {
-    const sampleCsv = `team_id,team_name,member_name,member_email,is_lead,resume_url,github_url,linkedin_url,portfolio_url
-T-001,Byte Builders,Aarav Shah,aarav@example.com,TRUE,https://drive.example.com/aarav.pdf,https://github.com/aarav-dev,https://linkedin.com/in/aaravshah,https://aarav.dev
-T-001,Byte Builders,Meera Patel,meera@example.com,FALSE,https://drive.example.com/meera.pdf,https://github.com/meera-p,,
-T-001,Byte Builders,Rohan Desai,rohan@example.com,FALSE,,https://github.com/rohand,https://linkedin.com/in/rohandesai,
-T-002,Solo Stack,Isha Mehta,isha@example.com,TRUE,https://drive.example.com/isha.pdf,,https://linkedin.com/in/ishamehta,https://isha.codes
-T-003,Null Pointers,Kabir Rao,kabir@example.com,TRUE,,https://github.com/kabir-rao,,
-T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
-
-    const file = new File([sampleCsv], "teams.sample.csv", { type: "text/csv" });
-    await handleFile(file);
-  };
-
   // Re-upload with mapping chosen from ColumnMapper
+
   const handleApplyMapping = async () => {
     if (lastFile) {
       await handleFile(lastFile, columnMap);
@@ -286,22 +269,22 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
       {/* Hero Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-3">
-            <Zap className="h-3.5 w-3.5 text-cyan-400" />
-            Stage 1 • Data Intake & Multi-Source Normalization
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1B263B] border border-[#415A77]/60 text-[#E0E1DD] text-xs font-semibold mb-3 shadow-sm">
+            <Zap className="h-3.5 w-3.5 text-[#778DA9]" />
+            <span>Stage 1 • Data Intake &amp; Multi-Source Normalization</span>
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
             Load Hackathon Registrations
           </h2>
-          <p className="text-slate-400 mt-2 text-sm max-w-2xl">
+          <p className="text-[#778DA9] mt-2 text-sm max-w-2xl leading-relaxed">
             Accepts raw Google Forms exports, multi-member CSVs, and canonical JSON.
             Individual profile links (GitHub, Resume, Portfolio, LinkedIn) are mapped and normalized automatically.
           </p>
         </div>
 
-        {/* Server & Demo Badges */}
+        {/* Server Status Badge */}
         <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900/80 border border-white/10 text-xs font-medium backdrop-blur-md">
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#1B263B] border border-[#415A77]/50 text-xs font-medium shadow-md">
             <span
               className={cn(
                 "h-2 w-2 rounded-full",
@@ -309,10 +292,10 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
                   ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
                   : serverOnline === false
                   ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]"
-                  : "bg-slate-500"
+                  : "bg-[#778DA9]"
               )}
             />
-            <span className="text-slate-300 font-mono">
+            <span className="text-[#E0E1DD] font-mono">
               {serverOnline === true
                 ? "Backend: Port 4000"
                 : serverOnline === false
@@ -322,22 +305,11 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
             <button
               onClick={checkHealth}
               title="Refresh connection"
-              className="text-slate-400 hover:text-white transition ml-1 cursor-pointer"
+              className="text-[#778DA9] hover:text-white transition ml-1 cursor-pointer"
             >
               <RefreshCw className="h-3 w-3" />
             </button>
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleLoadSample}
-            disabled={phase === "uploading" || phase === "enriching"}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 hover:from-indigo-500/30 hover:to-cyan-500/30 border border-cyan-500/30 text-cyan-300 text-xs font-bold shadow-lg shadow-cyan-950/20 transition cursor-pointer"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-cyan-400 animate-spin" style={{ animationDuration: "6s" }} />
-            Load Sample CSV
-          </motion.button>
         </div>
       </div>
 
@@ -348,15 +320,15 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center justify-between p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-500/30 text-indigo-300 text-xs font-medium"
+            className="flex items-center justify-between p-4 rounded-xl bg-[#1B263B] border border-[#415A77]/60 text-[#E0E1DD] text-xs font-medium shadow-lg"
           >
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-cyan-400 flex-shrink-0" />
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="h-4 w-4 text-[#778DA9] shrink-0" />
               <span>{infoNotice}</span>
             </div>
             <button
               onClick={() => setInfoNotice(null)}
-              className="text-slate-400 hover:text-white underline ml-4 text-[11px] cursor-pointer"
+              className="text-[#778DA9] hover:text-white underline ml-4 text-[11px] cursor-pointer"
             >
               Dismiss
             </button>
@@ -366,7 +338,7 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
 
       {/* Futuristic Dropzone */}
       <motion.div
-        whileHover={{ borderColor: "rgba(99, 102, 241, 0.4)" }}
+        whileHover={{ scale: 1.005 }}
         onDragOver={(e) => {
           e.preventDefault();
           setDragging(true);
@@ -375,10 +347,10 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
         onDrop={onDrop}
         onClick={() => document.getElementById("file-input").click()}
         className={cn(
-          "relative overflow-hidden rounded-2xl border-2 border-dashed p-10 md:p-14 text-center transition-all duration-300 cursor-pointer glass-panel",
+          "relative overflow-hidden rounded-2xl border-2 border-dashed p-10 md:p-14 text-center transition-all duration-300 cursor-pointer",
           dragging
-            ? "border-cyan-400 bg-cyan-500/5 shadow-[0_0_30px_rgba(6,182,212,0.2)]"
-            : "border-white/10 hover:border-indigo-500/40 hover:bg-white/[0.02]",
+            ? "border-[#E0E1DD] bg-[#415A77]/30 shadow-[0_0_40px_rgba(119,141,169,0.35)]"
+            : "border-[#415A77]/60 bg-[#1B263B]/60 hover:border-[#778DA9] hover:bg-[#1B263B]/85 hover:shadow-[0_0_30px_rgba(65,90,119,0.3)]",
           phase === "uploading" && "pointer-events-none opacity-60"
         )}
       >
@@ -392,17 +364,17 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
 
         {phase === "uploading" ? (
           <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-12 w-12 text-cyan-400 animate-spin" />
+            <Loader2 className="h-12 w-12 text-[#E0E1DD] animate-spin" />
             <div>
-              <p className="font-semibold text-white">Normalizing registrations…</p>
-              <p className="text-xs text-slate-400 mt-1 font-mono">{filename || "Processing file"}</p>
+              <p className="font-bold text-white text-base">Normalizing registrations…</p>
+              <p className="text-xs text-[#778DA9] mt-1 font-mono">{filename || "Processing file"}</p>
             </div>
           </div>
         ) : phase === "enriching" ? (
           <div className="flex flex-col items-center gap-4 w-full max-w-md mx-auto">
             <div className="relative">
-              <div className="absolute inset-0 rounded-full blur-md bg-indigo-500/30 animate-pulse" />
-              <Loader2 className="h-12 w-12 text-indigo-400 animate-spin relative" />
+              <div className="absolute inset-0 rounded-full blur-md bg-[#415A77]/40 animate-pulse" />
+              <Loader2 className="h-12 w-12 text-[#E0E1DD] animate-spin relative" />
             </div>
             <div className="text-center w-full space-y-2">
               <p className="font-bold text-white text-base">
@@ -410,18 +382,18 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
               </p>
 
               {activeJob?.progress?.total > 0 && (
-                <div className="space-y-1">
-                  <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+                <div className="space-y-1.5">
+                  <div className="h-2.5 w-full rounded-full bg-[#0D1B2A] border border-[#415A77]/50 overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full transition-all duration-300"
+                      className="h-full bg-gradient-to-r from-[#415A77] via-[#778DA9] to-[#E0E1DD] rounded-full transition-all duration-300"
                       style={{
                         width: `${Math.round((activeJob.progress.done / activeJob.progress.total) * 100)}%`,
                       }}
                     />
                   </div>
-                  <div className="flex justify-between text-[11px] font-mono text-slate-400">
+                  <div className="flex justify-between text-[11px] font-mono text-[#778DA9]">
                     <span>{activeJob.progress.done} of {activeJob.progress.total} processed</span>
-                    <span>{Math.round((activeJob.progress.done / activeJob.progress.total) * 100)}%</span>
+                    <span className="font-bold text-[#E0E1DD]">{Math.round((activeJob.progress.done / activeJob.progress.total) * 100)}%</span>
                   </div>
                 </div>
               )}
@@ -429,12 +401,12 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
           </div>
         ) : isImported ? (
           <div className="flex flex-col items-center gap-3">
-            <div className="h-14 w-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-950/40">
+            <div className="h-14 w-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-[#0D1B2A]/60">
               <CheckCircle2 className="h-8 w-8" />
             </div>
             <div>
               <p className="font-bold text-white text-lg">{filename}</p>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#778DA9] mt-0.5">
                 {isEnriched
                   ? "Enrichment complete — ready for criteria configuration"
                   : "Imported & normalized — click to select a different file"}
@@ -443,23 +415,23 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4">
-            <div className="h-16 w-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-xl shadow-indigo-950/40 group-hover:scale-105 transition-transform">
-              <Upload className="h-8 w-8 text-indigo-400" />
+            <div className="h-16 w-16 rounded-2xl bg-gradient-to-b from-[#415A77]/30 to-[#1B263B] border border-[#778DA9]/40 flex items-center justify-center text-[#E0E1DD] shadow-xl shadow-[#0D1B2A]/70 group-hover:scale-105 transition-transform">
+              <Upload className="h-8 w-8 text-[#E0E1DD]" />
             </div>
             <div>
               <p className="font-bold text-white text-lg">
                 Drag and drop your team spreadsheet or JSON
               </p>
-              <p className="text-xs text-slate-400 mt-1.5 max-w-md mx-auto">
+              <p className="text-xs text-[#778DA9] mt-1.5 max-w-md mx-auto">
                 Supports Google Forms CSV (one row per member), multi-member records, and custom team fields. Max 20 MB.
               </p>
             </div>
-            <div className="flex items-center gap-3 text-xs text-slate-400 font-mono pt-2">
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-white/10">
-                <FileText className="h-3.5 w-3.5 text-indigo-400" /> .csv
+            <div className="flex items-center gap-3 text-xs font-mono pt-2">
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0D1B2A] border border-[#415A77]/50 text-[#E0E1DD]">
+                <FileText className="h-3.5 w-3.5 text-[#778DA9]" /> .csv
               </span>
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-white/10">
-                <FileJson className="h-3.5 w-3.5 text-cyan-400" /> .json
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0D1B2A] border border-[#415A77]/50 text-[#E0E1DD]">
+                <FileJson className="h-3.5 w-3.5 text-[#778DA9]" /> .json
               </span>
             </div>
           </div>
@@ -468,8 +440,8 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
 
       {/* Error alert */}
       {error && (
-        <div className="flex items-center gap-3 text-rose-300 text-sm p-4 bg-rose-950/30 border border-rose-500/30 rounded-xl">
-          <AlertCircle className="h-5 w-5 flex-shrink-0 text-rose-400" />
+        <div className="flex items-center gap-3 text-rose-200 text-sm p-4 bg-rose-950/40 border border-rose-500/40 rounded-xl shadow-lg">
+          <AlertCircle className="h-5 w-5 shrink-0 text-rose-400" />
           <span>{error}</span>
         </div>
       )}
@@ -503,11 +475,11 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-indigo-500/20"
+          className="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-[#415A77]/50 shadow-xl"
         >
           <div>
-            <h4 className="font-bold text-white text-sm">Next Step: Profile Signal Enrichment</h4>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h4 className="font-bold text-white text-base">Next Step: Profile Signal Enrichment</h4>
+            <p className="text-xs text-[#778DA9] mt-0.5">
               Pull GitHub contribution counts, verify live portfolio links, and extract skills from resumes.
             </p>
           </div>
@@ -517,23 +489,15 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
               whileTap={{ scale: 0.98 }}
               onClick={handleEnrich}
               disabled={phase === "enriching"}
-              className="glow-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-white text-xs font-bold rounded-xl cursor-pointer"
+              className="glow-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 text-white text-xs font-bold rounded-xl cursor-pointer shadow-lg shadow-[#415A77]/40"
             >
               {phase === "enriching" ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#E0E1DD]" />
               ) : (
-                <Sparkles className="h-4 w-4 text-cyan-300" />
+                <Sparkles className="h-4 w-4 text-[#E0E1DD]" />
               )}
-              Enrich Profiles
+              <span>Enrich Profiles</span>
             </motion.button>
-
-            <button
-              onClick={() => navigate("/config")}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/[0.05] text-slate-300 text-xs font-semibold transition cursor-pointer"
-            >
-              Skip Enrichment
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
           </div>
         </motion.div>
       )}
@@ -543,17 +507,17 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-emerald-500/30 bg-emerald-950/15"
+          className="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-emerald-500/40 bg-[#1B263B]/90 shadow-xl"
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-              <CheckCircle2 className="h-5 w-5" />
+          <div className="flex items-center gap-3.5">
+            <div className="h-11 w-11 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+              <CheckCircle2 className="h-6 w-6" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">
+              <h4 className="font-bold text-white text-base">
                 Enrichment Complete • {enrichSummary?.teams ?? rawTeams.length} Teams Ready
               </h4>
-              <p className="text-xs text-emerald-300/80 mt-0.5">
+              <p className="text-xs text-[#778DA9] mt-0.5">
                 All profile signals, LLM extractions, and data quality metrics are attached to applicant records.
               </p>
             </div>
@@ -563,7 +527,7 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => navigate("/config")}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-extrabold rounded-xl shadow-lg shadow-emerald-950/40 transition cursor-pointer"
+            className="btn-primary flex items-center gap-2 px-6 py-3 text-xs font-bold rounded-xl shadow-lg cursor-pointer"
           >
             <span>Proceed to Configure Selection</span>
             <ArrowRight className="h-4 w-4" />

@@ -75,17 +75,17 @@ export default function SelectionPanel() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-panel rounded-2xl p-6 border border-white/10 space-y-6"
+      className="glass-panel rounded-2xl p-6 border border-[#415A77]/30 space-y-6"
     >
       {/* Header with Live Pool Badge */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+          <div className="p-2.5 rounded-xl bg-[#415A77]/25 border border-[#415A77]/50 text-[#E0E1DD] shadow-sm">
             <Award className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-bold text-base text-white">Selection Quota & Capacity</h3>
-            <p className="text-xs text-slate-400">
+            <h3 className="font-bold text-base text-white">Selection Quota &amp; Capacity</h3>
+            <p className="text-xs text-[#778DA9]">
               Calibrated dynamically to the active pool of {totalTeams} registered team{totalTeams !== 1 ? "s" : ""}
             </p>
           </div>
@@ -94,14 +94,14 @@ export default function SelectionPanel() {
         <div className="flex items-center gap-2">
           {/* Quick Proportion Presets */}
           {isLoaded && totalTeams > 1 && (
-            <div className="hidden lg:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-white/10 text-[11px] font-mono">
-              <span className="text-slate-500 px-1.5 flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1 bg-[#0D1B2A] p-1 rounded-xl border border-[#415A77]/50 text-[11px] font-mono shadow-inner">
+              <span className="text-[#778DA9] px-2 flex items-center gap-1 font-semibold">
                 <Percent className="h-3 w-3" /> Presets:
               </span>
               <button
                 type="button"
                 onClick={() => handlePreset(0.25)}
-                className="px-2 py-0.5 rounded-lg hover:bg-white/10 text-slate-300 transition cursor-pointer"
+                className="px-2.5 py-1 rounded-lg hover:bg-[#415A77]/40 text-[#E0E1DD] transition cursor-pointer"
                 title="Top 25% of pool"
               >
                 25%
@@ -109,7 +109,7 @@ export default function SelectionPanel() {
               <button
                 type="button"
                 onClick={() => handlePreset(0.5)}
-                className="px-2 py-0.5 rounded-lg hover:bg-white/10 text-slate-300 transition cursor-pointer"
+                className="px-2.5 py-1 rounded-lg hover:bg-[#415A77]/40 text-[#E0E1DD] transition cursor-pointer"
                 title="Top 50% of pool"
               >
                 50%
@@ -117,7 +117,7 @@ export default function SelectionPanel() {
               <button
                 type="button"
                 onClick={() => handlePreset(0.75)}
-                className="px-2 py-0.5 rounded-lg hover:bg-white/10 text-slate-300 transition cursor-pointer"
+                className="px-2.5 py-1 rounded-lg hover:bg-[#415A77]/40 text-[#E0E1DD] transition cursor-pointer"
                 title="Top 75% of pool"
               >
                 75%
@@ -125,7 +125,7 @@ export default function SelectionPanel() {
               <button
                 type="button"
                 onClick={() => handlePreset(1.0)}
-                className="px-2 py-0.5 rounded-lg hover:bg-white/10 text-cyan-300 font-bold transition cursor-pointer"
+                className="px-2.5 py-1 rounded-lg hover:bg-[#415A77]/40 text-white font-bold transition cursor-pointer"
                 title="Select all teams in pool"
               >
                 All
@@ -133,9 +133,9 @@ export default function SelectionPanel() {
             </div>
           )}
 
-          <span className="text-xs font-mono px-3 py-1 rounded-full bg-slate-800/90 border border-white/10 text-slate-300 flex items-center gap-1.5 shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-            Pool: <strong className="text-cyan-300 font-bold">{totalTeams}</strong> team{totalTeams !== 1 ? "s" : ""}
+          <span className="text-xs font-mono px-3.5 py-1.5 rounded-full bg-[#1B263B] border border-[#415A77]/60 text-[#E0E1DD] flex items-center gap-2 shadow-sm">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+            <span>Pool: <strong className="text-white font-bold">{totalTeams}</strong> team{totalTeams !== 1 ? "s" : ""}</span>
           </span>
         </div>
       </div>
@@ -143,9 +143,9 @@ export default function SelectionPanel() {
       {/* Main Quota Slider Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Top X Card */}
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors space-y-3.5 shadow-sm">
+        <div className="p-4 rounded-xl bg-[#1B263B]/60 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors space-y-3.5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+            <span className="text-xs font-bold text-[#E0E1DD] flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
               Primary Shortlist (Top X)
             </span>
@@ -156,9 +156,9 @@ export default function SelectionPanel() {
                 max={totalTeams}
                 value={effectiveTopX}
                 onChange={(e) => handleTopXChange(Number(e.target.value))}
-                className="w-16 text-center text-sm font-extrabold font-mono text-emerald-300 bg-emerald-950/40 px-2 py-0.5 rounded-lg border border-emerald-500/30 focus:outline-none focus:border-emerald-400"
+                className="w-16 text-center text-sm font-extrabold font-mono text-emerald-300 bg-emerald-950/40 px-2 py-0.5 rounded-lg border border-[#415A77]/40 focus:outline-none focus:border-emerald-400"
               />
-              <span className="text-[11px] font-mono text-slate-500">/ {totalTeams}</span>
+              <span className="text-[11px] font-mono text-[#415A77]">/ {totalTeams}</span>
             </div>
           </div>
 
@@ -168,7 +168,7 @@ export default function SelectionPanel() {
             max={totalTeams}
             value={effectiveTopX}
             onChange={(e) => handleTopXChange(Number(e.target.value))}
-            className="w-full accent-emerald-400 h-2 bg-slate-800 rounded-lg cursor-pointer"
+            className="w-full accent-emerald-400 h-2 bg-[#1B263B] rounded-lg cursor-pointer"
           />
 
           <div className="text-[11px] leading-relaxed">
@@ -178,7 +178,7 @@ export default function SelectionPanel() {
                   All <strong>{totalTeams}</strong> teams in the pool receive automatic qualification (100% of registrations).
                 </p>
               ) : (
-                <p className="text-slate-400">
+                <p className="text-[#778DA9]/80">
                   Teams ranked <strong>#1</strong> to <strong>#{effectiveTopX}</strong> receive automatic qualification{" "}
                   <span className="text-emerald-300 font-mono font-semibold">
                     ({Math.round((effectiveTopX / totalTeams) * 100)}% of pool)
@@ -186,7 +186,7 @@ export default function SelectionPanel() {
                 </p>
               )
             ) : (
-              <p className="text-slate-400">
+              <p className="text-[#778DA9]/80">
                 Teams ranked <strong>#1</strong> to <strong>#{effectiveTopX}</strong> receive automatic qualification.
               </p>
             )}
@@ -194,9 +194,9 @@ export default function SelectionPanel() {
         </div>
 
         {/* Waitlist Buffer Card */}
-        <div className="p-4 rounded-xl bg-slate-900/60 border border-amber-500/20 hover:border-amber-500/40 transition-colors space-y-3.5 shadow-sm">
+        <div className="p-4 rounded-xl bg-[#1B263B]/60 border border-amber-500/20 hover:border-amber-500/40 transition-colors space-y-3.5 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+            <span className="text-xs font-bold text-[#E0E1DD] flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
               Waitlist Buffer Reserve
             </span>
@@ -210,7 +210,7 @@ export default function SelectionPanel() {
                 onChange={(e) => handleWaitlistChange(Number(e.target.value))}
                 className="w-16 text-center text-sm font-extrabold font-mono text-amber-300 bg-amber-950/40 px-2 py-0.5 rounded-lg border border-amber-500/30 focus:outline-none focus:border-amber-400 disabled:opacity-40"
               />
-              <span className="text-[11px] font-mono text-slate-500">/ {maxWaitlist} max</span>
+              <span className="text-[11px] font-mono text-[#415A77]">/ {maxWaitlist} max</span>
             </div>
           </div>
 
@@ -221,7 +221,7 @@ export default function SelectionPanel() {
             disabled={isLoaded && maxWaitlist === 0}
             value={effectiveWaitlist}
             onChange={(e) => handleWaitlistChange(Number(e.target.value))}
-            className="w-full accent-amber-400 h-2 bg-slate-800 rounded-lg cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full accent-amber-400 h-2 bg-[#1B263B] rounded-lg cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
           />
 
           <div className="text-[11px] leading-relaxed">
@@ -231,11 +231,11 @@ export default function SelectionPanel() {
                   Entire pool of <strong>{totalTeams}</strong> teams is allocated to the Primary Shortlist. No teams remain for waitlist standby.
                 </p>
               ) : effectiveWaitlist === 0 ? (
-                <p className="text-slate-400">
+                <p className="text-[#778DA9]/80">
                   No standby buffer allocated. Remaining <strong>{maxWaitlist}</strong> team{maxWaitlist !== 1 ? "s" : ""} will be disqualified.
                 </p>
               ) : (
-                <p className="text-slate-400">
+                <p className="text-[#778DA9]/80">
                   Teams ranked <strong>#{effectiveTopX + 1}</strong> to <strong>#{effectiveTopX + effectiveWaitlist}</strong> are retained on standby{" "}
                   <span className="text-amber-300 font-mono font-semibold">
                     ({effectiveWaitlist} team{effectiveWaitlist !== 1 ? "s" : ""}, {Math.round((effectiveWaitlist / totalTeams) * 100)}% of pool)
@@ -243,7 +243,7 @@ export default function SelectionPanel() {
                 </p>
               )
             ) : (
-              <p className="text-slate-400">
+              <p className="text-[#778DA9]/80">
                 Teams ranked <strong>#{effectiveTopX + 1}</strong> to <strong>#{effectiveTopX + effectiveWaitlist}</strong> are retained on standby.
               </p>
             )}
@@ -253,10 +253,10 @@ export default function SelectionPanel() {
 
       {/* Visual Capacity Allocation Bar */}
       {isLoaded && (
-        <div className="space-y-2 pt-2 border-t border-white/[0.08]">
+        <div className="space-y-2 pt-2 border-t border-[#415A77]/25">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-400 font-medium flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5 text-cyan-400" />
+            <span className="text-[#778DA9]/80 font-medium flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5 text-[#778DA9]" />
               Cohort Capacity Allocation Breakdown
             </span>
             <div className="flex items-center gap-3 font-mono text-[11px]">
@@ -274,7 +274,7 @@ export default function SelectionPanel() {
             </div>
           </div>
 
-          <div className="h-2.5 w-full rounded-full bg-slate-800/80 overflow-hidden flex border border-white/5">
+          <div className="h-2.5 w-full rounded-full bg-[#1B263B]/80 overflow-hidden flex border border-white/5">
             <div
               style={{ width: `${(effectiveTopX / totalTeams) * 100}%` }}
               className="bg-emerald-500 h-full transition-all duration-300 shadow-[0_0_8px_rgba(16,185,129,0.5)]"

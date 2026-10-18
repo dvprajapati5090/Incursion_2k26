@@ -97,14 +97,14 @@ export default function ConfigPage() {
       {/* Header with control switches */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-semibold mb-2">
-            <Sliders className="h-3.5 w-3.5 text-cyan-400" />
-            Stage 2 • Algorithmic Tuning & Governance
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1B263B] border border-[#415A77]/60 text-[#E0E1DD] text-xs font-semibold mb-2 shadow-sm">
+            <Sliders className="h-3.5 w-3.5 text-[#778DA9]" />
+            <span>Stage 2 • Algorithmic Tuning &amp; Governance</span>
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">
+          <h2 className="text-3xl font-black tracking-tight text-white">
             Configure Selection Parameters
           </h2>
-          <p className="text-slate-400 mt-1 text-xs max-w-2xl">
+          <p className="text-[#778DA9] mt-1 text-sm max-w-2xl leading-relaxed">
             Weights are relative and normalized automatically. Zero code changes required to rebalance evaluation philosophies.
           </p>
         </div>
@@ -114,45 +114,45 @@ export default function ConfigPage() {
           {/* Blind Mode Toggle */}
           <button
             onClick={() => setBlindMode(!config.options?.blindMode)}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border transition cursor-pointer shadow-sm ${
               config.options?.blindMode
-                ? "bg-amber-500/15 border-amber-500/30 text-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.3)]"
-                : "bg-slate-900/80 border-white/10 text-slate-400 hover:text-white"
+                ? "bg-amber-500/20 border-amber-500/50 text-amber-200 shadow-[0_0_12px_rgba(251,191,36,0.35)]"
+                : "bg-[#1B263B] border-[#415A77]/60 text-[#E0E1DD] hover:bg-[#415A77]/30 hover:border-[#778DA9]"
             }`}
             title={config.options?.blindMode ? "Disable blind mode" : "Enable blind mode (anonymizes team and applicant names)"}
           >
-            {config.options?.blindMode ? <EyeOff className="h-3.5 w-3.5 text-amber-400" /> : <Eye className="h-3.5 w-3.5" />}
-            {config.options?.blindMode ? "Stealth Mode ON" : "Stealth Blind Mode"}
+            {config.options?.blindMode ? <EyeOff className="h-3.5 w-3.5 text-amber-300" /> : <Eye className="h-3.5 w-3.5 text-[#778DA9]" />}
+            <span>{config.options?.blindMode ? "Stealth Mode ON" : "Stealth Blind Mode"}</span>
           </button>
 
           {/* Live Ranking Toggle */}
           <button
             onClick={() => setLiveRanking((v) => !v)}
             disabled={!hasData}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border transition cursor-pointer shadow-sm ${
               liveRanking
-                ? "bg-cyan-500/15 border-cyan-500/30 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
-                : "bg-slate-900/80 border-white/10 text-slate-400 hover:text-white"
+                ? "bg-[#415A77]/40 border-[#778DA9] text-white shadow-[0_0_14px_rgba(119,141,169,0.45)]"
+                : "bg-[#1B263B] border-[#415A77]/60 text-[#E0E1DD] hover:bg-[#415A77]/30 hover:border-[#778DA9]"
             }`}
           >
-            <Activity className="h-3.5 w-3.5 text-cyan-400" />
-            Live Worker Ranking
+            <Activity className="h-3.5 w-3.5 text-[#778DA9]" />
+            <span>Live Worker Ranking</span>
           </button>
 
           <button
             onClick={handleSavePreset}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-900/80 border border-white/10 text-slate-300 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-[#1B263B] border border-[#415A77]/60 text-[#E0E1DD] hover:bg-[#415A77]/30 hover:border-[#778DA9] transition cursor-pointer shadow-sm"
           >
-            <Save className="h-3.5 w-3.5 text-indigo-400" />
-            Save Preset
+            <Save className="h-3.5 w-3.5 text-[#778DA9]" />
+            <span>Save Preset</span>
           </button>
 
           <button
             onClick={resetConfig}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-slate-900/80 border border-white/10 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl bg-[#1B263B] border border-[#415A77]/60 text-[#778DA9] hover:text-rose-300 hover:border-rose-500/40 hover:bg-rose-950/20 transition cursor-pointer shadow-sm"
           >
             <RotateCcw className="h-3.5 w-3.5" />
-            Reset
+            <span>Reset</span>
           </button>
         </div>
       </div>
@@ -174,14 +174,14 @@ export default function ConfigPage() {
 
       {/* Floating Sticky Bottom Execution Banner */}
       <div className="sticky bottom-6 z-30">
-        <div className="glass-panel rounded-2xl p-4 border border-indigo-500/30 bg-[#090e1a]/95 backdrop-blur-2xl shadow-2xl flex items-center justify-between gap-4 max-w-4xl mx-auto">
+        <div className="glass-panel rounded-2xl p-4 border border-[#415A77]/70 bg-[#1B263B]/95 backdrop-blur-2xl shadow-2xl flex items-center justify-between gap-4 max-w-4xl mx-auto">
           <div className="hidden sm:block">
             <p className="text-xs font-bold text-white flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              Engine Configuration Ready
+              <span>Engine Configuration Ready</span>
             </p>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Evaluating Top {config.selection?.topX} teams with {config.criteria.filter((c) => c.enabled).length} scoring criteria
+            <p className="text-[11px] text-[#778DA9] mt-0.5">
+              Evaluating Top <strong className="text-white font-mono">{config.selection?.topX}</strong> teams with <strong className="text-white font-mono">{config.criteria.filter((c) => c.enabled).length}</strong> scoring criteria
             </p>
           </div>
 
@@ -190,10 +190,10 @@ export default function ConfigPage() {
             whileTap={{ scale: 0.98 }}
             onClick={handleRun}
             disabled={!hasData}
-            className="glow-btn flex-1 sm:flex-none flex items-center justify-center gap-2.5 px-6 py-3 text-xs font-extrabold text-white rounded-xl shadow-xl shadow-indigo-600/30 transition cursor-pointer disabled:opacity-50"
+            className="btn-primary flex-1 sm:flex-none flex items-center justify-center gap-2.5 px-7 py-3 text-xs font-black rounded-xl shadow-xl transition cursor-pointer disabled:opacity-50"
           >
-            <Play className="h-4 w-4 fill-white" />
-            Execute Shortlist Engine
+            <Play className="h-4 w-4 fill-current" />
+            <span>Execute Shortlist Engine</span>
             <ArrowRight className="h-4 w-4" />
           </motion.button>
         </div>

@@ -81,17 +81,17 @@ export default function CriteriaEditor() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 }}
-      className="glass-panel rounded-2xl p-6 border border-white/10 space-y-5"
+      className="glass-panel rounded-2xl p-6 border border-[#415A77]/30 space-y-5"
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <Sliders className="h-5 w-5 text-indigo-400" />
-            <h3 className="font-bold text-base text-white">Scoring Criteria & Weight Distribution</h3>
+            <Sliders className="h-5 w-5 text-[#778DA9]" />
+            <h3 className="font-bold text-base text-[#E0E1DD]">Scoring Criteria & Weight Distribution</h3>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-[#778DA9]/80 mt-0.5">
             Weights are automatically normalized into relative percentage contributions. Total enabled weight:{" "}
-            <span className="font-mono text-cyan-300 font-bold">{totalWeight.toFixed(1)}</span>
+            <span className="font-mono text-[#E0E1DD] font-bold">{totalWeight.toFixed(1)}</span>
           </p>
         </div>
 
@@ -99,9 +99,9 @@ export default function CriteriaEditor() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleAdd}
-          className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 transition cursor-pointer self-start sm:self-auto"
+          className="flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl bg-[#415A77]/25 hover:bg-[#415A77]/40 border border-[#415A77]/50 text-[#E0E1DD] hover:text-white transition cursor-pointer self-start sm:self-auto"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-3.5 w-3.5 text-[#778DA9]" />
           Add Criterion
         </motion.button>
       </div>
@@ -123,8 +123,8 @@ export default function CriteriaEditor() {
               className={cn(
                 "rounded-xl border transition-all overflow-hidden",
                 criterion.enabled
-                  ? "bg-slate-900/60 border-white/10 hover:border-white/20"
-                  : "bg-slate-950/40 border-white/[0.05] opacity-60"
+                  ? "bg-[#1B263B]/60 border-[#415A77]/30 hover:border-[#778DA9]/40"
+                  : "bg-[#0D1B2A]/40 border-[#415A77]/18 opacity-60"
               )}
             >
               {/* Main Row */}
@@ -143,11 +143,11 @@ export default function CriteriaEditor() {
                     type="text"
                     value={criterion.label}
                     onChange={(e) => updateCriterion(criterion.id, { label: e.target.value })}
-                    className="font-semibold text-sm text-white bg-transparent border-b border-transparent hover:border-white/20 focus:border-indigo-400 outline-none px-1 py-0.5 flex-1 min-w-0 transition-colors"
+                    className="font-semibold text-sm text-white bg-transparent border-b border-transparent hover:border-[#778DA9]/40 focus:border-indigo-400 outline-none px-1 py-0.5 flex-1 min-w-0 transition-colors"
                   />
 
                   {/* Metric tag pill */}
-                  <span className="hidden md:inline-flex text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-white/5 truncate max-w-[140px]">
+                  <span className="hidden md:inline-flex text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#1B263B] text-[#778DA9]/80 border border-white/5 truncate max-w-[140px]">
                     {criterion.metric}
                   </span>
                 </div>
@@ -162,29 +162,29 @@ export default function CriteriaEditor() {
                     value={criterion.weight}
                     onChange={(e) => updateCriterion(criterion.id, { weight: Number(e.target.value) })}
                     disabled={!criterion.enabled}
-                    className="flex-1 accent-indigo-400 h-2 bg-slate-800 rounded-lg cursor-pointer"
+                    className="flex-1 accent-indigo-400 h-2 bg-[#1B263B] rounded-lg cursor-pointer"
                   />
 
                   <div className="flex items-center gap-1.5 w-16 justify-end">
-                    <span className="font-mono text-xs font-bold text-slate-200">
+                    <span className="font-mono text-xs font-bold text-[#E0E1DD]">
                       {criterion.weight}
                     </span>
-                    <span className="text-[10px] font-mono text-cyan-400 font-semibold bg-cyan-950/40 px-1 rounded border border-cyan-500/20">
+                    <span className="text-[10px] font-mono text-[#778DA9] font-semibold bg-[#0D1B2A]/40 px-1 rounded border border-[#415A77]/20">
                       {pct}%
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1 pl-1 border-l border-white/10">
+                  <div className="flex items-center gap-1 pl-1 border-l border-[#415A77]/30">
                     <button
                       onClick={() => toggle(criterion.id)}
-                      className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition"
+                      className="p-1 rounded-lg text-[#778DA9]/80 hover:text-white hover:bg-white/5 transition"
                       title="Advanced algorithmic settings"
                     >
                       {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     </button>
                     <button
                       onClick={() => removeCriterion(criterion.id)}
-                      className="p-1 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                      className="p-1 rounded-lg text-[#415A77] hover:text-rose-400 hover:bg-rose-500/10 transition"
                       title="Remove criterion"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -201,24 +201,24 @@ export default function CriteriaEditor() {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="border-t border-white/[0.06] bg-slate-950/50 p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs"
+                    className="border-t border-[#415A77]/20 bg-[#0D1B2A]/50 p-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs"
                   >
                     {/* Metric Select */}
                     <div className="space-y-1.5">
-                      <label className="text-slate-400 font-medium">Underlying Metric</label>
+                      <label className="text-[#778DA9]/80 font-medium">Underlying Metric</label>
                       <select
                         value={criterion.metric}
                         onChange={(e) => updateCriterion(criterion.id, { metric: e.target.value })}
-                        className="w-full rounded-lg bg-slate-900 border border-white/10 px-3 py-2 text-slate-200 outline-none focus:border-indigo-400"
+                        className="w-full rounded-lg bg-[#1B263B] border border-[#415A77]/30 px-3 py-2 text-[#E0E1DD] outline-none focus:border-indigo-400"
                       >
                         {METRIC_OPTIONS.map((opt) => (
-                          <optgroup key={opt.group} label={opt.group} className="bg-slate-900 text-slate-200">
+                          <optgroup key={opt.group} label={opt.group} className="bg-[#1B263B] text-[#E0E1DD]">
                             {opt.options.map((o) => (
                               <option
                                 key={o.value}
                                 value={o.value}
                                 disabled={o.disabled}
-                                className={o.disabled ? "text-slate-500 bg-slate-900" : "bg-slate-900 text-slate-200"}
+                                className={o.disabled ? "text-[#415A77] bg-[#1B263B]" : "bg-[#1B263B] text-[#E0E1DD]"}
                               >
                                 {o.label} {o.disabled ? `— [Disabled: ${o.disabledReason || "reserved"}]` : ""}
                               </option>
@@ -230,7 +230,7 @@ export default function CriteriaEditor() {
 
                     {/* Normalization Type */}
                     <div className="space-y-1.5">
-                      <label className="text-slate-400 font-medium">Normalization Policy</label>
+                      <label className="text-[#778DA9]/80 font-medium">Normalization Policy</label>
                       <div className="flex gap-2">
                         <select
                           value={criterion.normalization?.type ?? "minmax"}
@@ -242,10 +242,10 @@ export default function CriteriaEditor() {
                                 : { type },
                             });
                           }}
-                          className="flex-1 rounded-lg bg-slate-900 border border-white/10 px-3 py-2 text-slate-200 outline-none focus:border-indigo-400"
+                          className="flex-1 rounded-lg bg-[#1B263B] border border-[#415A77]/30 px-3 py-2 text-[#E0E1DD] outline-none focus:border-indigo-400"
                         >
                           {NORMALIZATIONS.map((n) => (
-                            <option key={n.value} value={n.value} className="bg-slate-900 text-slate-200">
+                            <option key={n.value} value={n.value} className="bg-[#1B263B] text-[#E0E1DD]">
                               {n.label}
                             </option>
                           ))}
@@ -260,7 +260,7 @@ export default function CriteriaEditor() {
                                 normalization: { type: "cap", cap: Number(e.target.value) },
                               })
                             }
-                            className="w-20 rounded-lg bg-slate-900 border border-white/10 px-3 py-2 text-slate-200 outline-none"
+                            className="w-20 rounded-lg bg-[#1B263B] border border-[#415A77]/30 px-3 py-2 text-[#E0E1DD] outline-none"
                             placeholder="Cap"
                           />
                         )}
@@ -269,14 +269,14 @@ export default function CriteriaEditor() {
 
                     {/* Aggregation Mode */}
                     <div className="space-y-1.5">
-                      <label className="text-slate-400 font-medium">Team Member Aggregation</label>
+                      <label className="text-[#778DA9]/80 font-medium">Team Member Aggregation</label>
                       <select
                         value={criterion.aggregation}
                         onChange={(e) => updateCriterion(criterion.id, { aggregation: e.target.value })}
-                        className="w-full rounded-lg bg-slate-900 border border-white/10 px-3 py-2 text-slate-200 outline-none focus:border-indigo-400"
+                        className="w-full rounded-lg bg-[#1B263B] border border-[#415A77]/30 px-3 py-2 text-[#E0E1DD] outline-none focus:border-indigo-400"
                       >
                         {AGGREGATIONS.map((a) => (
-                          <option key={a.value} value={a.value} className="bg-slate-900 text-slate-200">
+                          <option key={a.value} value={a.value} className="bg-[#1B263B] text-[#E0E1DD]">
                             {a.label}
                           </option>
                         ))}
@@ -285,14 +285,14 @@ export default function CriteriaEditor() {
 
                     {/* Missing Data Strategy */}
                     <div className="space-y-1.5">
-                      <label className="text-slate-400 font-medium">Missing Signal Handling</label>
+                      <label className="text-[#778DA9]/80 font-medium">Missing Signal Handling</label>
                       <select
                         value={criterion.onMissing}
                         onChange={(e) => updateCriterion(criterion.id, { onMissing: e.target.value })}
-                        className="w-full rounded-lg bg-slate-900 border border-white/10 px-3 py-2 text-slate-200 outline-none focus:border-indigo-400"
+                        className="w-full rounded-lg bg-[#1B263B] border border-[#415A77]/30 px-3 py-2 text-[#E0E1DD] outline-none focus:border-indigo-400"
                       >
                         {ON_MISSING.map((m) => (
-                          <option key={m.value} value={m.value} className="bg-slate-900 text-slate-200">
+                          <option key={m.value} value={m.value} className="bg-[#1B263B] text-[#E0E1DD]">
                             {m.label}
                           </option>
                         ))}

@@ -62,7 +62,7 @@ import DemoDataBanner from "@/components/common/DemoDataBanner";
 
 const STATUS_CONFIG = {
   shortlisted: {
-    bg: "bg-emerald-500/15 border-emerald-500/30 text-emerald-300",
+    bg: "bg-emerald-500/15 border-[#415A77]/40 text-emerald-300",
     glow: "shadow-[0_0_12px_rgba(52,211,153,0.3)]",
     label: "Shortlisted",
   },
@@ -82,7 +82,7 @@ const STATUS_CONFIG = {
     label: "Filter Disqualified",
   },
   excluded: {
-    bg: "bg-slate-700/30 border-slate-600/40 text-slate-300",
+    bg: "bg-slate-700/30 border-slate-600/40 text-[#778DA9]",
     glow: "",
     label: "Manually Excluded",
   },
@@ -100,8 +100,8 @@ export const SIGNAL_DOMAINS = [
     id: "github",
     name: "GitHub Intelligence",
     icon: Github,
-    color: "text-indigo-400",
-    badge: "bg-indigo-500/10 text-indigo-300 border-indigo-500/30",
+    color: "text-[#415A77]",
+    badge: "bg-[#415A77]/15 text-[#778DA9] border-[#415A77]/45",
     metrics: [
       { id: "github.contributions_1y", label: "Contributions (1y)" },
       { id: "github.public_repos", label: "Public Repos", aliases: ["github.repo_count"] },
@@ -122,8 +122,8 @@ export const SIGNAL_DOMAINS = [
     id: "resume",
     name: "Resume & Education Signals",
     icon: FileText,
-    color: "text-cyan-400",
-    badge: "bg-cyan-500/10 text-cyan-300 border-cyan-500/30",
+    color: "text-[#778DA9]",
+    badge: "bg-[#415A77]/15 text-[#778DA9] border-[#415A77]/45",
     metrics: [
       { id: "resume.project_count", label: "Projects Listed" },
       { id: "resume.experience_months", label: "Professional Experience" },
@@ -142,7 +142,7 @@ export const SIGNAL_DOMAINS = [
     name: "Portfolio & Deployment Demos",
     icon: Globe,
     color: "text-emerald-400",
-    badge: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
+    badge: "bg-emerald-500/10 text-emerald-300 border-[#415A77]/40",
     metrics: [
       { id: "portfolio.is_reachable", label: "Site Reachable" },
       { id: "portfolio.has_live_demo", label: "Live Deployment Demo" },
@@ -233,14 +233,14 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ type: "spring", damping: 28, stiffness: 280 }}
-        className="relative w-full max-w-2xl bg-[#090e1a] border-l border-white/10 shadow-2xl flex flex-col h-full z-10 text-slate-100"
+        className="relative w-full max-w-2xl bg-[#0D1B2A] border-l border-[#415A77]/30 shadow-2xl flex flex-col h-full z-10 text-[#E0E1DD]"
       >
         {/* Sticky Header */}
-        <div className="sticky top-0 bg-[#090e1a]/95 backdrop-blur-xl border-b border-white/10 px-6 py-5 z-20">
+        <div className="sticky top-0 bg-[#0D1B2A]/95 backdrop-blur-xl border-b border-[#415A77]/30 px-6 py-5 z-20">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-white/5">
+                <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#1B263B] text-[#778DA9] border border-white/5">
                   {team.teamId}
                 </span>
                 <span
@@ -249,7 +249,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   {statusCfg.label}
                 </span>
                 {team.rank && (
-                  <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-500/20">
+                  <span className="text-xs font-mono font-bold text-[#778DA9] bg-[#0D1B2A]/40 px-2 py-0.5 rounded border border-[#415A77]/20">
                     Rank #{team.rank}
                   </span>
                 )}
@@ -264,11 +264,11 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                 {blindMode ? `Team ${team.teamId}` : team.teamName || team.teamId}
               </h3>
 
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-[#778DA9]/80 mt-0.5">
                 {team.members?.length ?? 0} applicant
                 {team.members?.length !== 1 ? "s" : ""} registered
                 {team.fields?.track_interest && (
-                  <span className="ml-2 font-mono text-indigo-300 bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-500/20">
+                  <span className="ml-2 font-mono text-[#778DA9] bg-[#0D1B2A]/40 px-2 py-0.5 rounded border border-[#415A77]/35">
                     Track: {team.fields.track_interest}
                   </span>
                 )}
@@ -277,7 +277,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+              className="p-2 rounded-xl text-[#778DA9]/80 hover:text-white hover:bg-white/10 transition cursor-pointer"
               title="Close inspector"
             >
               <X className="h-5 w-5" />
@@ -285,7 +285,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
           </div>
 
           {/* Quick Override Governance Toolbar */}
-          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-white/10">
+          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-[#415A77]/30">
             {team.status !== "shortlisted" ? (
               <button
                 onClick={() => {
@@ -303,7 +303,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   clearOverride(team.teamId);
                   logAction("UNPIN", { teamId: team.teamId });
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/25 border border-indigo-500/40 text-indigo-300 font-bold text-xs transition cursor-pointer shadow-[0_0_12px_rgba(99,102,241,0.25)]"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#415A77]/25 border border-[#415A77]/55 text-[#778DA9] font-bold text-xs transition cursor-pointer shadow-[0_0_12px_rgba(99,102,241,0.25)]"
               >
                 <Pin className="h-3.5 w-3.5 fill-current" />
                 Pinned in Shortlist (Unpin)
@@ -314,7 +314,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   pinTeam(team.teamId);
                   logAction("PIN", { teamId: team.teamId });
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 font-semibold text-xs transition cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#415A77]/15 hover:bg-[#415A77]/20 border border-[#415A77]/45 text-[#778DA9] font-semibold text-xs transition cursor-pointer"
               >
                 <Pin className="h-3.5 w-3.5" />
                 Pin to Top
@@ -329,7 +329,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
                 isWaitlist
                   ? "bg-amber-500/25 border-amber-500/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]"
-                  : "bg-slate-900/80 border-white/10 text-slate-300 hover:text-amber-300 hover:border-amber-500/30"
+                  : "bg-[#1B263B]/80 border-[#415A77]/30 text-[#778DA9] hover:text-amber-300 hover:border-amber-500/30"
               }`}
             >
               <Clock className="h-3.5 w-3.5" />
@@ -344,7 +344,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
                 isExclude
                   ? "bg-rose-500/25 border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.25)]"
-                  : "bg-slate-900/80 border-white/10 text-slate-300 hover:text-rose-400 hover:border-rose-500/30"
+                  : "bg-[#1B263B]/80 border-[#415A77]/30 text-[#778DA9] hover:text-rose-400 hover:border-rose-500/30"
               }`}
             >
               <Ban className="h-3.5 w-3.5" />
@@ -357,7 +357,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   clearOverride(team.teamId);
                   logAction("RESET_OVERRIDE", { teamId: team.teamId });
                 }}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-white/10 text-xs text-slate-400 hover:text-white transition cursor-pointer ml-auto"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-[#415A77]/30 text-xs text-[#778DA9]/80 hover:text-white transition cursor-pointer ml-auto"
                 title="Reset manual override to algorithm rank"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
@@ -373,25 +373,25 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
           {isMockGithub && <DemoDataBanner />}
 
           {/* Top Score Comparison Strip */}
-          <div className="rounded-2xl bg-slate-900/80 border border-white/10 p-4 grid grid-cols-3 gap-3 text-center shadow-inner">
+          <div className="rounded-2xl bg-[#1B263B]/80 border border-[#415A77]/30 p-4 grid grid-cols-3 gap-3 text-center shadow-inner">
             <div className="space-y-1">
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+              <p className="text-[11px] font-medium text-[#778DA9]/80 uppercase tracking-wider">
                 Total Score
               </p>
               <p className="text-2xl font-extrabold font-mono text-white">
                 {team.score?.toFixed(4) ?? "—"}
               </p>
             </div>
-            <div className="space-y-1 border-x border-white/10">
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+            <div className="space-y-1 border-x border-[#415A77]/30">
+              <p className="text-[11px] font-medium text-[#778DA9]/80 uppercase tracking-wider">
                 Cutoff Line
               </p>
-              <p className="text-2xl font-extrabold font-mono text-slate-300">
+              <p className="text-2xl font-extrabold font-mono text-[#778DA9]">
                 {team.cutoffScore?.toFixed(4) ?? "—"}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+              <p className="text-[11px] font-medium text-[#778DA9]/80 uppercase tracking-wider">
                 Cutoff Margin
               </p>
               <p
@@ -416,14 +416,14 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="font-bold text-sm text-white flex items-center gap-2">
-                  <Award className="h-4 w-4 text-indigo-400" />
+                  <Award className="h-4 w-4 text-[#415A77]" />
                   Scoring Contribution Breakdown
                 </h4>
-                <span className="text-[11px] text-slate-400 font-mono">
+                <span className="text-[11px] text-[#778DA9]/80 font-mono">
                   Points per criterion
                 </span>
               </div>
-              <div className="h-44 w-full rounded-2xl bg-slate-900/60 border border-white/10 p-3 pt-4">
+              <div className="h-44 w-full rounded-2xl bg-[#1B263B]/60 border border-[#415A77]/30 p-3 pt-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={chartData}
@@ -467,12 +467,12 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
           {/* Criterion Scoring Matrix Table */}
           <div className="space-y-3">
             <h4 className="font-bold text-sm text-white flex items-center gap-2">
-              <Layers className="h-4 w-4 text-cyan-400" />
+              <Layers className="h-4 w-4 text-[#778DA9]" />
               Criterion Scoring Matrix
             </h4>
-            <div className="rounded-xl border border-white/10 overflow-hidden bg-slate-900/60">
+            <div className="rounded-xl border border-[#415A77]/30 overflow-hidden bg-[#1B263B]/60">
               <table className="w-full text-xs">
-                <thead className="bg-slate-950/70 border-b border-white/10 text-slate-400 font-semibold">
+                <thead className="bg-[#0D1B2A]/70 border-b border-[#415A77]/30 text-[#778DA9]/80 font-semibold">
                   <tr>
                     <th className="px-3.5 py-2.5 text-left">Criterion</th>
                     <th className="px-3 py-2.5 text-right font-mono">Raw</th>
@@ -488,26 +488,26 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                       key={b.criterionId}
                       className="hover:bg-white/[0.02] transition-colors"
                     >
-                      <td className="px-3.5 py-2.5 font-medium text-slate-200">
+                      <td className="px-3.5 py-2.5 font-medium text-[#E0E1DD]">
                         {b.label ?? b.criterionId}
                       </td>
-                      <td className="px-3 py-2.5 text-right font-mono text-slate-300">
+                      <td className="px-3 py-2.5 text-right font-mono text-[#778DA9]">
                         {b.raw != null ? String(b.raw) : "—"}
                       </td>
-                      <td className="px-3 py-2.5 text-right font-mono text-slate-300">
+                      <td className="px-3 py-2.5 text-right font-mono text-[#778DA9]">
                         {b.normalized != null ? b.normalized.toFixed(3) : "—"}
                       </td>
-                      <td className="px-3 py-2.5 text-right font-mono text-slate-400">
+                      <td className="px-3 py-2.5 text-right font-mono text-[#778DA9]/80">
                         {b.effectiveWeight?.toFixed(3) ?? "—"}
                       </td>
-                      <td className="px-3 py-2.5 text-right font-mono font-bold text-cyan-300">
+                      <td className="px-3 py-2.5 text-right font-mono font-bold text-[#778DA9]">
                         {b.contribution?.toFixed(4) ?? "0.0000"}
                       </td>
                       <td className="px-3.5 py-2.5 text-center">
                         <span
                           className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
                             b.status === "ok"
-                              ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300"
+                              ? "bg-emerald-500/15 border-[#415A77]/40 text-emerald-300"
                               : "bg-amber-500/15 border-amber-500/30 text-amber-300"
                           }`}
                         >
@@ -524,13 +524,13 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
 
           {/* Executive Decision Summary (AI / Engine Explanation) */}
           {team.explanation && (
-            <div className="space-y-3 p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/20">
-              <h4 className="font-bold text-sm text-indigo-300 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-indigo-400" />
+            <div className="space-y-3 p-4 rounded-xl bg-[#0D1B2A]/20 border border-[#415A77]/35">
+              <h4 className="font-bold text-sm text-[#778DA9] flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-[#415A77]" />
                 Executive Decision Summary
               </h4>
               {team.explanation.summary && (
-                <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                <p className="text-xs text-[#778DA9] leading-relaxed font-medium">
                   {team.explanation.summary}
                 </p>
               )}
@@ -539,9 +539,9 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   <p className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1.5">
                     <CheckCircle2 className="h-3 w-3" /> Key Strengths
                   </p>
-                  <ul className="list-disc list-inside text-xs text-slate-300 space-y-0.5">
+                  <ul className="list-disc list-inside text-xs text-[#778DA9] space-y-0.5">
                     {team.explanation.strengths.map((str, idx) => (
-                      <li key={idx} className="text-slate-300">
+                      <li key={idx} className="text-[#778DA9]">
                         {str}
                       </li>
                     ))}
@@ -553,9 +553,9 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   <p className="text-[11px] font-semibold text-amber-400 flex items-center gap-1.5">
                     <AlertTriangle className="h-3 w-3" /> Growth Opportunities
                   </p>
-                  <ul className="list-disc list-inside text-xs text-slate-300 space-y-0.5">
+                  <ul className="list-disc list-inside text-xs text-[#778DA9] space-y-0.5">
                     {team.explanation.growthAreas.map((ga, idx) => (
-                      <li key={idx} className="text-slate-300">
+                      <li key={idx} className="text-[#778DA9]">
                         {ga}
                       </li>
                     ))}
@@ -567,9 +567,9 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   <p className="text-[11px] font-semibold text-rose-400 flex items-center gap-1.5">
                     <Flag className="h-3 w-3" /> Missing Data Advisories
                   </p>
-                  <ul className="list-disc list-inside text-xs text-slate-400 space-y-0.5">
+                  <ul className="list-disc list-inside text-xs text-[#778DA9]/80 space-y-0.5">
                     {team.explanation.missingDataNotes.map((note, idx) => (
-                      <li key={idx} className="text-slate-400">
+                      <li key={idx} className="text-[#778DA9]/80">
                         {note}
                       </li>
                     ))}
@@ -590,12 +590,12 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                 {team.reasons.map((r, i) => (
                   <div
                     key={i}
-                    className="p-3 rounded-xl bg-slate-900/60 border border-white/10 flex items-start gap-3"
+                    className="p-3 rounded-xl bg-[#1B263B]/60 border border-[#415A77]/30 flex items-start gap-3"
                   >
-                    <span className="font-mono text-[10px] font-bold tracking-wider px-2 py-1 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 shrink-0">
+                    <span className="font-mono text-[10px] font-bold tracking-wider px-2 py-1 rounded bg-[#415A77]/20 text-[#778DA9] border border-[#415A77]/45 shrink-0">
                       {r.code}
                     </span>
-                    <p className="text-xs text-slate-300 leading-relaxed">
+                    <p className="text-xs text-[#778DA9] leading-relaxed">
                       {reasonToText(r, team, config)}
                     </p>
                   </div>
@@ -614,17 +614,17 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                 {team.filterResults.map((fr) => (
                   <div
                     key={fr.id}
-                    className="p-3 rounded-xl bg-slate-900/40 border border-white/[0.08] flex items-center justify-between gap-3 text-xs"
+                    className="p-3 rounded-xl bg-[#1B263B]/40 border border-[#415A77]/25 flex items-center justify-between gap-3 text-xs"
                   >
                     <div className="flex items-center gap-2.5">
                       {FILTER_ICONS[fr.result] ?? (
-                        <Info className="h-4 w-4 text-slate-400" />
+                        <Info className="h-4 w-4 text-[#778DA9]/80" />
                       )}
-                      <span className="font-medium text-slate-200">
+                      <span className="font-medium text-[#E0E1DD]">
                         {fr.label}
                       </span>
                     </div>
-                    <span className="capitalize font-mono font-bold text-[11px] text-slate-400">
+                    <span className="capitalize font-mono font-bold text-[11px] text-[#778DA9]/80">
                       {fr.result}
                     </span>
                   </div>
@@ -638,7 +638,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <h4 className="font-bold text-sm text-white flex items-center gap-2">
-                  <Award className="h-4 w-4 text-cyan-400" />
+                  <Award className="h-4 w-4 text-[#778DA9]" />
                   Applicant Profiles & Signal Matrix ({team.members.length})
                 </h4>
                 {blindMode && (
@@ -649,18 +649,18 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
               </div>
 
               {/* Signal Domain Filter Tabs */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-white/10">
+              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-[#1B263B] border border-[#415A77]/50 shadow-inner">
                 <button
                   type="button"
                   onClick={() => setActiveSignalTab("all")}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
                     activeSignalTab === "all"
-                      ? "bg-indigo-600 text-white shadow-sm"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      ? "bg-[#415A77] text-white shadow-md border border-[#778DA9]/50"
+                      : "text-[#778DA9] hover:text-white hover:bg-white/5"
                   }`}
                 >
                   <Layers className="h-3.5 w-3.5" />
-                  All Categories
+                  <span>All Categories</span>
                 </button>
                 {SIGNAL_DOMAINS.map((domain) => {
                   const DomainIcon = domain.icon;
@@ -670,14 +670,14 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                       key={domain.id}
                       type="button"
                       onClick={() => setActiveSignalTab(domain.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer ${
                         isActive
-                          ? "bg-indigo-600 text-white shadow-sm"
-                          : "text-slate-400 hover:text-white hover:bg-white/5"
+                          ? "bg-[#415A77] text-white shadow-md border border-[#778DA9]/50"
+                          : "text-[#778DA9] hover:text-white hover:bg-white/5"
                       }`}
                     >
-                      <DomainIcon className={`h-3.5 w-3.5 ${domain.color}`} />
-                      {domain.name.split(" ")[0]} ({domain.metrics.length})
+                      <DomainIcon className="h-3.5 w-3.5 text-[#E0E1DD]" />
+                      <span>{domain.name.split(" ")[0]} ({domain.metrics.length})</span>
                     </button>
                   );
                 })}
@@ -709,10 +709,10 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   return (
                     <div
                       key={m.memberId || mIdx}
-                      className={`p-4 rounded-xl border transition-all space-y-3 ${
+                      className={`p-4 rounded-xl border transition-all space-y-3 shadow-md ${
                         isHighlighted
-                          ? "bg-indigo-950/40 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.3)]"
-                          : "bg-slate-900/70 border-white/10 hover:border-white/20"
+                          ? "bg-[#1B263B] border-[#778DA9] shadow-[0_0_20px_rgba(119,141,169,0.35)]"
+                          : "bg-[#1B263B] border-[#415A77]/50 hover:border-[#778DA9]/60"
                       }`}
                     >
                       {/* Member Identity & Lead Badge */}
@@ -722,19 +722,19 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                             {displayName}
                           </span>
                           {m.isLead && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#415A77]/35 text-[#E0E1DD] border border-[#778DA9]/40 shadow-sm">
                               Lead
                             </span>
                           )}
                         </div>
-                        <span className="text-[11px] font-mono text-slate-500">
+                        <span className="text-[11px] font-mono text-[#778DA9]">
                           {blindMode ? `ID-${mIdx + 1}` : m.memberId}
                         </span>
                       </div>
 
                       {/* Member Email (Visible in non-blind mode only) */}
                       {!blindMode && m.email && (
-                        <p className="text-xs text-slate-400 font-mono">
+                        <p className="text-xs text-[#778DA9]/80 font-mono">
                           {m.email}
                         </p>
                       )}
@@ -747,7 +747,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                               href={m.sources.github.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-indigo-300 hover:text-white border border-white/5 transition"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#1B263B] text-xs font-medium text-[#778DA9] hover:text-white border border-white/5 transition"
                             >
                               <Github className="h-3 w-3" /> GitHub{" "}
                               <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
@@ -758,7 +758,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                               href={m.sources.resume.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-cyan-300 hover:text-white border border-white/5 transition"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#1B263B] text-xs font-medium text-[#778DA9] hover:text-white border border-white/5 transition"
                             >
                               <FileText className="h-3 w-3" /> Resume{" "}
                               <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
@@ -769,7 +769,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                               href={m.sources.linkedin.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-sky-300 hover:text-white border border-white/5 transition"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#1B263B] text-xs font-medium text-sky-300 hover:text-white border border-white/5 transition"
                             >
                               <Linkedin className="h-3 w-3" /> LinkedIn{" "}
                               <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
@@ -780,7 +780,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                               href={m.sources.portfolio.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-emerald-300 hover:text-white border border-white/5 transition"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#1B263B] text-xs font-medium text-emerald-300 hover:text-white border border-white/5 transition"
                             >
                               <Globe className="h-3 w-3" /> Portfolio{" "}
                               <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
@@ -834,7 +834,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                                 {/* Clickable related member jump (Rule #4) */}
                                 {!blindMode && flag.related?.length > 0 && (
                                   <div className="flex flex-col items-end shrink-0 gap-1">
-                                    <span className="text-[10px] text-slate-400 font-mono">
+                                    <span className="text-[10px] text-[#778DA9]/80 font-mono">
                                       Related:
                                     </span>
                                     <div className="flex gap-1">
@@ -848,7 +848,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                                                 : relId
                                             )
                                           }
-                                          className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 hover:bg-slate-700 border border-cyan-500/30 transition cursor-pointer"
+                                          className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#1B263B] text-[#778DA9] hover:bg-slate-700 border border-[#415A77]/45 transition cursor-pointer"
                                           title={`Highlight related applicant ${relId}`}
                                         >
                                           {relId}
@@ -866,11 +866,11 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                       {/* Categorized Enriched Signals Matrix */}
                       <div className="space-y-3 pt-2">
                         <div className="flex items-center justify-between">
-                          <p className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
-                            <Bot className="h-3.5 w-3.5 text-cyan-400" />
+                          <p className="text-[11px] font-semibold text-[#778DA9] flex items-center gap-1.5">
+                            <Bot className="h-3.5 w-3.5 text-[#778DA9]" />
                             Categorized Applicant Signals
                           </p>
-                          <span className="text-[10px] font-mono text-slate-500">
+                          <span className="text-[10px] font-mono text-[#415A77]">
                             {activeSignalTab === "all" ? "All Domains" : domainsToRender[0]?.name}
                           </span>
                         </div>
@@ -880,10 +880,10 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                           return (
                             <div
                               key={domain.id}
-                              className="space-y-2 rounded-xl bg-slate-950/50 p-3 border border-white/[0.07]"
+                              className="space-y-2 rounded-xl bg-[#0D1B2A]/50 p-3 border border-white/[0.07]"
                             >
                               {/* Domain Section Header */}
-                              <div className="flex items-center justify-between pb-1.5 border-b border-white/[0.06]">
+                              <div className="flex items-center justify-between pb-1.5 border-b border-[#415A77]/20">
                                 <div className="flex items-center gap-2">
                                   <DomainIcon className={`h-3.5 w-3.5 ${domain.color}`} />
                                   <span className="font-semibold text-xs text-white">
@@ -927,15 +927,15 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                                   return (
                                     <div
                                       key={metricDef.id}
-                                      className="p-2.5 rounded-lg bg-slate-900/90 border border-white/[0.06] space-y-1.5 hover:border-white/20 transition-colors"
+                                      className="p-2.5 rounded-lg bg-[#1B263B]/90 border border-[#415A77]/20 space-y-1.5 hover:border-[#778DA9]/40 transition-colors"
                                       title={formatted.tooltip || ""}
                                     >
                                       <div className="flex items-center justify-between text-[11px] gap-2">
                                         <div className="flex flex-col min-w-0">
-                                          <span className="font-medium text-slate-200 text-xs truncate">
+                                          <span className="font-medium text-[#E0E1DD] text-xs truncate">
                                             {metricDef.label}
                                           </span>
-                                          <span className="font-mono text-[10px] text-slate-500 truncate">
+                                          <span className="font-mono text-[10px] text-[#415A77] truncate">
                                             {metricDef.id}
                                           </span>
                                         </div>
@@ -943,7 +943,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                                           {/* AI Refined Badge (Must-do UI Rule #5) */}
                                           {isLlm && (
                                             <span
-                                              className="px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono font-bold flex items-center gap-0.5"
+                                              className="px-1 py-0.2 rounded bg-[#415A77]/20 text-[#778DA9] border border-[#415A77]/55 text-[9px] font-mono font-bold flex items-center gap-0.5"
                                               title={`AI Refined via ${
                                                 entry.model || "LLM"
                                               }${
@@ -958,7 +958,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                                                   : ""
                                               }`}
                                             >
-                                              <Sparkles className="h-2.5 w-2.5 text-cyan-300" />
+                                              <Sparkles className="h-2.5 w-2.5 text-[#778DA9]" />
                                               AI
                                             </span>
                                           )}
@@ -977,7 +977,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
 
                                       {/* AI previous audit comparison note */}
                                       {isLlm && entry.previous && (
-                                        <p className="text-[10px] text-slate-500 font-mono">
+                                        <p className="text-[10px] text-[#415A77] font-mono">
                                           Rules estimated: {entry.previous.value}
                                         </p>
                                       )}
@@ -1000,12 +1000,12 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
 
                         {/* Extra / Custom Metrics (if any uploaded beyond standard registry) */}
                         {activeSignalTab === "all" && extraMetrics.length > 0 && (
-                          <div className="space-y-2 rounded-xl bg-slate-950/50 p-3 border border-white/[0.07]">
-                            <div className="flex items-center justify-between pb-1.5 border-b border-white/[0.06]">
+                          <div className="space-y-2 rounded-xl bg-[#0D1B2A]/50 p-3 border border-white/[0.07]">
+                            <div className="flex items-center justify-between pb-1.5 border-b border-[#415A77]/20">
                               <span className="font-semibold text-xs text-white">
                                 Additional / Custom Signals
                               </span>
-                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border bg-slate-800 text-slate-400 border-white/10">
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border bg-[#1B263B] text-[#778DA9]/80 border-[#415A77]/30">
                                 {extraMetrics.length} metrics
                               </span>
                             </div>
@@ -1019,11 +1019,11 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                                 return (
                                   <div
                                     key={metricId}
-                                    className="p-2.5 rounded-lg bg-slate-900/90 border border-white/[0.06] space-y-1.5"
+                                    className="p-2.5 rounded-lg bg-[#1B263B]/90 border border-[#415A77]/20 space-y-1.5"
                                     title={formatted.tooltip || ""}
                                   >
                                     <div className="flex items-center justify-between text-[11px]">
-                                      <span className="font-mono text-slate-400 truncate max-w-[150px]">
+                                      <span className="font-mono text-[#778DA9]/80 truncate max-w-[150px]">
                                         {metricId}
                                       </span>
                                       <span
@@ -1051,18 +1051,18 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
 
           {/* Reference Time Baseline Footer (Must-do UI Rule #8) */}
           {asOf && (
-            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/10 flex items-center justify-between text-xs text-slate-400 font-mono">
+            <div className="p-3 rounded-xl bg-[#1B263B]/60 border border-[#415A77]/30 flex items-center justify-between text-xs text-[#778DA9]/80 font-mono">
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-cyan-400 shrink-0" />
+                <Calendar className="h-4 w-4 text-[#778DA9] shrink-0" />
                 <span>
                   Signal Reference Date (asOf):{" "}
-                  <strong className="text-slate-200">
+                  <strong className="text-[#E0E1DD]">
                     {new Date(asOf).toUTCString()}
                   </strong>
                 </span>
               </div>
               {enrichedAt && (
-                <span className="text-[11px] text-slate-500 hidden sm:inline">
+                <span className="text-[11px] text-[#415A77] hidden sm:inline">
                   Enriched at: {new Date(enrichedAt).toLocaleTimeString()}
                 </span>
               )}
