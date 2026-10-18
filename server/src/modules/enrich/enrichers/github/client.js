@@ -70,7 +70,7 @@ export async function fetchGithubProfile(login, now = Date.now()) {
         if (e.type === "RATE_LIMITED") throw fatal("github_rate_limited");
         throw fatal(`github_graphql_error: ${e.message}`);
       }
-      return { ...json.data.user, mergedPrs: json.data.mergedPrs.issueCount };
+      return { ...json.data.user, mergedPrs: json.data.mergedPrs?.issueCount ?? 0 };
     } catch (err) {
       if (err.fatal) throw err;
       lastErr = err; // network error or 5xx: back off and retry

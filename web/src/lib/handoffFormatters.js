@@ -22,12 +22,12 @@ export const METRIC_STATUSES = {
 export const STATUS_BADGE_CONFIG = {
   ok: {
     label: "Available",
-    badgeClass: "bg-emerald-500/15 border-emerald-500/30 text-emerald-300",
+    badgeClass: "bg-emerald-500/15 border-[#415A77]/40 text-emerald-300",
     dotClass: "bg-emerald-400",
   },
   not_provided: {
     label: "Not Provided",
-    badgeClass: "bg-slate-700/30 border-slate-600/30 text-slate-400",
+    badgeClass: "bg-slate-700/30 border-slate-600/30 text-[#778DA9]/80",
     dotClass: "bg-slate-500",
   },
   fetch_failed: {

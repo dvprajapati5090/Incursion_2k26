@@ -29,11 +29,12 @@ export default {
   source: "resume",
   metricIds: METRIC_IDS,
 
-  async enrich(member, ctx) {
+  async enrich(member, ctx = {}) {
     const src = member.sources.resume;
     if (src?.text) return toMetrics(src.text, "form_text", ctx.asOf);
     if (src?.url)
       return toMetrics(await getResumeText(src.url), "pdf_text", ctx.asOf);
+
     throw new Error("no_resume_text_or_url");
   },
 };

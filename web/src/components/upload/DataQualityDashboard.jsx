@@ -58,29 +58,29 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
   });
 
   const getSourceBadge = (id) => {
-    if (id.startsWith("github")) return { label: "GitHub", color: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" };
-    if (id.startsWith("resume")) return { label: "Resume", color: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30" };
+    if (id.startsWith("github")) return { label: "GitHub", color: "bg-[#415A77]/20 text-[#778DA9] border-[#415A77]/45" };
+    if (id.startsWith("resume")) return { label: "Resume", color: "bg-[#415A77]/15 text-[#778DA9] border-[#415A77]/45" };
     if (id.startsWith("linkedin")) return { label: "LinkedIn", color: "bg-sky-500/15 text-sky-300 border-sky-500/30" };
-    if (id.startsWith("portfolio")) return { label: "Portfolio", color: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" };
+    if (id.startsWith("portfolio")) return { label: "Portfolio", color: "bg-emerald-500/15 text-emerald-300 border-[#415A77]/40" };
     return { label: "Computed", color: "bg-purple-500/15 text-purple-300 border-purple-500/30" };
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-6 border border-white/10 space-y-6">
+    <div className="glass-panel rounded-2xl p-6 border border-[#415A77]/30 space-y-6">
       {/* Header with expand toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 border border-cyan-500/30 text-cyan-300">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#415A77]/20 to-[#415A77]/20 border border-[#415A77]/45 text-[#778DA9]">
             <Activity className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-base text-white">Cohort Data Quality & Signal Coverage</h3>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#415A77]/15 text-[#778DA9] border border-[#415A77]/45">
                 Pre-Ranking Audit
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[#778DA9]/80 mt-0.5">
               Verified metric completeness across {members} applicant profile{members !== 1 ? "s" : ""} in {teams} team{teams !== 1 ? "s" : ""}.
             </p>
           </div>
@@ -89,7 +89,7 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 text-slate-300 text-xs font-semibold transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#415A77]/30 hover:bg-white/5 text-[#778DA9] text-xs font-semibold transition cursor-pointer"
           >
             {isExpanded ? (
               <>
@@ -106,54 +106,54 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
 
       {/* KPI Overview Tiles */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        <div className="p-4 rounded-xl bg-slate-900/80 border border-white/10 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+        <div className="p-4 rounded-xl bg-[#1B263B]/80 border border-[#415A77]/30 space-y-1">
+          <div className="flex items-center justify-between text-[#778DA9]/80 text-xs">
             <span>Overall Completeness</span>
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold font-mono text-emerald-300">
             {overallCompleteness}%
           </div>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-[#415A77]">
             {totalOk} of {grandTotal} signal data points verified
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900/80 border border-white/10 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+        <div className="p-4 rounded-xl bg-[#1B263B]/80 border border-[#415A77]/30 space-y-1">
+          <div className="flex items-center justify-between text-[#778DA9]/80 text-xs">
             <span>AI Refinements (LLM)</span>
-            <Bot className="h-4 w-4 text-indigo-400" />
+            <Bot className="h-4 w-4 text-[#415A77]" />
           </div>
-          <div className="text-2xl font-bold font-mono text-indigo-300">
+          <div className="text-2xl font-bold font-mono text-[#778DA9]">
             {llm.metricsUpdated ?? 0}
           </div>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-[#415A77]">
             {llm.attempted ?? 0} analyzed • {llm.failed ?? 0} failed
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900/80 border border-white/10 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+        <div className="p-4 rounded-xl bg-[#1B263B]/80 border border-[#415A77]/30 space-y-1">
+          <div className="flex items-center justify-between text-[#778DA9]/80 text-xs">
             <span>Profile Flags Raised</span>
             <Flag className="h-4 w-4 text-amber-400" />
           </div>
           <div className="text-2xl font-bold font-mono text-amber-300">
             {totalFlagsCount}
           </div>
-          <p className="text-[11px] text-slate-500">
+          <p className="text-[11px] text-[#415A77]">
             Across {Object.keys(flags).length} distinct audit categories
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900/80 border border-white/10 space-y-1">
-          <div className="flex items-center justify-between text-slate-400 text-xs">
+        <div className="p-4 rounded-xl bg-[#1B263B]/80 border border-[#415A77]/30 space-y-1">
+          <div className="flex items-center justify-between text-[#778DA9]/80 text-xs">
             <span>Signal Timestamp</span>
-            <Calendar className="h-4 w-4 text-cyan-400" />
+            <Calendar className="h-4 w-4 text-[#778DA9]" />
           </div>
-          <div className="text-xs font-mono text-cyan-300 truncate font-semibold mt-1">
+          <div className="text-xs font-mono text-[#778DA9] truncate font-semibold mt-1">
             {asOf ? new Date(asOf).toLocaleDateString() : "Present"}
           </div>
-          <p className="text-[10px] text-slate-500 truncate" title={asOf || ""}>
+          <p className="text-[10px] text-[#415A77] truncate" title={asOf || ""}>
             asOf reference baseline
           </p>
         </div>
@@ -162,7 +162,7 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
       {isExpanded && (
         <div className="space-y-4 pt-2">
           {/* Source Tabs */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#415A77]/30 pb-3">
             <div className="flex flex-wrap gap-1.5 text-xs">
               {[
                 { id: "all", label: "All Metrics" },
@@ -176,8 +176,8 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
                   onClick={() => setFilterSource(tab.id)}
                   className={`px-3 py-1 rounded-lg font-medium transition cursor-pointer ${
                     filterSource === tab.id
-                      ? "bg-indigo-600 text-white font-bold"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                      ? "bg-[#415A77] text-white font-bold"
+                      : "text-[#778DA9]/80 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   {tab.label}
@@ -186,7 +186,7 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-3 text-[11px] text-slate-400 font-mono">
+            <div className="flex items-center gap-3 text-[11px] text-[#778DA9]/80 font-mono">
               <span className="flex items-center gap-1">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" /> Available (ok)
               </span>
@@ -203,9 +203,9 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
           </div>
 
           {/* Metric Completeness Table */}
-          <div className="rounded-xl border border-white/10 overflow-hidden bg-slate-950/60 max-h-80 overflow-y-auto">
+          <div className="rounded-xl border border-[#415A77]/30 overflow-hidden bg-[#0D1B2A]/60 max-h-80 overflow-y-auto">
             <table className="w-full text-xs">
-              <thead className="bg-slate-950 text-slate-400 sticky top-0 border-b border-white/10">
+              <thead className="bg-[#0D1B2A] text-[#778DA9]/80 sticky top-0 border-b border-[#415A77]/30">
                 <tr>
                   <th className="px-4 py-2.5 text-left font-semibold">Signal Metric</th>
                   <th className="px-3 py-2.5 text-left font-semibold">Distribution Breakdown</th>
@@ -237,11 +237,11 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
                           <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${src.color}`}>
                             {src.label}
                           </span>
-                          <span className="font-mono text-slate-200">{metricId}</span>
+                          <span className="font-mono text-[#E0E1DD]">{metricId}</span>
                         </div>
                       </td>
                       <td className="px-3 py-2.5 w-48">
-                        <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden flex">
+                        <div className="h-2 w-full rounded-full bg-[#1B263B] overflow-hidden flex">
                           {pctOk > 0 && (
                             <div style={{ width: `${pctOk}%` }} className="h-full bg-emerald-500" title={`Available: ${mOk}`} />
                           )}
@@ -259,7 +259,7 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
                       <td className="px-3 py-2.5 text-right font-mono text-emerald-300 font-semibold">{mOk}</td>
                       <td className="px-3 py-2.5 text-right font-mono text-amber-300">{mLow}</td>
                       <td className="px-3 py-2.5 text-right font-mono text-rose-300">{mFail}</td>
-                      <td className="px-4 py-2.5 text-right font-mono text-slate-500">{mMissing}</td>
+                      <td className="px-4 py-2.5 text-right font-mono text-[#415A77]">{mMissing}</td>
                     </tr>
                   );
                 })}
@@ -269,8 +269,8 @@ export default function DataQualityDashboard({ summary, asOf, enrichedAt }) {
 
           {/* Footnote on asOf baseline */}
           {asOf && (
-            <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
-              <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+            <div className="flex items-center gap-2 text-[11px] text-[#415A77] font-mono">
+              <Calendar className="h-3.5 w-3.5 text-[#778DA9]/80 shrink-0" />
               <span>
                 Baseline Signal Reference: <strong>{new Date(asOf).toUTCString()}</strong>.
                 Resume "Present" dates and GitHub account ages are calculated relative to this timestamp.
