@@ -80,12 +80,12 @@ export default function SelectionPanel() {
       {/* Header with Live Pool Badge */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-[#415A77]/15 border border-[#415A77]/20 text-[#778DA9]">
+          <div className="p-2.5 rounded-xl bg-[#415A77]/25 border border-[#415A77]/50 text-[#E0E1DD] shadow-sm">
             <Award className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-bold text-base text-white">Selection Quota & Capacity</h3>
-            <p className="text-xs text-[#778DA9]/80">
+            <h3 className="font-bold text-base text-white">Selection Quota &amp; Capacity</h3>
+            <p className="text-xs text-[#778DA9]">
               Calibrated dynamically to the active pool of {totalTeams} registered team{totalTeams !== 1 ? "s" : ""}
             </p>
           </div>
@@ -94,14 +94,14 @@ export default function SelectionPanel() {
         <div className="flex items-center gap-2">
           {/* Quick Proportion Presets */}
           {isLoaded && totalTeams > 1 && (
-            <div className="hidden lg:flex items-center gap-1 bg-[#1B263B]/80 p-1 rounded-xl border border-[#415A77]/30 text-[11px] font-mono">
-              <span className="text-[#415A77] px-1.5 flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1 bg-[#0D1B2A] p-1 rounded-xl border border-[#415A77]/50 text-[11px] font-mono shadow-inner">
+              <span className="text-[#778DA9] px-2 flex items-center gap-1 font-semibold">
                 <Percent className="h-3 w-3" /> Presets:
               </span>
               <button
                 type="button"
                 onClick={() => handlePreset(0.25)}
-                className="px-2 py-0.5 rounded-lg hover:bg-white/10 text-[#778DA9] transition cursor-pointer"
+                className="px-2.5 py-1 rounded-lg hover:bg-[#415A77]/40 text-[#E0E1DD] transition cursor-pointer"
                 title="Top 25% of pool"
               >
                 25%
@@ -109,7 +109,7 @@ export default function SelectionPanel() {
               <button
                 type="button"
                 onClick={() => handlePreset(0.5)}
-                className="px-2 py-0.5 rounded-lg hover:bg-white/10 text-[#778DA9] transition cursor-pointer"
+                className="px-2.5 py-1 rounded-lg hover:bg-[#415A77]/40 text-[#E0E1DD] transition cursor-pointer"
                 title="Top 50% of pool"
               >
                 50%
@@ -117,7 +117,7 @@ export default function SelectionPanel() {
               <button
                 type="button"
                 onClick={() => handlePreset(0.75)}
-                className="px-2 py-0.5 rounded-lg hover:bg-white/10 text-[#778DA9] transition cursor-pointer"
+                className="px-2.5 py-1 rounded-lg hover:bg-[#415A77]/40 text-[#E0E1DD] transition cursor-pointer"
                 title="Top 75% of pool"
               >
                 75%
@@ -125,7 +125,7 @@ export default function SelectionPanel() {
               <button
                 type="button"
                 onClick={() => handlePreset(1.0)}
-                className="px-2 py-0.5 rounded-lg hover:bg-white/10 text-[#778DA9] font-bold transition cursor-pointer"
+                className="px-2.5 py-1 rounded-lg hover:bg-[#415A77]/40 text-white font-bold transition cursor-pointer"
                 title="Select all teams in pool"
               >
                 All
@@ -133,9 +133,9 @@ export default function SelectionPanel() {
             </div>
           )}
 
-          <span className="text-xs font-mono px-3 py-1 rounded-full bg-[#1B263B]/90 border border-[#415A77]/30 text-[#778DA9] flex items-center gap-1.5 shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-[#778DA9] shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
-            Pool: <strong className="text-[#778DA9] font-bold">{totalTeams}</strong> team{totalTeams !== 1 ? "s" : ""}
+          <span className="text-xs font-mono px-3.5 py-1.5 rounded-full bg-[#1B263B] border border-[#415A77]/60 text-[#E0E1DD] flex items-center gap-2 shadow-sm">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+            <span>Pool: <strong className="text-white font-bold">{totalTeams}</strong> team{totalTeams !== 1 ? "s" : ""}</span>
           </span>
         </div>
       </div>

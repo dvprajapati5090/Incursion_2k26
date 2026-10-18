@@ -124,23 +124,23 @@ export default function ResultsPage() {
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-semibold mb-2">
-            <Sparkles className="h-3 w-3 text-emerald-400" />
-            Stage 3 • Selection Shortlist & Leaderboard
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1B263B] border border-[#415A77]/60 text-[#E0E1DD] text-xs font-semibold mb-2 shadow-sm">
+            <Sparkles className="h-3.5 w-3.5 text-[#778DA9]" />
+            <span>Stage 3 • Selection Shortlist &amp; Leaderboard</span>
           </div>
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">
+          <h2 className="text-3xl font-black tracking-tight text-white">
             Shortlist Results
           </h2>
-          <p className="text-[#778DA9]/80 mt-1 text-xs">
+          <p className="text-[#778DA9] mt-1 text-sm">
             Top <strong className="text-white font-mono">{config.selection?.topX}</strong> of{" "}
             <strong className="text-white font-mono">{runMeta?.totalTeams ?? rankedResults.length}</strong> teams evaluated
             {runMeta?.durationMs != null && (
-              <span className="ml-2 font-mono text-[#778DA9] bg-[#0D1B2A]/40 px-2 py-0.5 rounded border border-[#415A77]/20">
+              <span className="ml-2.5 font-mono text-[#E0E1DD] bg-[#1B263B] px-2.5 py-0.5 rounded-lg border border-[#415A77]/50 text-xs">
                 {runMeta.durationMs}ms
               </span>
             )}
             {asOf && (
-              <span className="ml-2 font-mono text-[#778DA9]/80 bg-[#1B263B]/60 px-2 py-0.5 rounded border border-white/5 text-[11px]">
+              <span className="ml-2 font-mono text-[#778DA9] bg-[#1B263B] px-2.5 py-0.5 rounded-lg border border-[#415A77]/30 text-xs">
                 Reference: {new Date(asOf).toLocaleDateString()}
               </span>
             )}
@@ -152,32 +152,32 @@ export default function ResultsPage() {
           {enrichSummary?.byMetric && (
             <button
               onClick={() => setShowQualityDashboard(!showQualityDashboard)}
-              className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border transition cursor-pointer shadow-sm ${
                 showQualityDashboard
-                  ? "bg-[#415A77]/20 border-[#415A77]/55 text-[#778DA9]"
-                  : "border-[#415A77]/30 hover:bg-white/[0.05] text-[#778DA9]"
+                  ? "bg-[#415A77] border-[#778DA9] text-white"
+                  : "bg-[#1B263B] border-[#415A77]/60 hover:bg-[#415A77]/30 text-[#E0E1DD]"
               }`}
             >
               <Activity className="h-3.5 w-3.5 text-[#778DA9]" />
-              {showQualityDashboard ? "Hide Data Quality" : "Inspect Data Quality"}
+              <span>{showQualityDashboard ? "Hide Data Quality" : "Inspect Data Quality"}</span>
             </button>
           )}
 
           <button
             onClick={() => navigate("/config")}
-            className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-[#415A77]/30 hover:bg-white/[0.05] text-[#778DA9] transition cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-[#1B263B] border border-[#415A77]/60 hover:bg-[#415A77]/30 hover:border-[#778DA9] text-[#E0E1DD] transition cursor-pointer shadow-sm"
           >
-            <Sliders className="h-3.5 w-3.5" />
-            Re-tune Weights
+            <Sliders className="h-3.5 w-3.5 text-[#778DA9]" />
+            <span>Re-tune Weights</span>
           </button>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate("/export")}
-            className="glow-btn flex items-center gap-2 px-4 py-2 text-xs font-bold text-white rounded-xl cursor-pointer"
+            className="btn-primary flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl cursor-pointer shadow-lg"
           >
             <Download className="h-3.5 w-3.5" />
-            Export Shortlist
+            <span>Export Shortlist</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </motion.button>
         </div>
@@ -195,50 +195,50 @@ export default function ResultsPage() {
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Shortlisted */}
-        <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/10 to-emerald-500/5 p-4 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(16,185,129,0.2)]">
-          <div className="flex items-center justify-between text-xs font-medium text-[#778DA9]/80 mb-2">
+        <div className="rounded-2xl border border-emerald-500/40 bg-[#1B263B] p-5 shadow-xl shadow-[#0D1B2A]/50 transition-all hover:border-emerald-400">
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#778DA9] mb-2">
             <span>Shortlisted</span>
             <Award className="h-4 w-4 text-emerald-400" />
           </div>
-          <p className="text-3xl font-extrabold font-mono text-emerald-400">{shortlist.length}</p>
-          <p className="text-[11px] text-[#778DA9]/80 mt-1">Qualified within Top X</p>
+          <p className="text-4xl font-black font-mono text-emerald-400">{shortlist.length}</p>
+          <p className="text-[11px] text-[#778DA9] mt-1">Qualified within Top X</p>
         </div>
 
         {/* Waitlisted */}
-        <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-b from-amber-500/10 to-amber-500/5 p-4 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(245,158,11,0.2)]">
-          <div className="flex items-center justify-between text-xs font-medium text-[#778DA9]/80 mb-2">
+        <div className="rounded-2xl border border-amber-500/40 bg-[#1B263B] p-5 shadow-xl shadow-[#0D1B2A]/50 transition-all hover:border-amber-400">
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#778DA9] mb-2">
             <span>Waitlisted</span>
             <Clock className="h-4 w-4 text-amber-400" />
           </div>
-          <p className="text-3xl font-extrabold font-mono text-amber-400">{waitlist.length}</p>
-          <p className="text-[11px] text-[#778DA9]/80 mt-1">On standby cushion</p>
+          <p className="text-4xl font-black font-mono text-amber-400">{waitlist.length}</p>
+          <p className="text-[11px] text-[#778DA9] mt-1">On standby cushion</p>
         </div>
 
         {/* Rejected */}
-        <div className="rounded-2xl border border-rose-500/20 bg-gradient-to-b from-rose-500/10 to-rose-500/5 p-4 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(244,63,94,0.2)]">
-          <div className="flex items-center justify-between text-xs font-medium text-[#778DA9]/80 mb-2">
+        <div className="rounded-2xl border border-rose-500/40 bg-[#1B263B] p-5 shadow-xl shadow-[#0D1B2A]/50 transition-all hover:border-rose-400">
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#778DA9] mb-2">
             <span>Disqualified / Excluded</span>
             <Ban className="h-4 w-4 text-rose-400" />
           </div>
-          <p className="text-3xl font-extrabold font-mono text-rose-400">{rejected.length}</p>
-          <p className="text-[11px] text-[#778DA9]/80 mt-1">Below cutoff or filtered</p>
+          <p className="text-4xl font-black font-mono text-rose-400">{rejected.length}</p>
+          <p className="text-[11px] text-[#778DA9] mt-1">Below cutoff or filtered</p>
         </div>
 
         {/* Cutoff Score */}
-        <div className="rounded-2xl border border-[#415A77]/20 bg-gradient-to-b from-[#415A77]/15 to-[#1B263B]/40 p-4 backdrop-blur-md shadow-[0_0_20px_-5px_rgba(6,182,212,0.2)]">
-          <div className="flex items-center justify-between text-xs font-medium text-[#778DA9]/80 mb-2">
+        <div className="rounded-2xl border border-[#778DA9]/40 bg-[#1B263B] p-5 shadow-xl shadow-[#0D1B2A]/50 transition-all hover:border-[#E0E1DD]">
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-[#778DA9] mb-2">
             <span>Cutoff Threshold</span>
-            <span className="h-2 w-2 rounded-full bg-[#778DA9] animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-[#E0E1DD] animate-pulse" />
           </div>
-          <p className="text-3xl font-extrabold font-mono text-[#778DA9]">
+          <p className="text-4xl font-black font-mono text-[#E0E1DD]">
             {cutoffScore != null ? cutoffScore.toFixed(4) : "—"}
           </p>
-          <p className="text-[11px] text-[#778DA9]/80 mt-1">Minimum score to qualify</p>
+          <p className="text-[11px] text-[#778DA9] mt-1">Minimum score to qualify</p>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#415A77]/30 pb-2">
+      <div className="flex items-center gap-2 border-b border-[#415A77]/40 pb-2">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.key;
           const count = tabCounts[tab.key] ?? 0;
@@ -249,8 +249,8 @@ export default function ResultsPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 isActive
-                  ? "bg-[#1B263B] text-white shadow-md border border-[#415A77]/30"
-                  : "text-[#778DA9]/80 hover:text-white hover:bg-white/[0.04]"
+                  ? "bg-[#415A77] text-white shadow-md border border-[#778DA9]/50"
+                  : "bg-[#1B263B]/50 text-[#778DA9] hover:text-white hover:bg-[#1B263B] border border-transparent"
               }`}
             >
               <span>{tab.label}</span>

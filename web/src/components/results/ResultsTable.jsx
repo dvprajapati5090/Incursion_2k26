@@ -32,11 +32,11 @@ import { FLAG_DEFINITIONS, getSafeFlagDetail } from "@/lib/handoffFormatters";
 const columnHelper = createColumnHelper();
 
 const STATUS_BADGES = {
-  shortlisted: "bg-emerald-500/15 border-[#415A77]/40 text-emerald-300",
-  waitlisted:  "bg-amber-500/15 border-amber-500/30 text-amber-300",
-  rejected:    "bg-rose-500/15 border-rose-500/30 text-rose-300",
-  filter_rejected: "bg-orange-500/15 border-orange-500/30 text-orange-300",
-  excluded:    "bg-slate-700/30 border-slate-600/40 text-[#778DA9]/80",
+  shortlisted: "bg-emerald-500/15 border-emerald-500/40 text-emerald-300",
+  waitlisted:  "bg-amber-500/15 border-amber-500/40 text-amber-300",
+  rejected:    "bg-rose-500/15 border-rose-500/40 text-rose-300",
+  filter_rejected: "bg-orange-500/15 border-orange-500/40 text-orange-300",
+  excluded:    "bg-[#415A77]/25 border-[#778DA9]/30 text-[#778DA9]",
 };
 
 export default function ResultsTable({ data, config, onRowClick }) {
@@ -338,45 +338,45 @@ export default function ResultsTable({ data, config, onRowClick }) {
     <div className="space-y-4">
       {/* Search Input Filter */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-3 h-4 w-4 text-[#415A77]" />
+        <Search className="absolute left-3.5 top-3 h-4 w-4 text-[#778DA9]" />
         <input
           type="text"
           placeholder="Filter by team name, ID, or keywords…"
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#1B263B]/60 border border-[#415A77]/30 text-xs text-white placeholder-slate-500 focus:border-[#778DA9] focus:outline-none focus:ring-1 focus:ring-cyan-400 transition"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#1B263B] border border-[#415A77]/60 text-xs text-[#E0E1DD] placeholder-[#778DA9]/60 focus:border-[#778DA9] focus:outline-none focus:ring-1 focus:ring-[#778DA9] transition shadow-inner"
         />
       </div>
 
       {/* Leaderboard Table Container */}
-      <div className="glass-panel rounded-2xl border border-[#415A77]/30 overflow-hidden shadow-xl">
+      <div className="glass-panel rounded-2xl border border-[#415A77]/45 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#0D1B2A]/70 border-b border-[#415A77]/30 text-[#778DA9]/80 font-semibold tracking-wider uppercase">
+            <thead className="bg-[#0D1B2A] border-b border-[#415A77]/45 text-[#778DA9] font-bold tracking-wider uppercase">
               {table.getHeaderGroups().map((hg) => (
                 <tr key={hg.id}>
                   {hg.headers.map((header) => (
                     <th
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
-                      className="px-4 py-3.5 font-semibold text-[#778DA9]/80 cursor-pointer select-none whitespace-nowrap hover:text-white transition"
+                      className="px-4 py-3.5 font-bold text-[#778DA9] cursor-pointer select-none whitespace-nowrap hover:text-white transition"
                     >
                       <div className="flex items-center gap-1.5">
                         {flexRender(header.column.columnDef.header, header.getContext())}
-                        {header.column.getIsSorted() === "asc" && <ChevronUp className="h-3.5 w-3.5 text-[#778DA9]" />}
-                        {header.column.getIsSorted() === "desc" && <ChevronDown className="h-3.5 w-3.5 text-[#778DA9]" />}
+                        {header.column.getIsSorted() === "asc" && <ChevronUp className="h-3.5 w-3.5 text-[#E0E1DD]" />}
+                        {header.column.getIsSorted() === "desc" && <ChevronDown className="h-3.5 w-3.5 text-[#E0E1DD]" />}
                       </div>
                     </th>
                   ))}
                 </tr>
               ))}
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-[#415A77]/25">
               {table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
                   onClick={() => onRowClick?.(row.original)}
-                  className="group hover:bg-white/[0.04] cursor-pointer transition-colors"
+                  className="group hover:bg-[#415A77]/20 cursor-pointer transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="px-4 py-3.5">

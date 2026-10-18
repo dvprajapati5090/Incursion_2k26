@@ -219,13 +219,13 @@ export default function FilterEditor() {
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#415A77]/20 to-purple-500/20 border border-[#415A77]/45 text-[#778DA9]">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#415A77]/30 to-[#1B263B] border border-[#415A77]/50 text-[#E0E1DD]">
             <ShieldAlert className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-base text-white">Eligibility Rules & Hard Filters</h3>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#415A77]/20 text-[#778DA9] border border-[#415A77]/45">
+              <h3 className="font-bold text-base text-[#E0E1DD]">Eligibility Rules & Hard Filters</h3>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#1B263B] text-[#E0E1DD] border border-[#415A77]/40">
                 {(config.filters || []).filter((f) => f.enabled !== false).length} Active Rule{config.filters?.length !== 1 ? "s" : ""}
               </span>
             </div>
@@ -238,9 +238,9 @@ export default function FilterEditor() {
         <button
           onClick={handleAddDefault}
           aria-label="Add Filter"
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#415A77]/20 hover:bg-[#415A77]/25 border border-[#415A77]/45 text-[#778DA9] text-xs font-bold transition cursor-pointer self-start sm:self-auto"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#415A77]/25 hover:bg-[#415A77]/40 border border-[#415A77]/50 text-[#E0E1DD] hover:text-white text-xs font-bold transition cursor-pointer self-start sm:self-auto"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-3.5 w-3.5 text-[#778DA9]" />
           Add Filter
         </button>
       </div>
@@ -249,18 +249,18 @@ export default function FilterEditor() {
       <div className="space-y-2 pt-1 border-t border-[#415A77]/20">
         <div className="flex items-center gap-2 text-xs text-[#778DA9]/80">
           <Zap className="h-3.5 w-3.5 text-[#778DA9]" />
-          <span className="font-semibold text-[#778DA9]">1-Click Common Presets:</span>
+          <span className="font-semibold text-[#E0E1DD]">1-Click Common Presets:</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {QUICK_PRESETS.map((preset) => (
             <button
               key={preset.title}
               onClick={() => handleApplyPreset(preset)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1B263B]/80 hover:bg-white/10 border border-[#415A77]/30 hover:border-[#415A77]/55 text-xs text-[#778DA9] hover:text-white transition cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1B263B] hover:bg-[#415A77]/30 border border-[#415A77]/35 hover:border-[#415A77]/60 text-xs text-[#E0E1DD] transition cursor-pointer shadow-sm"
             >
               <span>{preset.icon}</span>
               <span className="font-medium">{preset.title}</span>
-              <Plus className="h-3 w-3 text-[#778DA9] opacity-60 ml-0.5" />
+              <Plus className="h-3 w-3 text-[#778DA9] opacity-75 ml-0.5" />
             </button>
           ))}
         </div>
