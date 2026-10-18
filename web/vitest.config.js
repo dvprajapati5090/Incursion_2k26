@@ -7,7 +7,12 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: { "@": path.resolve(root, "src") } },
+  resolve: {
+    alias: {
+      "@": path.resolve(root, "src"),
+      "@engine": path.resolve(root, "../engine/src"),
+    },
+  },
   test: {
     environment: "node",
     include: ["tests/**/*.test.{js,jsx}"],

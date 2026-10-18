@@ -6,6 +6,25 @@
  */
 import { create } from "zustand";
 import { DEFAULT_CONFIG } from "@/lib/configSchema";
+import useResultsStore from "./resultsStore";
+import useImportStore from "./importStore";
+import { runShortlist } from "@/engine/runShortlist";
+
+function syncShortlistResults(newConfig) {
+  const { enrichedTeams, rawTeams } = useImportStore.getState();
+  const teams = enrichedTeams.length > 0 ? enrichedTeams : rawTeams;
+  if (!teams || teams.length === 0) return;
+
+  const currentResults = useResultsStore.getState().rankedResults;
+  if (!currentResults || currentResults.length === 0) return;
+
+  try {
+    const result = runShortlist(teams, newConfig);
+    useResultsStore.getState().setResults(result);
+  } catch (err) {
+    console.error("Live override recalculation error:", err);
+  }
+}
 
 const useConfigStore = create((set, get) => ({
   // Active config (plain JS object matching Config Zod schema)
@@ -98,8 +117,8 @@ const useConfigStore = create((set, get) => ({
 
   // ---------- Overrides ----------
   pinTeam: (teamId) =>
-    set((s) => ({
-      config: {
+    set((s) => {
+      const nextConfig = {
         ...s.config,
         overrides: {
           ...s.config.overrides,
@@ -107,12 +126,14 @@ const useConfigStore = create((set, get) => ({
           exclude: s.config.overrides.exclude.filter((id) => id !== teamId),
           waitlist: s.config.overrides.waitlist.filter((id) => id !== teamId),
         },
-      },
-    })),
+      };
+      syncShortlistResults(nextConfig);
+      return { config: nextConfig };
+    }),
 
   excludeTeam: (teamId) =>
-    set((s) => ({
-      config: {
+    set((s) => {
+      const nextConfig = {
         ...s.config,
         overrides: {
           ...s.config.overrides,
@@ -120,12 +141,14 @@ const useConfigStore = create((set, get) => ({
           pin: s.config.overrides.pin.filter((id) => id !== teamId),
           waitlist: s.config.overrides.waitlist.filter((id) => id !== teamId),
         },
-      },
-    })),
+      };
+      syncShortlistResults(nextConfig);
+      return { config: nextConfig };
+    }),
 
   waitlistTeam: (teamId) =>
-    set((s) => ({
-      config: {
+    set((s) => {
+      const nextConfig = {
         ...s.config,
         overrides: {
           ...s.config.overrides,
@@ -133,20 +156,24 @@ const useConfigStore = create((set, get) => ({
           pin: s.config.overrides.pin.filter((id) => id !== teamId),
           exclude: s.config.overrides.exclude.filter((id) => id !== teamId),
         },
-      },
-    })),
+      };
+      syncShortlistResults(nextConfig);
+      return { config: nextConfig };
+    }),
 
   clearOverride: (teamId) =>
-    set((s) => ({
-      config: {
+    set((s) => {
+      const nextConfig = {
         ...s.config,
         overrides: {
           pin: s.config.overrides.pin.filter((id) => id !== teamId),
           exclude: s.config.overrides.exclude.filter((id) => id !== teamId),
           waitlist: s.config.overrides.waitlist.filter((id) => id !== teamId),
         },
-      },
-    })),
+      };
+      syncShortlistResults(nextConfig);
+      return { config: nextConfig };
+    }),
 
   // ---------- Reset ----------
   resetConfig: () => set({ config: structuredClone(DEFAULT_CONFIG) }),

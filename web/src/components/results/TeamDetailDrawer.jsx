@@ -33,7 +33,13 @@ import {
   Bot,
   Calendar,
   ShieldAlert,
+  Pin,
+  Ban,
+  Clock,
+  RotateCcw,
 } from "lucide-react";
+import useConfigStore from "@/stores/configStore";
+import usePresetsStore from "@/stores/presetsStore";
 import {
   BarChart,
   Bar,
@@ -91,12 +97,17 @@ const FILTER_ICONS = {
 
 export default function TeamDetailDrawer({ team, config, onClose }) {
   const { asOf, enrichedAt, isMockGithub } = useImportStore();
+  const { pinTeam, excludeTeam, waitlistTeam, clearOverride } = useConfigStore();
+  const { logAction } = usePresetsStore();
   const [highlightedMemberId, setHighlightedMemberId] = useState(null);
 
   if (!team) return null;
 
   const blindMode = config?.options?.blindMode;
   const statusCfg = STATUS_CONFIG[team.status] || STATUS_CONFIG.shortlisted;
+  const isPin = config?.overrides?.pin?.includes(team.teamId);
+  const isWaitlist = config?.overrides?.waitlist?.includes(team.teamId);
+  const isExclude = config?.overrides?.exclude?.includes(team.teamId);
 
   const chartData = (team.breakdown ?? []).map((b) => ({
     name: b.label ?? b.metric ?? b.criterionId,
@@ -131,51 +142,135 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
         className="relative w-full max-w-2xl bg-[#090e1a] border-l border-white/10 shadow-2xl flex flex-col h-full z-10 text-slate-100"
       >
         {/* Sticky Header */}
-        <div className="sticky top-0 bg-[#090e1a]/95 backdrop-blur-xl border-b border-white/10 px-6 py-5 flex items-start justify-between gap-4 z-20">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-white/5">
-                {team.teamId}
-              </span>
-              <span
-                className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${statusCfg.bg} ${statusCfg.glow}`}
-              >
-                {statusCfg.label}
-              </span>
-              {team.rank && (
-                <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-500/20">
-                  Rank #{team.rank}
+        <div className="sticky top-0 bg-[#090e1a]/95 backdrop-blur-xl border-b border-white/10 px-6 py-5 z-20">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-white/5">
+                  {team.teamId}
                 </span>
-              )}
-              {blindMode && (
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  Blind Mode Active
+                <span
+                  className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${statusCfg.bg} ${statusCfg.glow}`}
+                >
+                  {statusCfg.label}
                 </span>
-              )}
+                {team.rank && (
+                  <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-500/20">
+                    Rank #{team.rank}
+                  </span>
+                )}
+                {blindMode && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    Blind Mode Active
+                  </span>
+                )}
+              </div>
+
+              <h3 className="text-xl font-bold text-white tracking-tight">
+                {blindMode ? `Team ${team.teamId}` : team.teamName || team.teamId}
+              </h3>
+
+              <p className="text-xs text-slate-400 mt-0.5">
+                {team.members?.length ?? 0} applicant
+                {team.members?.length !== 1 ? "s" : ""} registered
+                {team.fields?.track_interest && (
+                  <span className="ml-2 font-mono text-indigo-300 bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-500/20">
+                    Track: {team.fields.track_interest}
+                  </span>
+                )}
+              </p>
             </div>
 
-            <h3 className="text-xl font-bold text-white tracking-tight">
-              {blindMode ? `Team ${team.teamId}` : team.teamName || team.teamId}
-            </h3>
-
-            <p className="text-xs text-slate-400 mt-0.5">
-              {team.members?.length ?? 0} applicant
-              {team.members?.length !== 1 ? "s" : ""} registered
-              {team.fields?.track_interest && (
-                <span className="ml-2 font-mono text-indigo-300 bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-500/20">
-                  Track: {team.fields.track_interest}
-                </span>
-              )}
-            </p>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+              title="Close inspector"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
-            title="Close inspector"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          {/* Quick Override Governance Toolbar */}
+          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-white/10">
+            {team.status !== "shortlisted" ? (
+              <button
+                onClick={() => {
+                  pinTeam(team.teamId);
+                  logAction("PIN", { teamId: team.teamId });
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.25)]"
+              >
+                <Award className="h-3.5 w-3.5 text-emerald-400" />
+                Move to Shortlist
+              </button>
+            ) : isPin ? (
+              <button
+                onClick={() => {
+                  clearOverride(team.teamId);
+                  logAction("UNPIN", { teamId: team.teamId });
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/25 border border-indigo-500/40 text-indigo-300 font-bold text-xs transition cursor-pointer shadow-[0_0_12px_rgba(99,102,241,0.25)]"
+              >
+                <Pin className="h-3.5 w-3.5 fill-current" />
+                Pinned in Shortlist (Unpin)
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  pinTeam(team.teamId);
+                  logAction("PIN", { teamId: team.teamId });
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 font-semibold text-xs transition cursor-pointer"
+              >
+                <Pin className="h-3.5 w-3.5" />
+                Pin to Top
+              </button>
+            )}
+
+            <button
+              onClick={() => {
+                isWaitlist ? clearOverride(team.teamId) : waitlistTeam(team.teamId);
+                logAction(isWaitlist ? "CLEAR_WAITLIST" : "WAITLIST", { teamId: team.teamId });
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                isWaitlist
+                  ? "bg-amber-500/25 border-amber-500/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]"
+                  : "bg-slate-900/80 border-white/10 text-slate-300 hover:text-amber-300 hover:border-amber-500/30"
+              }`}
+            >
+              <Clock className="h-3.5 w-3.5" />
+              {isWaitlist ? "In Waitlist (Click to Reset)" : "Move to Waitlist"}
+            </button>
+
+            <button
+              onClick={() => {
+                isExclude ? clearOverride(team.teamId) : excludeTeam(team.teamId);
+                logAction(isExclude ? "UNEXCLUDE" : "EXCLUDE", { teamId: team.teamId });
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+                isExclude
+                  ? "bg-rose-500/25 border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.25)]"
+                  : "bg-slate-900/80 border-white/10 text-slate-300 hover:text-rose-400 hover:border-rose-500/30"
+              }`}
+            >
+              <Ban className="h-3.5 w-3.5" />
+              {isExclude ? "Excluded (Restore)" : "Exclude Team"}
+            </button>
+
+            {(isPin || isWaitlist || isExclude) && (
+              <button
+                onClick={() => {
+                  clearOverride(team.teamId);
+                  logAction("RESET_OVERRIDE", { teamId: team.teamId });
+                }}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-white/10 text-xs text-slate-400 hover:text-white transition cursor-pointer ml-auto"
+                title="Reset manual override to algorithm rank"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Reset Override
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Scrollable Content */}
