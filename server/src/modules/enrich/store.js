@@ -4,11 +4,15 @@ import { httpError } from "../../utils/httpError.js";
 
 const DIR = path.resolve("data", "enriched");
 
-export async function saveEnriched(importId, { enrichers, summary, teams }) {
+export async function saveEnriched(
+  importId,
+  { enrichers, summary, teams, asOf },
+) {
   await fs.mkdir(DIR, { recursive: true });
   const record = {
     importId,
     enrichedAt: new Date().toISOString(),
+    asOf,
     enrichers,
     summary,
     teams,

@@ -1,5 +1,11 @@
 export const ALIASES = {
   team_id: ["team_id", "teamid", "team_no", "team_number"],
+  linkedin_text: [
+    "linkedin_text",
+    "linkedin_profile_text",
+    "linkedin_export_text",
+  ],
+  linkedin_pdf_url: ["linkedin_pdf_url", "linkedin_pdf", "linkedin_export_url"],
   team_name: ["team_name", "team"],
   member_name: ["member_name", "name", "full_name"],
   member_email: ["member_email", "email", "email_address"],

@@ -1,0 +1,5 @@
+team_id,team_name,member_name,member_email,is_lead,portfolio_url
+T-001,Real,Test One,t1@example.com,true,https://alyssafaustino.com/
+T-002,Thin,Test Two,t2@example.com,true,https://example.com
+T-003,Dead,Test Three,t3@example.com,true,https://this-site-should-not-exist-9f3k2.dev
+T-004,Blocked,Test Four,t4@example.com,true,http://localhost:4000/api/health

@@ -1,0 +1,10 @@
+team_id,team_name,member_name,member_email,is_lead,resume_text,github_url
+T-001,Exp,Test One,t1@example.com,true,"EXPERIENCE
+Backend Intern, TechNova
+June 2024 - August 2024
+Web Developer, CodeLab
+Jan 2025 - Present
+EDUCATION
+B.Tech in Computer Science
+SKILLS
+Languages: JavaScript, Python",https://github.com/torvalds

@@ -32,7 +32,7 @@ function mergeRefined(member, refined) {
 
 export async function enrichTeams(teams, enrichers, { onProgress } = {}) {
   const report = (phase, done, total) => onProgress?.({ phase, done, total });
-
+  const ctx = { asOf: Date.now() };
   // Pass 1: enrichers (GitHub, resume rules, ...)
   const limit = pLimit(env.enrichConcurrency);
   const jobs = [];
@@ -55,7 +55,7 @@ export async function enrichTeams(teams, enrichers, { onProgress } = {}) {
           limit(async () => {
             const t0 = Date.now();
             try {
-              const out = await enr.enrich(member);
+              const out = await enr.enrich(member, ctx);
               for (const id of enr.metricIds) {
                 setMetric(
                   member,
@@ -126,7 +126,11 @@ export async function enrichTeams(teams, enrichers, { onProgress } = {}) {
   const flags = detectFlags(teams);
   report("flags", 1, 1);
 
-  return { teams, summary: { ...summarize(teams), llm, flags } };
+  return {
+    teams,
+    asOf: ctx.asOf,
+    summary: { ...summarize(teams), llm, flags },
+  };
 }
 
 function summarize(teams) {

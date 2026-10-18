@@ -156,7 +156,8 @@
       "source": "linkedin",
       "type": "number",
       "unit": "count",
-      "description": "Posts in the past 12 months (from user-provided export only)"
+      "reserved": true,
+      "description": "Posts in the past 12 months. RESERVED: needs the posts file from LinkedIn's full data export; not collected yet"
     },
     {
       "id": "linkedin.experience_count",

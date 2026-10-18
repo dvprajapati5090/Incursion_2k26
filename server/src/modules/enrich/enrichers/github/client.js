@@ -1,7 +1,7 @@
 import { env } from "../../../../config/env.js";
 
 const QUERY = `
-query($login: String!) {
+query($login: String!, $mergedQuery: String!) {
   user(login: $login) {
     createdAt
     allRepos: repositories(ownerAffiliations: OWNER, privacy: PUBLIC) { totalCount }
@@ -24,13 +24,21 @@ query($login: String!) {
       }
     }
   }
+  mergedPrs: search(query: $mergedQuery, type: ISSUE, first: 1) { issueCount }
 }`;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const fatal = (message) => Object.assign(new Error(message), { fatal: true }); // don't retry these
 
-export async function fetchGithubProfile(login) {
-  const body = JSON.stringify({ query: QUERY, variables: { login } });
+export async function fetchGithubProfile(login, now = Date.now()) {
+  const since = new Date(now - 365 * 86_400_000).toISOString().slice(0, 10);
+  const body = JSON.stringify({
+    query: QUERY,
+    variables: {
+      login,
+      mergedQuery: `author:${login} is:pr is:merged merged:>=${since}`,
+    },
+  });
   let lastErr;
 
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -62,7 +70,7 @@ export async function fetchGithubProfile(login) {
         if (e.type === "RATE_LIMITED") throw fatal("github_rate_limited");
         throw fatal(`github_graphql_error: ${e.message}`);
       }
-      return json.data.user;
+      return { ...json.data.user, mergedPrs: json.data.mergedPrs.issueCount };
     } catch (err) {
       if (err.fatal) throw err;
       lastErr = err; // network error or 5xx: back off and retry

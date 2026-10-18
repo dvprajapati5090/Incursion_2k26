@@ -15,6 +15,8 @@ export const METRIC_IDS = [
   "github.account_age_days",
   "github.languages",
   "github.language_count",
+  "github.merged_prs_1y",
+  "github.last_activity_days",
 ];
 
 function isEmptyRepo(r) {
@@ -42,7 +44,12 @@ export function summarizeUser(user, fetchedAt) {
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])) // deterministic order
     .map(([name]) => name)
     .slice(0, 10);
-
+  const activeDates = days
+    .filter((d) => d.contributionCount > 0)
+    .map((d) => d.date);
+  const lastActivityDate = activeDates.length
+    ? activeDates.reduce((a, b) => (a > b ? a : b))
+    : null;
   return {
     createdAt: user.createdAt,
     fetchedAt,
@@ -54,6 +61,8 @@ export function summarizeUser(user, fetchedAt) {
     emptyRepos: nodes.filter(isEmptyRepo).length,
     starsReceived: nodes.reduce((sum, r) => sum + r.stargazerCount, 0),
     languages,
+    mergedPrs1y: user.mergedPrs,
+    lastActivityDate,
   };
 }
 
@@ -64,8 +73,22 @@ export function toMetrics(s) {
   const ageDays = Math.floor(
     (s.fetchedAt - new Date(s.createdAt).getTime()) / DAY_MS,
   );
-
+  const lastActivityDays = s.lastActivityDate
+    ? Math.max(
+        0,
+        Math.floor(
+          (s.fetchedAt - Date.parse(`${s.lastActivityDate}T00:00:00Z`)) /
+            DAY_MS,
+        ),
+      )
+    : 366; // no contributions in the past year: the real value is above 365
+  const lastActivity = ok("github.last_activity_days", lastActivityDays, o);
+  if (!s.lastActivityDate)
+    lastActivity.note =
+      "no contributions in the past year; the real value is above 365";
   return {
+    "github.merged_prs_1y": ok("github.merged_prs_1y", s.mergedPrs1y, o),
+    "github.last_activity_days": lastActivity,
     "github.contributions_1y": ok(
       "github.contributions_1y",
       s.totalContributions,

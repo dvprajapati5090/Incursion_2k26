@@ -1,29 +1,22 @@
 import { extractText, getDocumentProxy } from "unpdf";
+import { safeFetchBuffer } from "../portfolio/safeFetch.js";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
 export async function fetchResumeText(url) {
-  let res;
+  let result;
   try {
-    res = await fetch(url, {
-      redirect: "follow",
-      signal: AbortSignal.timeout(20_000),
-      headers: { "User-Agent": "team-shortlist-enrichment" },
+    result = await safeFetchBuffer(url, {
+      maxBytes: MAX_BYTES,
+      timeoutMs: 20_000,
+      accept: "application/pdf,*/*",
     });
   } catch (e) {
-    throw new Error(
-      e.name === "TimeoutError"
-        ? "resume_fetch_timeout"
-        : "resume_fetch_network_error",
-    );
+    throw new Error(`resume_${e.message}`);
   }
-  if (!res.ok) throw new Error(`resume_http_${res.status}`);
-  if (Number(res.headers.get("content-length") || 0) > MAX_BYTES)
-    throw new Error("resume_too_large");
+  if (result.truncated) throw new Error("resume_too_large"); // a cut-off PDF is unreadable
 
-  const buf = new Uint8Array(await res.arrayBuffer());
-  if (buf.length > MAX_BYTES) throw new Error("resume_too_large");
-
+  const buf = new Uint8Array(result.buffer);
   // A private Drive file returns an HTML login page, not a PDF
   const isPdf =
     buf.length > 4 &&
