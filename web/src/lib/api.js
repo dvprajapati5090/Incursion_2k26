@@ -8,11 +8,23 @@ const BASE = "/api";
 async function handleResponse(res) {
   if (!res.ok) {
     let message = `HTTP ${res.status}`;
+    let code = `HTTP_${res.status}`;
+    let details = null;
     try {
       const body = await res.json();
-      message = body.message || body.error || message;
+      if (body.error) {
+        message = body.error.message || message;
+        code = body.error.code || code;
+        details = body.error.details || null;
+      } else if (body.message) {
+        message = body.message;
+      }
     } catch {}
-    throw new Error(message);
+    const err = new Error(message);
+    err.status = res.status;
+    err.code = code;
+    err.details = details;
+    throw err;
   }
   return res.json();
 }
@@ -26,6 +38,8 @@ export async function getHealth() {
 
 // ---------- Imports ----------
 
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB per Section 2 & 10
+
 /**
  * Upload a CSV or JSON file.
  * @param {File} file
@@ -33,6 +47,13 @@ export async function getHealth() {
  * @returns {{ importId: string, report: object }}
  */
 export async function uploadFile(file, columnMap = {}) {
+  if (file && file.size > MAX_FILE_SIZE) {
+    const err = new Error("File exceeds maximum allowed size of 20 MB.");
+    err.code = "LIMIT_FILE_SIZE";
+    err.status = 413;
+    throw err;
+  }
+
   const form = new FormData();
   form.append("file", file);
   if (Object.keys(columnMap).length > 0) {
@@ -52,17 +73,28 @@ export async function getImport(importId) {
   return handleResponse(res);
 }
 
-// ---------- Enrichment ----------
+// ---------- Enrichment & Jobs ----------
 
 /**
  * Trigger enrichment for an importId (fetches GitHub, parses resumes, etc.)
+ * Returns 202 job object.
  * @param {string} importId
- * @returns {{ importId, enrichedAt, enrichers, summary }}
+ * @returns {Promise<object>}
  */
 export async function enrichImport(importId) {
   const res = await fetch(`${BASE}/imports/${importId}/enrich`, {
     method: "POST",
   });
+  return handleResponse(res);
+}
+
+/**
+ * Poll job progress and status.
+ * @param {string} jobId
+ * @returns {Promise<{ jobId, importId, status, phase, progress, summary, error, statusUrl }>}
+ */
+export async function getJob(jobId) {
+  const res = await fetch(`${BASE}/jobs/${jobId}`);
   return handleResponse(res);
 }
 

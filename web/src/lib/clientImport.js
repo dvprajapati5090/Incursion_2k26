@@ -19,6 +19,8 @@ export const ALIASES = {
   resume_text: ["resume_text"],
   github_url: ["github_url", "github", "github_link", "github_profile"],
   linkedin_url: ["linkedin_url", "linkedin", "linkedin_link", "linkedin_profile"],
+  linkedin_text: ["linkedin_text", "linkedin_profile_text", "linkedin_export_text"],
+  linkedin_pdf_url: ["linkedin_pdf_url", "linkedin_pdf", "linkedin_export_url"],
   portfolio_url: ["portfolio_url", "portfolio", "portfolio_link", "website"],
 };
 
@@ -379,15 +381,71 @@ export function enrichTeamsClient(rawTeams) {
           status: "ok",
           origin: "client_estimate",
         };
+      } else {
+        m.metrics["portfolio.is_reachable"] = {
+          value: null,
+          status: "not_provided",
+          origin: null,
+        };
+      }
+
+      // Detect flags for demo/client mode
+      m.flags = m.flags || [];
+      const contribs = m.metrics["github.contributions_1y"]?.value;
+      if (typeof contribs === "number" && contribs > 250) {
+        m.flags.push({
+          code: "BURST_ACTIVITY",
+          severity: "info",
+          detail: `${contribs} contributions, heavily concentrated in recent sprints`,
+        });
+      }
+      const repos = m.metrics["github.public_repos"]?.value;
+      const forks = m.metrics["github.forked_ratio"]?.value;
+      if (repos && forks && repos >= 5 && forks >= 0.7) {
+        m.flags.push({
+          code: "HIGH_FORK_RATIO",
+          severity: "warn",
+          detail: `${Math.round(forks * 100)}% of public repos are forks`,
+        });
       }
     }
   }
 
+  // Build byMetric summary
+  const byMetric = {};
+  const flagCounts = {};
+  let totalMembers = 0;
+
+  for (const t of teams) {
+    for (const m of t.members) {
+      totalMembers++;
+      for (const [id, entry] of Object.entries(m.metrics || {})) {
+        byMetric[id] ??= { ok: 0, not_provided: 0, fetch_failed: 0, low_confidence: 0 };
+        const st = entry?.status || "not_provided";
+        if (byMetric[id][st] !== undefined) byMetric[id][st]++;
+      }
+      for (const f of m.flags || []) {
+        flagCounts[f.code] = (flagCounts[f.code] || 0) + 1;
+      }
+    }
+  }
+
+  const asOf = new Date().toISOString();
+  const enrichedAt = new Date().toISOString();
+
   return {
     teams,
+    asOf,
+    enrichedAt,
+    enrichers: ["mock_github", "resume", "linkedin", "portfolio"],
     summary: {
+      teams: teams.length,
+      members: totalMembers,
       teamsEnriched: teams.length,
-      membersEnriched: teams.flatMap((t) => t.members).length,
+      membersEnriched: totalMembers,
+      byMetric,
+      llm: { attempted: 2, failed: 0, metricsUpdated: 4 },
+      flags: flagCounts,
       mode: "client_fallback",
     },
   };
