@@ -21,11 +21,16 @@ import {
   Download,
   Search,
   Sparkles,
+  Activity,
+  Calendar,
 } from "lucide-react";
 import useResultsStore from "@/stores/resultsStore";
 import useConfigStore from "@/stores/configStore";
+import useImportStore from "@/stores/importStore";
 import ResultsTable from "@/components/results/ResultsTable";
 import TeamDetailDrawer from "@/components/results/TeamDetailDrawer";
+import DemoDataBanner from "@/components/common/DemoDataBanner";
+import DataQualityDashboard from "@/components/upload/DataQualityDashboard";
 
 const TABS = [
   { key: "shortlisted", label: "Shortlisted", badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
@@ -47,8 +52,10 @@ export default function ResultsPage() {
     error,
   } = useResultsStore();
   const { config } = useConfigStore();
+  const { asOf, enrichedAt, enrichSummary, isMockGithub } = useImportStore();
   const [activeTab, setActiveTab] = useState("shortlisted");
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [showQualityDashboard, setShowQualityDashboard] = useState(false);
 
   const tableData = {
     shortlisted: shortlist,
@@ -111,6 +118,9 @@ export default function ResultsPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Demo Data Banner (Must-do UI Rule #8) */}
+      <DemoDataBanner />
+
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -129,14 +139,33 @@ export default function ResultsPage() {
                 {runMeta.durationMs}ms
               </span>
             )}
+            {asOf && (
+              <span className="ml-2 font-mono text-slate-400 bg-slate-900/60 px-2 py-0.5 rounded border border-white/5 text-[11px]">
+                Reference: {new Date(asOf).toLocaleDateString()}
+              </span>
+            )}
           </p>
         </div>
 
         {/* Action buttons */}
         <div className="flex items-center gap-2.5">
+          {enrichSummary?.byMetric && (
+            <button
+              onClick={() => setShowQualityDashboard(!showQualityDashboard)}
+              className={`flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold rounded-xl border transition cursor-pointer ${
+                showQualityDashboard
+                  ? "bg-cyan-500/20 border-cyan-500/40 text-cyan-300"
+                  : "border-white/10 hover:bg-white/[0.05] text-slate-300"
+              }`}
+            >
+              <Activity className="h-3.5 w-3.5 text-cyan-400" />
+              {showQualityDashboard ? "Hide Data Quality" : "Inspect Data Quality"}
+            </button>
+          )}
+
           <button
             onClick={() => navigate("/config")}
-            className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-white/10 hover:bg-white/[0.05] text-slate-300 transition"
+            className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-white/10 hover:bg-white/[0.05] text-slate-300 transition cursor-pointer"
           >
             <Sliders className="h-3.5 w-3.5" />
             Re-tune Weights
@@ -153,6 +182,15 @@ export default function ResultsPage() {
           </motion.button>
         </div>
       </div>
+
+      {/* Collapsible Data Quality Dashboard */}
+      {showQualityDashboard && enrichSummary?.byMetric && (
+        <DataQualityDashboard
+          summary={enrichSummary}
+          asOf={asOf}
+          enrichedAt={enrichedAt}
+        />
+      )}
 
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

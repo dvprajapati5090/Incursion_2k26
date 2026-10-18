@@ -3,9 +3,9 @@
  *
  * High-tech intake portal for tabular CSV / JSON hackathon registrations.
  * Features drag-and-drop, automated header mapping, health diagnostics,
- * and multi-source enrichment pipeline.
+ * multi-phase enrichment polling with live telemetry, and data quality audits.
  */
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -21,15 +21,25 @@ import {
   RefreshCw,
   Zap,
   Layers,
-  ArrowUpRight,
+  Activity,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { uploadFile, getImport, enrichImport, getEnriched, getHealth } from "@/lib/api";
+import { uploadFile, getImport, enrichImport, getJob, getEnriched, getHealth } from "@/lib/api";
 import { parseClientCsv, parseClientJson, enrichTeamsClient } from "@/lib/clientImport";
 import useImportStore from "@/stores/importStore";
 import usePresetsStore from "@/stores/presetsStore";
 import ImportReport from "@/components/upload/ImportReport";
 import ColumnMapper from "@/components/upload/ColumnMapper";
+import DataQualityDashboard from "@/components/upload/DataQualityDashboard";
+import DemoDataBanner from "@/components/common/DemoDataBanner";
+
+const PHASE_LABELS = {
+  enrich: "Phase 1/4: Multi-Source Signal Ingestion (GitHub, Resumes, Portfolios)",
+  llm: "Phase 2/4: AI Resume Parsing & LLM Refinement (~4s cadence)",
+  flags: "Phase 3/4: Profile Integrity & Duplicate Signal Audit",
+  saving: "Phase 4/4: Persisting Cohort Database Records",
+};
 
 export default function UploadPage() {
   const navigate = useNavigate();
@@ -41,6 +51,10 @@ export default function UploadPage() {
     rawTeams,
     error,
     enrichSummary,
+    asOf,
+    enrichedAt,
+    enrichers,
+    isMockGithub,
     setUploading,
     setImported,
     setEnriching,
@@ -53,8 +67,20 @@ export default function UploadPage() {
   const [dragging, setDragging] = useState(false);
   const [columnMap, setColumnMap] = useState({});
   const [showMapper, setShowMapper] = useState(false);
+  const [missingTeamIdHeaders, setMissingTeamIdHeaders] = useState([]);
+  const [lastFile, setLastFile] = useState(null);
   const [serverOnline, setServerOnline] = useState(null);
   const [infoNotice, setInfoNotice] = useState(null);
+  const [activeJob, setActiveJob] = useState(null);
+
+  const pollTimerRef = useRef(null);
+
+  // Clear polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+    };
+  }, []);
 
   // Check backend server health
   const checkHealth = useCallback(async () => {
@@ -70,8 +96,8 @@ export default function UploadPage() {
     checkHealth();
   }, [checkHealth]);
 
-  // Upload handler with seamless client fallback
-  const handleFile = useCallback(async (file) => {
+  // Upload handler with 422 MISSING_TEAM_ID_COLUMN recovery & client fallback
+  const handleFile = useCallback(async (file, explicitColumnMap = columnMap) => {
     if (!file) return;
     const ext = file.name.split(".").pop().toLowerCase();
     if (!["csv", "json"].includes(ext)) {
@@ -79,11 +105,13 @@ export default function UploadPage() {
       return;
     }
 
+    setLastFile(file);
     setUploading();
     setInfoNotice(null);
+    setMissingTeamIdHeaders([]);
 
     try {
-      const result = await uploadFile(file, columnMap);
+      const result = await uploadFile(file, explicitColumnMap);
       let teams = [];
       try {
         const full = await getImport(result.importId);
@@ -98,15 +126,24 @@ export default function UploadPage() {
       });
       logAction("FILE_UPLOADED", { filename: file.name, importId: result.importId, mode: "server" });
       setServerOnline(true);
-      if (ext === "csv" && result.report?.columns?.extra?.length > 0) {
-        setShowMapper(false);
-      }
+      setShowMapper(false);
     } catch (serverErr) {
-      console.warn("Backend upload failed, utilizing browser-side client engine:", serverErr);
+      // Catch 422 MISSING_TEAM_ID_COLUMN
+      if (
+        (serverErr.code === "MISSING_TEAM_ID_COLUMN" || serverErr.status === 422) &&
+        Array.isArray(serverErr.details?.headers)
+      ) {
+        setMissingTeamIdHeaders(serverErr.details.headers);
+        setShowMapper(true);
+        setError("Missing team_id column: please select which header identifies the team.");
+        return;
+      }
+
+      console.warn("Backend upload failed or offline, utilizing browser-side client engine:", serverErr);
       try {
         const text = await file.text();
         const clientResult = ext === "csv"
-          ? parseClientCsv(text, columnMap)
+          ? parseClientCsv(text, explicitColumnMap)
           : parseClientJson(text);
 
         setImported({
@@ -146,27 +183,93 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
     await handleFile(file);
   };
 
-  // Enrichment pipeline
+  // Re-upload with mapping chosen from ColumnMapper
+  const handleApplyMapping = async () => {
+    if (lastFile) {
+      await handleFile(lastFile, columnMap);
+    }
+  };
+
+  // Enrichment pipeline with active job polling
   const handleEnrich = async () => {
     if (!importId) return;
     setEnriching();
+    setActiveJob(null);
 
+    // Client-side fallback if offline
     if (importId.startsWith("client_") || serverOnline === false) {
       const enriched = enrichTeamsClient(rawTeams);
-      setEnriched({ teams: enriched.teams, summary: enriched.summary });
+      setEnriched({
+        teams: enriched.teams,
+        summary: enriched.summary,
+        asOf: enriched.asOf,
+        enrichedAt: enriched.enrichedAt,
+        enrichers: enriched.enrichers,
+      });
       logAction("ENRICHMENT_COMPLETE", { importId, summary: enriched.summary, mode: "client" });
       return;
     }
 
     try {
-      const enrichResult = await enrichImport(importId);
-      const enriched = await getEnriched(importId);
-      setEnriched({ teams: enriched.teams, summary: enrichResult.summary });
-      logAction("ENRICHMENT_COMPLETE", { importId, summary: enrichResult.summary, mode: "server" });
+      const job = await enrichImport(importId);
+      setActiveJob(job);
+
+      // Start polling GET /api/jobs/:jobId every 1.2s per Handoff spec
+      pollTimerRef.current = setInterval(async () => {
+        try {
+          const currentJob = await getJob(job.jobId);
+          setActiveJob(currentJob);
+
+          if (currentJob.status === "done") {
+            clearInterval(pollTimerRef.current);
+            const enriched = await getEnriched(importId);
+            setEnriched({
+              teams: enriched.teams,
+              summary: enriched.summary || currentJob.summary,
+              asOf: enriched.asOf,
+              enrichedAt: enriched.enrichedAt,
+              enrichers: enriched.enrichers,
+            });
+            logAction("ENRICHMENT_COMPLETE", {
+              importId,
+              summary: enriched.summary,
+              mode: "server",
+            });
+          } else if (currentJob.status === "failed") {
+            clearInterval(pollTimerRef.current);
+            setError(currentJob.error?.message || "Enrichment pipeline failed");
+          }
+        } catch (pollErr) {
+          // If job expired (404), check if enriched file was already written
+          if (pollErr.status === 404 || pollErr.code === "JOB_NOT_FOUND") {
+            try {
+              const enriched = await getEnriched(importId);
+              clearInterval(pollTimerRef.current);
+              setEnriched({
+                teams: enriched.teams,
+                summary: enriched.summary,
+                asOf: enriched.asOf,
+                enrichedAt: enriched.enrichedAt,
+                enrichers: enriched.enrichers,
+              });
+              return;
+            } catch {
+              clearInterval(pollTimerRef.current);
+              setError("Job expired from memory. Please start enrichment again.");
+            }
+          }
+        }
+      }, 1200);
     } catch (e) {
-      console.warn("Backend enrich fallback triggered:", e);
+      console.warn("Backend enrich trigger failed, utilizing browser fallback:", e);
       const fallback = enrichTeamsClient(rawTeams);
-      setEnriched({ teams: fallback.teams, summary: { ...fallback.summary, note: "Client fallback metrics used" } });
+      setEnriched({
+        teams: fallback.teams,
+        summary: fallback.summary,
+        asOf: fallback.asOf,
+        enrichedAt: fallback.enrichedAt,
+        enrichers: fallback.enrichers,
+      });
       setInfoNotice("Generated rich profile metrics locally so you can proceed to scoring.");
       logAction("ENRICHMENT_COMPLETE", { importId, summary: fallback.summary, mode: "client_fallback" });
     }
@@ -177,19 +280,22 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
+      {/* Demo Data Banner (Must-do UI Rule #8) */}
+      <DemoDataBanner />
+
       {/* Hero Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold mb-3">
             <Zap className="h-3.5 w-3.5 text-cyan-400" />
-            Stage 1 • Data Intake & Normalization
+            Stage 1 • Data Intake & Multi-Source Normalization
           </div>
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             Load Hackathon Registrations
           </h2>
           <p className="text-slate-400 mt-2 text-sm max-w-2xl">
             Accepts raw Google Forms exports, multi-member CSVs, and canonical JSON.
-            Individual profile links (GitHub, Resume, Portfolio) are mapped and normalized automatically.
+            Individual profile links (GitHub, Resume, Portfolio, LinkedIn) are mapped and normalized automatically.
           </p>
         </div>
 
@@ -216,7 +322,7 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
             <button
               onClick={checkHealth}
               title="Refresh connection"
-              className="text-slate-400 hover:text-white transition ml-1"
+              className="text-slate-400 hover:text-white transition ml-1 cursor-pointer"
             >
               <RefreshCw className="h-3 w-3" />
             </button>
@@ -250,7 +356,7 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
             </div>
             <button
               onClick={() => setInfoNotice(null)}
-              className="text-slate-400 hover:text-white underline ml-4 text-[11px]"
+              className="text-slate-400 hover:text-white underline ml-4 text-[11px] cursor-pointer"
             >
               Dismiss
             </button>
@@ -289,18 +395,36 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
             <Loader2 className="h-12 w-12 text-cyan-400 animate-spin" />
             <div>
               <p className="font-semibold text-white">Normalizing registrations…</p>
-              <p className="text-xs text-slate-400 mt-1 font-mono">{filename}</p>
+              <p className="text-xs text-slate-400 mt-1 font-mono">{filename || "Processing file"}</p>
             </div>
           </div>
         ) : phase === "enriching" ? (
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-4 w-full max-w-md mx-auto">
             <div className="relative">
               <div className="absolute inset-0 rounded-full blur-md bg-indigo-500/30 animate-pulse" />
               <Loader2 className="h-12 w-12 text-indigo-400 animate-spin relative" />
             </div>
-            <div>
-              <p className="font-semibold text-white">Enriching profile signals…</p>
-              <p className="text-xs text-slate-400 mt-1">Analyzing GitHub activity, resume projects, and portfolios</p>
+            <div className="text-center w-full space-y-2">
+              <p className="font-bold text-white text-base">
+                {activeJob?.phase ? PHASE_LABELS[activeJob.phase] || "Enriching profile signals…" : "Enriching profile signals…"}
+              </p>
+
+              {activeJob?.progress?.total > 0 && (
+                <div className="space-y-1">
+                  <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${Math.round((activeJob.progress.done / activeJob.progress.total) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[11px] font-mono text-slate-400">
+                    <span>{activeJob.progress.done} of {activeJob.progress.total} processed</span>
+                    <span>{Math.round((activeJob.progress.done / activeJob.progress.total) * 100)}%</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ) : isImported ? (
@@ -327,7 +451,7 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
                 Drag and drop your team spreadsheet or JSON
               </p>
               <p className="text-xs text-slate-400 mt-1.5 max-w-md mx-auto">
-                Supports Google Forms CSV (one row per member), multi-member records, and custom team fields.
+                Supports Google Forms CSV (one row per member), multi-member records, and custom team fields. Max 20 MB.
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs text-slate-400 font-mono pt-2">
@@ -350,19 +474,31 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
         </div>
       )}
 
-      {/* Import Report Section */}
-      {report && <ImportReport report={report} />}
-
-      {/* Column Mapper (if needed) */}
-      {report?.columns && showMapper && (
+      {/* Column Mapper (for custom columns OR 422 recovery) */}
+      {(showMapper || missingTeamIdHeaders.length > 0) && (
         <ColumnMapper
-          columns={report.columns}
+          columns={report?.columns}
+          availableHeaders={missingTeamIdHeaders}
           columnMap={columnMap}
           onChange={setColumnMap}
+          onReupload={handleApplyMapping}
+          missingTeamIdError={missingTeamIdHeaders.length > 0}
         />
       )}
 
-      {/* Action Bar */}
+      {/* Import Report Section */}
+      {report && <ImportReport report={report} />}
+
+      {/* Data Quality Dashboard (Must-do UI Rule #2) */}
+      {isEnriched && enrichSummary?.byMetric && (
+        <DataQualityDashboard
+          summary={enrichSummary}
+          asOf={asOf}
+          enrichedAt={enrichedAt}
+        />
+      )}
+
+      {/* Action Bar (Trigger Enrichment) */}
       {isImported && !isEnriched && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -393,7 +529,7 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
 
             <button
               onClick={() => navigate("/config")}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/[0.05] text-slate-300 text-xs font-semibold transition"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 hover:bg-white/[0.05] text-slate-300 text-xs font-semibold transition cursor-pointer"
             >
               Skip Enrichment
               <ArrowRight className="h-3.5 w-3.5" />
@@ -415,10 +551,10 @@ T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,`;
             </div>
             <div>
               <h4 className="font-bold text-white text-sm">
-                Enrichment Complete • {enrichSummary?.teamsEnriched ?? rawTeams.length} Teams Ready
+                Enrichment Complete • {enrichSummary?.teams ?? rawTeams.length} Teams Ready
               </h4>
               <p className="text-xs text-emerald-300/80 mt-0.5">
-                All profile signals and quantitative metrics are attached to member records.
+                All profile signals, LLM extractions, and data quality metrics are attached to applicant records.
               </p>
             </div>
           </div>

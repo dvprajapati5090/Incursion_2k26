@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import useConfigStore from "@/stores/configStore";
 import usePresetsStore from "@/stores/presetsStore";
+import { FLAG_DEFINITIONS, getSafeFlagDetail } from "@/lib/handoffFormatters";
 
 const columnHelper = createColumnHelper();
 
@@ -156,24 +157,58 @@ export default function ResultsTable({ data, config, onRowClick }) {
       size: 80,
     }),
 
-    // Flags column
-    columnHelper.accessor("flags", {
+    // Flags column (Must-do UI Rule #4)
+    columnHelper.display({
+      id: "flags",
       header: "Flags & Notices",
       cell: (info) => {
-        const flags = info.getValue() ?? [];
+        const row = info.row.original;
+        const rawFlags = row.flags ?? [];
+        const memberFlags = (row.members ?? []).flatMap((m) => m.flags ?? []);
+
+        // Deduplicate flags by code
+        const flagsMap = new Map();
+        for (const f of rawFlags) {
+          const code = typeof f === "string" ? f : f?.code;
+          if (code && !flagsMap.has(code)) {
+            flagsMap.set(code, typeof f === "object" ? f : { code });
+          }
+        }
+        for (const f of memberFlags) {
+          if (f?.code && !flagsMap.has(f.code)) {
+            flagsMap.set(f.code, f);
+          }
+        }
+
+        const flags = Array.from(flagsMap.values());
         if (flags.length === 0) {
           return <span className="text-[11px] text-slate-600 font-mono">—</span>;
         }
+
         return (
           <div className="flex flex-wrap gap-1">
-            {flags.map((f) => (
-              <span
-                key={f}
-                className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20"
-              >
-                {f}
-              </span>
-            ))}
+            {flags.map((f) => {
+              const def = FLAG_DEFINITIONS[f.code] || {
+                defaultSeverity: "warn",
+                title: f.code,
+              };
+              const isWarn = (f.severity || def.defaultSeverity) === "warn";
+              const safeDetail = getSafeFlagDetail(f, blindMode);
+
+              return (
+                <span
+                  key={f.code}
+                  title={`${def.title || f.code}: ${safeDetail}`}
+                  className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${
+                    isWarn
+                      ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                      : "bg-blue-500/15 text-blue-300 border-blue-500/30"
+                  }`}
+                >
+                  {f.code}
+                </span>
+              );
+            })}
           </div>
         );
       },

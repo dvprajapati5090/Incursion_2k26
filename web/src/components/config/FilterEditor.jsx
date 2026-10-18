@@ -108,7 +108,11 @@ export default function FilterEditor() {
                 >
                   {METRIC_OPTIONS.map((g) => (
                     <optgroup key={g.group} label={g.group}>
-                      {g.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                      {g.options.map((o) => (
+                        <option key={o.value} value={o.value} disabled={o.disabled}>
+                          {o.label} {o.disabled ? `— [Disabled: ${o.disabledReason || "reserved"}]` : ""}
+                        </option>
+                      ))}
                     </optgroup>
                   ))}
                 </select>

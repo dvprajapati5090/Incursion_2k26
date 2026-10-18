@@ -214,8 +214,13 @@ export default function CriteriaEditor() {
                         {METRIC_OPTIONS.map((opt) => (
                           <optgroup key={opt.group} label={opt.group} className="bg-slate-900 text-slate-200">
                             {opt.options.map((o) => (
-                              <option key={o.value} value={o.value} className="bg-slate-900 text-slate-200">
-                                {o.label}
+                              <option
+                                key={o.value}
+                                value={o.value}
+                                disabled={o.disabled}
+                                className={o.disabled ? "text-slate-500 bg-slate-900" : "bg-slate-900 text-slate-200"}
+                              >
+                                {o.label} {o.disabled ? `— [Disabled: ${o.disabledReason || "reserved"}]` : ""}
                               </option>
                             ))}
                           </optgroup>
