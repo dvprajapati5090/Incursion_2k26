@@ -5,6 +5,7 @@ describe("GitHub profile metric extraction", () => {
   it("summarizes repo, language, contribution, and account-age metrics deterministically", () => {
     const user = {
       createdAt: "2020-01-01T00:00:00Z",
+      mergedPrs: 5,
       allRepos: { totalCount: 4 },
       ownRepos: { totalCount: 3, nodes: [
         { isEmpty: false, stargazerCount: 5, primaryLanguage: { name: "TypeScript" }, defaultBranchRef: { target: { history: { totalCount: 3 } } } },
@@ -23,7 +24,7 @@ describe("GitHub profile metric extraction", () => {
   });
 
   it("returns safe zero ratios when the account has no public repositories", () => {
-    const metrics = toMetrics({ createdAt: "2025-01-01T00:00:00Z", fetchedAt: Date.parse("2025-01-02T00:00:00Z"), totalContributions: 0, activeMonths: 0, publicRepos: 0, originalRepos: 0, sampledOriginalRepos: 0, emptyRepos: 0, starsReceived: 0, languages: [] });
+    const metrics = toMetrics({ createdAt: "2025-01-01T00:00:00Z", fetchedAt: Date.parse("2025-01-02T00:00:00Z"), totalContributions: 0, activeMonths: 0, publicRepos: 0, originalRepos: 0, sampledOriginalRepos: 0, emptyRepos: 0, starsReceived: 0, languages: [], mergedPrs1y: 0, lastActivityDate: null });
     expect(metrics["github.forked_ratio"].value).toBe(0);
     expect(metrics["github.empty_repo_ratio"].value).toBe(0);
   });

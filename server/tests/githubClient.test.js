@@ -14,10 +14,18 @@ const response = (status, body, headers = {}) => ({
 
 describe("GitHub GraphQL client", () => {
   it("returns the profile from a successful API response", async () => {
-    const profile = { user: { createdAt: "2020-01-01", allRepos: { totalCount: 2 } } };
+    const profile = {
+      user: {
+        createdAt: "2020-01-01",
+        allRepos: { totalCount: 2 },
+        ownRepos: { totalCount: 1, nodes: [] },
+        contributionsCollection: { contributionCalendar: { totalContributions: 0, weeks: [] } },
+      },
+      mergedPrs: { issueCount: 7 },
+    };
     const fetchMock = vi.fn().mockResolvedValue(response(200, { data: profile }));
     vi.stubGlobal("fetch", fetchMock);
-    await expect(fetchGithubProfile("octocat")).resolves.toEqual(profile.user);
+    await expect(fetchGithubProfile("octocat")).resolves.toEqual({ ...profile.user, mergedPrs: 7 });
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(fetchMock.mock.calls[0][1].body).toContain("octocat");
   });

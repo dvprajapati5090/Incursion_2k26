@@ -13,6 +13,7 @@ afterEach(() => vi.restoreAllMocks());
 
 const profile = {
   createdAt: "2020-01-01T00:00:00Z",
+  mergedPrs: 4,
   allRepos: { totalCount: 2 },
   ownRepos: { totalCount: 1, nodes: [{ isEmpty: false, stargazerCount: 3, primaryLanguage: { name: "JavaScript" }, defaultBranchRef: { target: { history: { totalCount: 4 } } } }] },
   contributionsCollection: { contributionCalendar: { totalContributions: 22, weeks: [{ contributionDays: [{ date: "2025-02-01", contributionCount: 2 }] }] } },
