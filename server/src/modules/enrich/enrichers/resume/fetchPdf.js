@@ -8,22 +8,34 @@ export async function fetchResumeText(url) {
     // Check content-length header first to avoid downloading oversized files
     res = await fetch(url, {
       signal: AbortSignal.timeout(20_000),
-      headers: { "User-Agent": "team-shortlist-enrichment", Accept: "application/pdf,*/*" },
+      headers: {
+        "User-Agent": "team-shortlist-enrichment",
+        Accept: "application/pdf,*/*",
+      },
     });
   } catch (e) {
-    throw new Error(e.name === "TimeoutError" ? "resume_fetch_timeout" : "resume_network_error");
+    const renamed = {
+      timeout: "fetch_timeout",
+      network_error: "fetch_network_error",
+    };
+    throw new Error(`resume_${renamed[e.message] ?? e.message}`);
   }
 
   if (!res.ok) throw new Error(`resume_http_${res.status}`);
 
   const contentLength = res.headers.get("content-length");
-  if (contentLength && Number(contentLength) > MAX_BYTES) throw new Error("resume_too_large");
+  if (contentLength && Number(contentLength) > MAX_BYTES)
+    throw new Error("resume_too_large");
 
   let buffer;
   try {
     buffer = await res.arrayBuffer();
   } catch (e) {
-    throw new Error(e.name === "TimeoutError" ? "resume_fetch_timeout" : "resume_network_error");
+    throw new Error(
+      e.name === "TimeoutError"
+        ? "resume_fetch_timeout"
+        : "resume_network_error",
+    );
   }
 
   const buf = new Uint8Array(buffer);
