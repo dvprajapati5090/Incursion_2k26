@@ -15,7 +15,7 @@ const HEADINGS = [
   ],
   [
     "skills",
-    /^(?:(?:technical|key|core|professional)\s+)?skills?(?:\s+(?:and|&)\s+[a-z ]+)?$|^technologies$|^tech stack$|^technical expertise$/,
+    /^(?:(?:technical|key|core|professional|top)\s+)?skills?(?:\s+(?:and|&)\s+[a-z ]+)?$|^technologies$|^tech stack$|^technical expertise$/,
   ],
   [
     "achievements",

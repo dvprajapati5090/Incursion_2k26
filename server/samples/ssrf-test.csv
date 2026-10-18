@@ -1,0 +1,3 @@
+team_id,team_name,member_name,member_email,is_lead,resume_url
+T-001,Blocked,Test One,t1@example.com,true,http://localhost:4000/api/health
+T-002,Dead,Test Two,t2@example.com,true,https://drive.google.com/file/d/FAKEID123/view

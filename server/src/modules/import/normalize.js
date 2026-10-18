@@ -43,16 +43,18 @@ function cleanUrl(value, column, row, issues) {
   }
 }
 
-function toSource({ url, text }) {
-  if (url === null && text === null) return null; // missing = null, never {}
+function toSource({ url, text, pdfUrl = null }) {
+  if (url === null && text === null && pdfUrl === null) return null; // missing = null, never {}
   const s = {};
   if (url !== null) s.url = url;
   if (text !== null) s.text = text;
+  if (pdfUrl !== null) s.pdfUrl = pdfUrl;
   return s;
 }
 
 function buildMember(rec, memberId, row, issues) {
   const url = (col) => cleanUrl(rec[col] ?? null, col, row, issues);
+
   return {
     memberId,
     name: rec.member_name ?? null,
@@ -64,8 +66,12 @@ function buildMember(rec, memberId, row, issues) {
         text: rec.resume_text ?? null,
       }),
       github: toSource({ url: url("github_url"), text: null }),
-      linkedin: toSource({ url: url("linkedin_url"), text: null }),
       portfolio: toSource({ url: url("portfolio_url"), text: null }),
+      linkedin: toSource({
+        url: url("linkedin_url"),
+        text: rec.linkedin_text ?? null,
+        pdfUrl: url("linkedin_pdf_url"),
+      }),
     },
     metrics: {},
     flags: [],

@@ -1,6 +1,6 @@
 import { ok } from "../../../metrics/metricValue.js";
 import { splitSections, BULLET } from "./sections.js";
-
+import { experienceMonths } from "./experience.js";
 export const METRIC_IDS = [
   "resume.text",
   "resume.skills",
@@ -10,6 +10,7 @@ export const METRIC_IDS = [
   "resume.internship_count",
   "resume.publication_count",
   "resume.education_level",
+  "resume.experience_months",
 ];
 
 const TEXT_CAP = 20_000;
@@ -102,7 +103,7 @@ function educationLevel(eduLines, fullText) {
   return { value: 0, confidence: eduLines ? 0.4 : NOT_FOUND };
 }
 
-export function parseResume(text) {
+export function parseResume(text, asOf) {
   const s = splitSections(text);
   return {
     skills: parseSkills(s.skills),
@@ -112,13 +113,19 @@ export function parseResume(text) {
     certifications: countItems(s.certifications),
     publications: countItems(s.publications),
     education: educationLevel(s.education, text),
+    experience: experienceMonths(s.experience, asOf),
   };
 }
 
-export function toMetrics(text, origin) {
-  const p = parseResume(text);
+export function toMetrics(text, origin, asOf) {
+  const p = parseResume(text, asOf);
   const o = { origin: "rule_based" };
   return {
+    "resume.experience_months": ok(
+      "resume.experience_months",
+      p.experience.value,
+      { ...o, confidence: p.experience.confidence },
+    ),
     "resume.text": ok("resume.text", text.slice(0, TEXT_CAP), { origin }),
     "resume.skills": ok("resume.skills", p.skills.value, {
       ...o,

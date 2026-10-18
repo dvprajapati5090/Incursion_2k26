@@ -1,0 +1,25 @@
+team_id,team_name,member_name,member_email,is_lead,linkedin_url,linkedin_text
+T-001,Pasted,Aarav,a@example.com,true,https://linkedin.com/in/aaravshah,"Contact
+www.linkedin.com/in/aaravshah
+Top Skills
+React
+Node.js
+Python
+Summary
+Final year student who likes building web apps.
+Experience
+TechNova
+Backend Developer Intern
+June 2025 - August 2025 (3 months)
+Mumbai
+CodeLab
+Web Developer
+January 2024 - May 2024 (5 months)
+Education
+XYZ University
+Bachelor of Technology, Computer Science (2022 - 2026)
+Certifications
+AWS Cloud Practitioner
+Google Data Analytics"
+T-002,LinkOnly,Meera,m@example.com,true,https://linkedin.com/in/meera,
+T-003,Nothing,Rohan,r@example.com,true,,
