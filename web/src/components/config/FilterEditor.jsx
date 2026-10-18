@@ -237,10 +237,11 @@ export default function FilterEditor() {
 
         <button
           onClick={handleAddDefault}
+          aria-label="Add Filter"
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-bold transition cursor-pointer self-start sm:self-auto"
         >
           <Plus className="h-3.5 w-3.5" />
-          Add Custom Rule
+          Add Filter
         </button>
       </div>
 

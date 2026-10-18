@@ -273,7 +273,7 @@ export default function ResultsPage() {
       <AnimatePresence>
         {selectedTeam && (
           <TeamDetailDrawer
-            team={selectedTeam}
+            team={rankedResults.find((t) => t.teamId === selectedTeam.teamId) || selectedTeam}
             config={config}
             onClose={() => setSelectedTeam(null)}
           />

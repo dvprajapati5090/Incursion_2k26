@@ -29,9 +29,15 @@ function keywordMatch(member, params = {}) {
 
   if (keywords.length === 0) return null;
 
+  const hasAnyField = fields.some((field) => {
+    const m = member.metrics?.[`resume.${field}`];
+    return m && (m.status === "ok" || m.status === "low_confidence") && m.value != null;
+  });
+  if (!hasAnyField) return null;
+
   const getText = (field) => {
     const m = member.metrics?.[`resume.${field}`];
-    if (!m || m.status !== "ok") return "";
+    if (!m || (m.status !== "ok" && m.status !== "low_confidence")) return "";
     if (Array.isArray(m.value)) return m.value.join(" ");
     return String(m.value ?? "");
   };
