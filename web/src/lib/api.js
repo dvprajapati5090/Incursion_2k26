@@ -86,3 +86,62 @@ export async function getRegistry() {
   const res = await fetch(`${BASE}/registry`);
   return handleResponse(res);
 }
+
+// ---------- Engine / Shortlist Endpoints ----------
+
+/**
+ * Run engine through backend
+ * @param {{ importId?: string, teams?: Array, config: object, registry?: object }} payload
+ */
+export async function runShortlistApi(payload) {
+  const res = await fetch(`${BASE}/engine/run`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse(res);
+}
+
+/**
+ * Fetch strategy presets from engine
+ */
+export async function getPresetsApi() {
+  const res = await fetch(`${BASE}/engine/presets`);
+  return handleResponse(res);
+}
+
+/**
+ * Compare two teams head-to-head
+ */
+export async function compareTeamsApi(teamA, teamB) {
+  const res = await fetch(`${BASE}/engine/compare`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ teamA, teamB }),
+  });
+  return handleResponse(res);
+}
+
+/**
+ * Run sensitivity analysis on weights
+ */
+export async function analyzeSensitivityApi(payload) {
+  const res = await fetch(`${BASE}/engine/sensitivity`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse(res);
+}
+
+/**
+ * Anonymize team profiles for blind evaluation
+ */
+export async function anonymizeTeamsApi(teams) {
+  const res = await fetch(`${BASE}/engine/anonymize`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ teams }),
+  });
+  return handleResponse(res);
+}

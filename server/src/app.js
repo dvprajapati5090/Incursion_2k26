@@ -8,8 +8,8 @@ import importRoutes from "./routes/import.routes.js";
 import registryRoutes from "./routes/registry.routes.js";
 import jobsRoutes from "./routes/jobs.routes.js";
 import enrichRoutes from "./routes/enrich.routes.js";
-// ...
-// ...
+import engineRoutes from "./routes/engine.routes.js";
+
 const app = express();
 
 app.use(cors({ origin: env.corsOrigin }));
@@ -18,8 +18,9 @@ app.use("/api/jobs", jobsRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/imports", importRoutes);
 app.use("/api/registry", registryRoutes);
-app.use("/api/imports", importRoutes);
 app.use("/api/imports", enrichRoutes);
+app.use("/api/engine", engineRoutes);
+app.use("/api/shortlist", engineRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
