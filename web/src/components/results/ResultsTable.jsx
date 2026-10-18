@@ -87,21 +87,43 @@ export default function ResultsTable({ data, config, onRowClick }) {
     // Team column
     columnHelper.accessor("teamName", {
       header: "Team Name",
-      cell: (info) => (
-        <div>
-          <p className="font-bold text-sm text-white group-hover:text-cyan-300 transition-colors">
-            {blindMode ? `Team ${info.row.original.teamId}` : (info.getValue() || info.row.original.teamId)}
-          </p>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[11px] font-mono text-slate-500">{info.row.original.teamId}</span>
-            {!blindMode && (
-              <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                • {info.row.original.members?.length ?? 0} members
-              </span>
-            )}
+      cell: (info) => {
+        const teamId = info.row.original.teamId;
+        const isPin = config?.overrides?.pin?.includes(teamId);
+        const isWaitlist = config?.overrides?.waitlist?.includes(teamId);
+        const isExclude = config?.overrides?.exclude?.includes(teamId);
+
+        return (
+          <div>
+            <p className="font-bold text-sm text-white group-hover:text-cyan-300 transition-colors">
+              {blindMode ? `Team ${teamId}` : (info.getValue() || teamId)}
+            </p>
+            <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+              <span className="text-[11px] font-mono text-slate-500">{teamId}</span>
+              {isPin && (
+                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold tracking-wide">
+                  PINNED
+                </span>
+              )}
+              {isWaitlist && (
+                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold tracking-wide">
+                  OVERRIDE WAITLIST
+                </span>
+              )}
+              {isExclude && (
+                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold tracking-wide">
+                  EXCLUDED
+                </span>
+              )}
+              {!blindMode && (
+                <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                  • {info.row.original.members?.length ?? 0} members
+                </span>
+              )}
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     }),
 
     // Status column
@@ -220,54 +242,84 @@ export default function ResultsTable({ data, config, onRowClick }) {
       header: "",
       cell: (info) => {
         const teamId = info.row.original.teamId;
+        const status = info.row.original.status;
         const isPin = config?.overrides?.pin?.includes(teamId);
         const isExclude = config?.overrides?.exclude?.includes(teamId);
+        const isWaitlist = config?.overrides?.waitlist?.includes(teamId);
+        const isShortlisted = status === "shortlisted";
 
         return (
-          <div className="flex items-center gap-1 justify-end" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => {
-                isPin ? clearOverride(teamId) : pinTeam(teamId);
-                logAction(isPin ? "UNPIN" : "PIN", { teamId });
-              }}
-              title={isPin ? "Unpin team" : "Pin to shortlist"}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
-                isPin
-                  ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
-                  : "text-slate-500 hover:text-indigo-300 hover:bg-slate-800"
-              }`}
-            >
-              <Pin className="h-3.5 w-3.5" />
-            </button>
+          <div className="flex items-center gap-1.5 justify-end" onClick={(e) => e.stopPropagation()}>
+            {/* Quick Prominent "Move to Shortlist" for non-shortlisted teams */}
+            {!isShortlisted && (
+              <button
+                onClick={() => {
+                  pinTeam(teamId);
+                  logAction("PIN", { teamId });
+                }}
+                title="Move to shortlist"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-semibold text-xs transition cursor-pointer shadow-sm hover:shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+              >
+                <Award className="h-3.5 w-3.5 text-emerald-400" />
+                <span className="whitespace-nowrap">Move to Shortlist</span>
+              </button>
+            )}
+
+            {/* Pin Button (Active if pinned, toggles on/off) */}
+            {isShortlisted && (
+              <button
+                onClick={() => {
+                  isPin ? clearOverride(teamId) : pinTeam(teamId);
+                  logAction(isPin ? "UNPIN" : "PIN", { teamId });
+                }}
+                title={isPin ? "Pinned in shortlist (Click to unpin)" : "Pin to shortlist"}
+                className={`p-1.5 rounded-lg transition cursor-pointer ${
+                  isPin
+                    ? "bg-indigo-500/25 text-indigo-300 border border-indigo-500/40 shadow-[0_0_8px_rgba(99,102,241,0.4)]"
+                    : "text-slate-500 hover:text-indigo-300 hover:bg-slate-800"
+                }`}
+              >
+                <Pin className={`h-3.5 w-3.5 ${isPin ? "fill-current" : ""}`} />
+              </button>
+            )}
+
+            {/* Exclude Button */}
             <button
               onClick={() => {
                 isExclude ? clearOverride(teamId) : excludeTeam(teamId);
                 logAction(isExclude ? "UNEXCLUDE" : "EXCLUDE", { teamId });
               }}
-              title={isExclude ? "Remove exclusion" : "Exclude team"}
+              title={isExclude ? "Excluded (Click to remove exclusion)" : "Exclude team"}
               className={`p-1.5 rounded-lg transition cursor-pointer ${
                 isExclude
-                  ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                  ? "bg-rose-500/25 text-rose-300 border border-rose-500/40 shadow-[0_0_8px_rgba(244,63,94,0.4)]"
                   : "text-slate-500 hover:text-rose-400 hover:bg-slate-800"
               }`}
             >
               <Ban className="h-3.5 w-3.5" />
             </button>
+
+            {/* Move to Waitlist Button */}
             <button
               onClick={() => {
-                waitlistTeam(teamId);
-                logAction("WAITLIST", { teamId });
+                isWaitlist ? clearOverride(teamId) : waitlistTeam(teamId);
+                logAction(isWaitlist ? "CLEAR_WAITLIST" : "WAITLIST", { teamId });
               }}
-              title="Move to waitlist"
-              className="p-1.5 rounded-lg text-slate-500 hover:text-amber-400 hover:bg-slate-800 transition cursor-pointer"
+              title={isWaitlist ? "Manually waitlisted (Click to reset)" : "Move to waitlist"}
+              className={`p-1.5 rounded-lg transition cursor-pointer ${
+                isWaitlist
+                  ? "bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-[0_0_8px_rgba(245,158,11,0.4)]"
+                  : "text-slate-500 hover:text-amber-400 hover:bg-slate-800"
+              }`}
             >
               <Clock className="h-3.5 w-3.5" />
             </button>
+
             <ChevronRight className="h-4 w-4 text-slate-600 group-hover:text-cyan-400 transition ml-1" />
           </div>
         );
       },
-      size: 110,
+      size: 160,
     }),
   ];
 
