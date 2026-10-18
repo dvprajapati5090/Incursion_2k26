@@ -181,25 +181,51 @@ export default function ImportReport({ report }) {
         </div>
       )}
 
-      {/* Issues list (if any) */}
+      {/* Issues list (if any) — Must-do rule: Show every issue to the organizer; nothing dropped silently */}
       {issues?.length > 0 && (
-        <div className="border border-amber-500/20 bg-amber-500/5 rounded-xl p-3.5 space-y-2 text-xs">
-          <span className="font-semibold text-amber-300 flex items-center gap-1.5">
-            <AlertTriangle className="h-3.5 w-3.5" />
-            Data Hygiene Notices ({issues.length})
-          </span>
-          <div className="max-h-28 overflow-y-auto space-y-1 text-slate-300 pr-1">
-            {issues.slice(0, 5).map((iss, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className="text-amber-400 font-mono">•</span>
-                <span>{iss.message}</span>
+        <div className="border border-white/10 bg-slate-900/60 rounded-xl p-4 space-y-3 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-white flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-400" />
+              Import Data Hygiene & Integrity Log ({issues.length} item{issues.length !== 1 ? "s" : ""})
+            </span>
+            <span className="text-[11px] font-mono text-slate-400">
+              {issueCounts?.error || 0} errors • {issueCounts?.warning || 0} warnings
+            </span>
+          </div>
+
+          <div className="max-h-52 overflow-y-auto space-y-2 pr-1 divide-y divide-white/[0.04]">
+            {issues.map((iss, i) => (
+              <div key={i} className="pt-2 first:pt-0 flex items-start justify-between gap-3 text-xs">
+                <div className="flex items-start gap-2.5">
+                  <span
+                    className={`text-[10px] font-mono uppercase font-bold px-2 py-0.5 rounded border shrink-0 mt-0.5 ${
+                      iss.severity === "error"
+                        ? "bg-rose-500/15 border-rose-500/30 text-rose-300"
+                        : "bg-amber-500/15 border-amber-500/30 text-amber-300"
+                    }`}
+                  >
+                    {iss.severity}
+                  </span>
+                  <div>
+                    <p className="text-slate-200">{iss.message}</p>
+                    {iss.code && (
+                      <span className="text-[10px] font-mono text-slate-500 mr-2">
+                        code: {iss.code}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {(iss.row != null || iss.column) && (
+                  <div className="text-[10px] font-mono text-slate-400 shrink-0 text-right">
+                    {iss.row != null && <span>row {iss.row}</span>}
+                    {iss.row != null && iss.column && <span> • </span>}
+                    {iss.column && <span>col "{iss.column}"</span>}
+                  </div>
+                )}
               </div>
             ))}
-            {issues.length > 5 && (
-              <p className="text-[11px] text-slate-500 pl-3">
-                ...and {issues.length - 5} more handled gracefully
-              </p>
-            )}
           </div>
         </div>
       )}

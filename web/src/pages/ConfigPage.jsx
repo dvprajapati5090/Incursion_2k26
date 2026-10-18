@@ -32,6 +32,7 @@ import CriteriaEditor from "@/components/config/CriteriaEditor";
 import FilterEditor from "@/components/config/FilterEditor";
 import SelectionPanel from "@/components/config/SelectionPanel";
 import PresetManager from "@/components/config/PresetManager";
+import DemoDataBanner from "@/components/common/DemoDataBanner";
 
 export default function ConfigPage() {
   const navigate = useNavigate();
@@ -90,6 +91,9 @@ export default function ConfigPage() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-16">
+      {/* Demo Data Banner (Must-do UI Rule #8) */}
+      <DemoDataBanner />
+
       {/* Header with control switches */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>

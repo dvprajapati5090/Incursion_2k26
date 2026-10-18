@@ -1,8 +1,17 @@
 /**
  * TeamDetailDrawer — Slide-in inspector for detailed team auditing.
  * Features 100% opaque cyber-luxe glass panel, contribution bar charts,
- * criterion audit tables, natural language reasoning, and applicant rosters.
+ * criterion audit tables, executive reasoning summaries, and applicant rosters.
+ *
+ * Implements Must-do UI Rules #1, #3, #4, #5, #6, #8 from Enrichment Handoff:
+ * - Never show missing values as 0 (use status badges: ok, not_provided, fetch_failed, low_confidence)
+ * - Show low_confidence & fetch_failed visibly with failure reason tooltips
+ * - Support all 9 flags with severity and related member links
+ * - AI marker for origin: "llm" with model, confidence, and previous value comparison
+ * - Blind review mode masks names, emails, sources, and redacts usernames from duplicate flags
+ * - asOf & enrichedAt display in run telemetry and demo data banner
  */
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -21,6 +30,9 @@ import {
   Globe,
   Info,
   Sparkles,
+  Bot,
+  Calendar,
+  ShieldAlert,
 } from "lucide-react";
 import {
   BarChart,
@@ -32,6 +44,15 @@ import {
   Cell,
 } from "recharts";
 import { reasonToText } from "@/lib/exportUtils";
+import {
+  formatMetricValue,
+  formatFailureReason,
+  STATUS_BADGE_CONFIG,
+  FLAG_DEFINITIONS,
+  getSafeFlagDetail,
+} from "@/lib/handoffFormatters";
+import useImportStore from "@/stores/importStore";
+import DemoDataBanner from "@/components/common/DemoDataBanner";
 
 const STATUS_CONFIG = {
   shortlisted: {
@@ -69,6 +90,9 @@ const FILTER_ICONS = {
 };
 
 export default function TeamDetailDrawer({ team, config, onClose }) {
+  const { asOf, enrichedAt, isMockGithub } = useImportStore();
+  const [highlightedMemberId, setHighlightedMemberId] = useState(null);
+
   if (!team) return null;
 
   const blindMode = config?.options?.blindMode;
@@ -80,7 +104,11 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
     status: b.status ?? (b.score != null ? "ok" : "missing"),
   }));
 
-  const margin = team.margin ?? (team.score != null && team.cutoffScore != null ? team.score - team.cutoffScore : null);
+  const margin =
+    team.margin ??
+    (team.score != null && team.cutoffScore != null
+      ? team.score - team.cutoffScore
+      : null);
   const isPositiveMargin = margin != null && margin >= 0;
 
   return (
@@ -100,7 +128,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ type: "spring", damping: 28, stiffness: 280 }}
-        className="relative w-full max-w-xl bg-[#090e1a] border-l border-white/10 shadow-2xl flex flex-col h-full z-10 text-slate-100"
+        className="relative w-full max-w-2xl bg-[#090e1a] border-l border-white/10 shadow-2xl flex flex-col h-full z-10 text-slate-100"
       >
         {/* Sticky Header */}
         <div className="sticky top-0 bg-[#090e1a]/95 backdrop-blur-xl border-b border-white/10 px-6 py-5 flex items-start justify-between gap-4 z-20">
@@ -109,7 +137,9 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
               <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-white/5">
                 {team.teamId}
               </span>
-              <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${statusCfg.bg} ${statusCfg.glow}`}>
+              <span
+                className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${statusCfg.bg} ${statusCfg.glow}`}
+              >
                 {statusCfg.label}
               </span>
               {team.rank && (
@@ -117,14 +147,25 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   Rank #{team.rank}
                 </span>
               )}
+              {blindMode && (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Blind Mode Active
+                </span>
+              )}
             </div>
 
             <h3 className="text-xl font-bold text-white tracking-tight">
-              {blindMode ? `Team ${team.teamId}` : (team.teamName || team.teamId)}
+              {blindMode ? `Team ${team.teamId}` : team.teamName || team.teamId}
             </h3>
 
             <p className="text-xs text-slate-400 mt-0.5">
-              {team.members?.length ?? 0} team member{team.members?.length !== 1 ? "s" : ""} registered
+              {team.members?.length ?? 0} applicant
+              {team.members?.length !== 1 ? "s" : ""} registered
+              {team.fields?.track_interest && (
+                <span className="ml-2 font-mono text-indigo-300 bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-500/20">
+                  Track: {team.fields.track_interest}
+                </span>
+              )}
             </p>
           </div>
 
@@ -139,63 +180,76 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-          
+          {/* Demo Data Banner if mock_github */}
+          {isMockGithub && <DemoDataBanner />}
+
           {/* Top Score Comparison Strip */}
           <div className="rounded-2xl bg-slate-900/80 border border-white/10 p-4 grid grid-cols-3 gap-3 text-center shadow-inner">
             <div className="space-y-1">
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Total Score</p>
+              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                Total Score
+              </p>
               <p className="text-2xl font-extrabold font-mono text-white">
                 {team.score?.toFixed(4) ?? "—"}
               </p>
             </div>
             <div className="space-y-1 border-x border-white/10">
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Cutoff Line</p>
+              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                Cutoff Line
+              </p>
               <p className="text-2xl font-extrabold font-mono text-slate-300">
                 {team.cutoffScore?.toFixed(4) ?? "—"}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Cutoff Margin</p>
-              <p className={`text-2xl font-extrabold font-mono flex items-center justify-center gap-0.5 ${
-                isPositiveMargin ? "text-emerald-400" : "text-rose-400"
-              }`}>
-                {isPositiveMargin ? <TrendingUp className="h-4 w-4 inline" /> : <TrendingDown className="h-4 w-4 inline" />}
-                {margin != null ? (isPositiveMargin ? "+" : "") + margin.toFixed(4) : "—"}
+              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                Cutoff Margin
+              </p>
+              <p
+                className={`text-2xl font-extrabold font-mono flex items-center justify-center gap-0.5 ${
+                  isPositiveMargin ? "text-emerald-400" : "text-rose-400"
+                }`}
+              >
+                {isPositiveMargin ? (
+                  <TrendingUp className="h-5 w-5" />
+                ) : (
+                  <TrendingDown className="h-5 w-5" />
+                )}
+                {margin != null
+                  ? `${isPositiveMargin ? "+" : ""}${margin.toFixed(4)}`
+                  : "—"}
               </p>
             </div>
           </div>
 
-          {/* Recharts Score Breakdown Chart */}
+          {/* Contribution Bar Chart */}
           {chartData.length > 0 && (
-            <div className="space-y-3 rounded-2xl bg-slate-900/50 border border-white/10 p-5">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="font-bold text-sm text-white flex items-center gap-2">
                   <Award className="h-4 w-4 text-indigo-400" />
-                  Criteria Contribution Breakdown
+                  Scoring Contribution Breakdown
                 </h4>
-                <span className="text-[11px] text-slate-400 font-mono">Weighted score share</span>
+                <span className="text-[11px] text-slate-400 font-mono">
+                  Points per criterion
+                </span>
               </div>
-
-              <div className="h-48 w-full pt-2">
+              <div className="h-44 w-full rounded-2xl bg-slate-900/60 border border-white/10 p-3 pt-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={chartData}
                     layout="vertical"
-                    margin={{ left: 10, right: 30, top: 5, bottom: 5 }}
+                    margin={{ top: 0, right: 24, left: 24, bottom: 0 }}
                   >
-                    <XAxis
-                      type="number"
-                      domain={[0, "auto"]}
-                      stroke="#475569"
-                      tick={{ fill: "#94a3b8", fontSize: 11 }}
-                      tickFormatter={(v) => v.toFixed(2)}
-                    />
+                    <XAxis type="number" hide />
                     <YAxis
                       type="category"
                       dataKey="name"
-                      stroke="#475569"
-                      tick={{ fill: "#cbd5e1", fontSize: 11 }}
-                      width={110}
+                      stroke="#94a3b8"
+                      fontSize={11}
+                      tickLine={false}
+                      axisLine={false}
+                      width={120}
                     />
                     <Tooltip
                       contentStyle={{
@@ -221,7 +275,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
             </div>
           )}
 
-          {/* Criterion Details Table */}
+          {/* Criterion Scoring Matrix Table */}
           <div className="space-y-3">
             <h4 className="font-bold text-sm text-white flex items-center gap-2">
               <Layers className="h-4 w-4 text-cyan-400" />
@@ -241,7 +295,10 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                 </thead>
                 <tbody className="divide-y divide-white/[0.06]">
                   {(team.breakdown ?? []).map((b) => (
-                    <tr key={b.criterionId} className="hover:bg-white/[0.02] transition-colors">
+                    <tr
+                      key={b.criterionId}
+                      className="hover:bg-white/[0.02] transition-colors"
+                    >
                       <td className="px-3.5 py-2.5 font-medium text-slate-200">
                         {b.label ?? b.criterionId}
                       </td>
@@ -276,7 +333,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
             </div>
           </div>
 
-          {/* Engine Explanation Breakdown */}
+          {/* Executive Decision Summary (AI / Engine Explanation) */}
           {team.explanation && (
             <div className="space-y-3 p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/20">
               <h4 className="font-bold text-sm text-indigo-300 flex items-center gap-2">
@@ -295,7 +352,9 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   </p>
                   <ul className="list-disc list-inside text-xs text-slate-300 space-y-0.5">
                     {team.explanation.strengths.map((str, idx) => (
-                      <li key={idx} className="text-slate-300">{str}</li>
+                      <li key={idx} className="text-slate-300">
+                        {str}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -307,7 +366,9 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   </p>
                   <ul className="list-disc list-inside text-xs text-slate-300 space-y-0.5">
                     {team.explanation.growthAreas.map((ga, idx) => (
-                      <li key={idx} className="text-slate-300">{ga}</li>
+                      <li key={idx} className="text-slate-300">
+                        {ga}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -319,7 +380,9 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   </p>
                   <ul className="list-disc list-inside text-xs text-slate-400 space-y-0.5">
                     {team.explanation.missingDataNotes.map((note, idx) => (
-                      <li key={idx} className="text-slate-400">{note}</li>
+                      <li key={idx} className="text-slate-400">
+                        {note}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -355,7 +418,9 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
           {/* Filter Rule Checks */}
           {team.filterResults?.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-bold text-sm text-white">Eligibility Rules Verification</h4>
+              <h4 className="font-bold text-sm text-white">
+                Eligibility Rules Verification
+              </h4>
               <div className="space-y-2">
                 {team.filterResults.map((fr) => (
                   <div
@@ -363,8 +428,12 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                     className="p-3 rounded-xl bg-slate-900/40 border border-white/[0.08] flex items-center justify-between gap-3 text-xs"
                   >
                     <div className="flex items-center gap-2.5">
-                      {FILTER_ICONS[fr.result] ?? <Info className="h-4 w-4 text-slate-400" />}
-                      <span className="font-medium text-slate-200">{fr.label}</span>
+                      {FILTER_ICONS[fr.result] ?? (
+                        <Info className="h-4 w-4 text-slate-400" />
+                      )}
+                      <span className="font-medium text-slate-200">
+                        {fr.label}
+                      </span>
                     </div>
                     <span className="capitalize font-mono font-bold text-[11px] text-slate-400">
                       {fr.result}
@@ -375,76 +444,296 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
             </div>
           )}
 
-          {/* Member Roster (Visible in non-blind mode) */}
-          {!blindMode && team.members?.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="font-bold text-sm text-white">Registered Team Members</h4>
-              <div className="space-y-2.5">
-                {team.members.map((m) => (
-                  <div
-                    key={m.memberId}
-                    className="p-4 rounded-xl bg-slate-900/60 border border-white/10 space-y-2"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-white">{m.name || m.memberId}</span>
-                        {m.isLead && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-                            Team Lead
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] font-mono text-slate-500">{m.memberId}</span>
-                    </div>
-
-                    {m.email && <p className="text-xs text-slate-400 font-mono">{m.email}</p>}
-
-                    {/* Source links pills */}
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      {m.sources?.github?.url && (
-                        <a
-                          href={m.sources.github.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-indigo-300 hover:text-white border border-white/5 transition"
-                        >
-                          <Github className="h-3 w-3" /> GitHub <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
-                        </a>
-                      )}
-                      {m.sources?.resume?.url && (
-                        <a
-                          href={m.sources.resume.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-cyan-300 hover:text-white border border-white/5 transition"
-                        >
-                          <FileText className="h-3 w-3" /> Resume <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
-                        </a>
-                      )}
-                      {m.sources?.linkedin?.url && (
-                        <a
-                          href={m.sources.linkedin.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-sky-300 hover:text-white border border-white/5 transition"
-                        >
-                          <Linkedin className="h-3 w-3" /> LinkedIn <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
-                        </a>
-                      )}
-                      {m.sources?.portfolio?.url && (
-                        <a
-                          href={m.sources.portfolio.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-emerald-300 hover:text-white border border-white/5 transition"
-                        >
-                          <Globe className="h-3 w-3" /> Portfolio <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
+          {/* Applicant Profiles Roster (Must-do UI Rules #1, #3, #4, #5, #6) */}
+          {team.members?.length > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-bold text-sm text-white flex items-center gap-2">
+                  <Award className="h-4 w-4 text-cyan-400" />
+                  Applicant Profiles & Signal Matrix ({team.members.length})
+                </h4>
+                {blindMode && (
+                  <span className="text-[11px] text-amber-300/80 font-mono">
+                    PII & direct links masked for bias mitigation
+                  </span>
+                )}
               </div>
+
+              <div className="space-y-4">
+                {team.members.map((m, mIdx) => {
+                  const displayName = blindMode
+                    ? `Applicant #${mIdx + 1}${m.isLead ? " (Lead)" : ""}`
+                    : m.name || `Member ${mIdx + 1}`;
+
+                  const isHighlighted = highlightedMemberId === m.memberId;
+
+                  return (
+                    <div
+                      key={m.memberId || mIdx}
+                      className={`p-4 rounded-xl border transition-all space-y-3 ${
+                        isHighlighted
+                          ? "bg-indigo-950/40 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+                          : "bg-slate-900/70 border-white/10 hover:border-white/20"
+                      }`}
+                    >
+                      {/* Member Identity & Lead Badge */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-sm text-white">
+                            {displayName}
+                          </span>
+                          {m.isLead && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                              Lead
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] font-mono text-slate-500">
+                          {blindMode ? `ID-${mIdx + 1}` : m.memberId}
+                        </span>
+                      </div>
+
+                      {/* Member Email (Visible in non-blind mode only) */}
+                      {!blindMode && m.email && (
+                        <p className="text-xs text-slate-400 font-mono">
+                          {m.email}
+                        </p>
+                      )}
+
+                      {/* Source links pills (Visible in non-blind mode only) */}
+                      {!blindMode && (
+                        <div className="flex flex-wrap gap-2 pt-0.5">
+                          {m.sources?.github?.url && (
+                            <a
+                              href={m.sources.github.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-indigo-300 hover:text-white border border-white/5 transition"
+                            >
+                              <Github className="h-3 w-3" /> GitHub{" "}
+                              <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
+                            </a>
+                          )}
+                          {m.sources?.resume?.url && (
+                            <a
+                              href={m.sources.resume.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-cyan-300 hover:text-white border border-white/5 transition"
+                            >
+                              <FileText className="h-3 w-3" /> Resume{" "}
+                              <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
+                            </a>
+                          )}
+                          {m.sources?.linkedin?.url && (
+                            <a
+                              href={m.sources.linkedin.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-sky-300 hover:text-white border border-white/5 transition"
+                            >
+                              <Linkedin className="h-3 w-3" /> LinkedIn{" "}
+                              <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
+                            </a>
+                          )}
+                          {m.sources?.portfolio?.url && (
+                            <a
+                              href={m.sources.portfolio.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800 text-xs font-medium text-emerald-300 hover:text-white border border-white/5 transition"
+                            >
+                              <Globe className="h-3 w-3" /> Portfolio{" "}
+                              <ArrowUpRight className="h-2.5 w-2.5 opacity-60" />
+                            </a>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Flags attached to this applicant (All 9 Flag Codes supported) */}
+                      {m.flags?.length > 0 && (
+                        <div className="space-y-1.5 pt-1">
+                          {m.flags.map((flag, fIdx) => {
+                            const def =
+                              FLAG_DEFINITIONS[flag.code] || {
+                                defaultSeverity: "warn",
+                                title: flag.code,
+                              };
+                            const isWarn =
+                              (flag.severity || def.defaultSeverity) === "warn";
+                            const safeDetail = getSafeFlagDetail(flag, blindMode);
+
+                            return (
+                              <div
+                                key={fIdx}
+                                className={`p-2.5 rounded-lg border flex items-start justify-between gap-2 text-xs ${
+                                  isWarn
+                                    ? "bg-amber-500/10 border-amber-500/25 text-amber-200"
+                                    : "bg-blue-500/10 border-blue-500/25 text-blue-200"
+                                }`}
+                              >
+                                <div className="space-y-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.2 rounded border ${
+                                        isWarn
+                                          ? "bg-amber-500/20 border-amber-500/40 text-amber-300"
+                                          : "bg-blue-500/20 border-blue-500/40 text-blue-300"
+                                      }`}
+                                    >
+                                      {flag.severity || def.defaultSeverity}
+                                    </span>
+                                    <strong className="text-white text-[11px]">
+                                      {def.title || flag.code}
+                                    </strong>
+                                  </div>
+                                  <p className="text-[11px] opacity-90 leading-snug">
+                                    {safeDetail}
+                                  </p>
+                                </div>
+
+                                {/* Clickable related member jump (Rule #4) */}
+                                {!blindMode && flag.related?.length > 0 && (
+                                  <div className="flex flex-col items-end shrink-0 gap-1">
+                                    <span className="text-[10px] text-slate-400 font-mono">
+                                      Related:
+                                    </span>
+                                    <div className="flex gap-1">
+                                      {flag.related.map((relId) => (
+                                        <button
+                                          key={relId}
+                                          onClick={() =>
+                                            setHighlightedMemberId(
+                                              highlightedMemberId === relId
+                                                ? null
+                                                : relId
+                                            )
+                                          }
+                                          className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 hover:bg-slate-700 border border-cyan-500/30 transition cursor-pointer"
+                                          title={`Highlight related applicant ${relId}`}
+                                        >
+                                          {relId}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Enriched Metrics Grid for this Applicant */}
+                      {m.metrics && Object.keys(m.metrics).length > 0 && (
+                        <div className="space-y-1.5 pt-1">
+                          <p className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+                            <Bot className="h-3 w-3 text-cyan-400" />
+                            Signals & Enriched Metrics
+                          </p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            {Object.entries(m.metrics).map(
+                              ([metricId, entry]) => {
+                                const formatted = formatMetricValue(
+                                  metricId,
+                                  entry
+                                );
+                                const statusCfgBadge =
+                                  STATUS_BADGE_CONFIG[formatted.status] ||
+                                  STATUS_BADGE_CONFIG.ok;
+
+                                const isLlm = entry?.origin === "llm";
+
+                                return (
+                                  <div
+                                    key={metricId}
+                                    className="p-2 rounded-lg bg-slate-950/60 border border-white/[0.06] space-y-1"
+                                    title={formatted.tooltip || ""}
+                                  >
+                                    <div className="flex items-center justify-between text-[11px]">
+                                      <span className="font-mono text-slate-400 truncate max-w-[150px]">
+                                        {metricId}
+                                      </span>
+                                      <div className="flex items-center gap-1">
+                                        {/* AI Refined Badge (Must-do UI Rule #5) */}
+                                        {isLlm && (
+                                          <span
+                                            className="px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[9px] font-mono font-bold flex items-center gap-0.5"
+                                            title={`AI Refined via ${
+                                              entry.model || "LLM"
+                                            }${
+                                              entry.confidence != null
+                                                ? ` (${Math.round(
+                                                    entry.confidence * 100
+                                                  )}% conf)`
+                                                : ""
+                                            }${
+                                              entry.previous
+                                                ? ` • Replaced rule value: ${entry.previous.value}`
+                                                : ""
+                                            }`}
+                                          >
+                                            <Sparkles className="h-2.5 w-2.5 text-cyan-300" />
+                                            AI
+                                          </span>
+                                        )}
+                                        {/* Status badge (Must-do UI Rule #1 & #3) */}
+                                        <span
+                                          className={`text-[9px] px-1.5 py-0.2 rounded-full font-semibold border ${statusCfgBadge.badgeClass}`}
+                                        >
+                                          {statusCfgBadge.label}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    <div className="font-mono font-bold text-white text-xs truncate">
+                                      {formatted.display}
+                                    </div>
+
+                                    {/* AI previous audit comparison note */}
+                                    {isLlm && entry.previous && (
+                                      <p className="text-[10px] text-slate-500 font-mono">
+                                        Rules estimated: {entry.previous.value}
+                                      </p>
+                                    )}
+
+                                    {/* Tooltip reason if failed */}
+                                    {entry.error && (
+                                      <p className="text-[10px] text-rose-400 font-mono truncate">
+                                        {formatFailureReason(entry.error)}
+                                      </p>
+                                    )}
+                                  </div>
+                                );
+                              }
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Reference Time Baseline Footer (Must-do UI Rule #8) */}
+          {asOf && (
+            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/10 flex items-center justify-between text-xs text-slate-400 font-mono">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-cyan-400 shrink-0" />
+                <span>
+                  Signal Reference Date (asOf):{" "}
+                  <strong className="text-slate-200">
+                    {new Date(asOf).toUTCString()}
+                  </strong>
+                </span>
+              </div>
+              {enrichedAt && (
+                <span className="text-[11px] text-slate-500 hidden sm:inline">
+                  Enriched at: {new Date(enrichedAt).toLocaleTimeString()}
+                </span>
+              )}
             </div>
           )}
         </div>
