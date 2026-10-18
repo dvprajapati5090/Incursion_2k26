@@ -214,22 +214,22 @@ export default function FilterEditor() {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-panel rounded-2xl p-6 border border-white/10 space-y-6"
+      className="glass-panel rounded-2xl p-6 border border-[#415A77]/30 space-y-6"
     >
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 text-indigo-300">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-[#415A77]/30 to-[#1B263B] border border-[#415A77]/50 text-[#E0E1DD]">
             <ShieldAlert className="h-5 w-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-base text-white">Eligibility Rules & Hard Filters</h3>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+              <h3 className="font-bold text-base text-[#E0E1DD]">Eligibility Rules & Hard Filters</h3>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#1B263B] text-[#E0E1DD] border border-[#415A77]/40">
                 {(config.filters || []).filter((f) => f.enabled !== false).length} Active Rule{config.filters?.length !== 1 ? "s" : ""}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[#778DA9]/80 mt-0.5">
               Evaluated before scoring. Teams failing hard rules are categorized for audit review or disqualified.
             </p>
           </div>
@@ -238,29 +238,29 @@ export default function FilterEditor() {
         <button
           onClick={handleAddDefault}
           aria-label="Add Filter"
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-bold transition cursor-pointer self-start sm:self-auto"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#415A77]/25 hover:bg-[#415A77]/40 border border-[#415A77]/50 text-[#E0E1DD] hover:text-white text-xs font-bold transition cursor-pointer self-start sm:self-auto"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-3.5 w-3.5 text-[#778DA9]" />
           Add Filter
         </button>
       </div>
 
       {/* Quick Presets Strip */}
-      <div className="space-y-2 pt-1 border-t border-white/[0.06]">
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <Zap className="h-3.5 w-3.5 text-cyan-400" />
-          <span className="font-semibold text-slate-300">1-Click Common Presets:</span>
+      <div className="space-y-2 pt-1 border-t border-[#415A77]/20">
+        <div className="flex items-center gap-2 text-xs text-[#778DA9]/80">
+          <Zap className="h-3.5 w-3.5 text-[#778DA9]" />
+          <span className="font-semibold text-[#E0E1DD]">1-Click Common Presets:</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {QUICK_PRESETS.map((preset) => (
             <button
               key={preset.title}
               onClick={() => handleApplyPreset(preset)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-white/10 border border-white/10 hover:border-cyan-500/40 text-xs text-slate-300 hover:text-white transition cursor-pointer shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1B263B] hover:bg-[#415A77]/30 border border-[#415A77]/35 hover:border-[#415A77]/60 text-xs text-[#E0E1DD] transition cursor-pointer shadow-sm"
             >
               <span>{preset.icon}</span>
               <span className="font-medium">{preset.title}</span>
-              <Plus className="h-3 w-3 text-cyan-400 opacity-60 ml-0.5" />
+              <Plus className="h-3 w-3 text-[#778DA9] opacity-75 ml-0.5" />
             </button>
           ))}
         </div>
@@ -268,10 +268,10 @@ export default function FilterEditor() {
 
       {/* Empty State */}
       {(!config.filters || config.filters.length === 0) && (
-        <div className="text-center py-10 px-4 rounded-xl border border-dashed border-white/10 bg-slate-900/30 space-y-2">
-          <ShieldAlert className="h-8 w-8 text-slate-500 mx-auto" />
-          <p className="text-sm font-semibold text-slate-300">No Eligibility Rules Configured</p>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+        <div className="text-center py-10 px-4 rounded-xl border border-dashed border-[#415A77]/30 bg-[#1B263B]/30 space-y-2">
+          <ShieldAlert className="h-8 w-8 text-[#415A77] mx-auto" />
+          <p className="text-sm font-semibold text-[#778DA9]">No Eligibility Rules Configured</p>
+          <p className="text-xs text-[#415A77] max-w-sm mx-auto">
             All registered teams in the pool will proceed directly to competitive scoring without hard barriers.
           </p>
         </div>
@@ -302,8 +302,8 @@ export default function FilterEditor() {
               key={filter.id}
               className={`rounded-2xl border transition-all p-5 space-y-4 ${
                 filter.enabled !== false
-                  ? "bg-slate-900/70 border-white/10 hover:border-white/20 shadow-sm"
-                  : "bg-slate-950/40 border-white/5 opacity-60"
+                  ? "bg-[#1B263B]/70 border-[#415A77]/30 hover:border-[#778DA9]/40 shadow-sm"
+                  : "bg-[#0D1B2A]/40 border-white/5 opacity-60"
               }`}
             >
               {/* Row 1: Checkbox, Title Input, Mode & Delete */}
@@ -321,7 +321,7 @@ export default function FilterEditor() {
                     value={filter.label}
                     onChange={(e) => updateFilter(filter.id, { label: e.target.value })}
                     placeholder="Describe eligibility rule..."
-                    className="font-bold text-sm text-white bg-transparent border-b border-transparent hover:border-white/20 focus:border-indigo-400 outline-none px-1 py-0.5 flex-1 min-w-0 transition-colors"
+                    className="font-bold text-sm text-white bg-transparent border-b border-transparent hover:border-[#778DA9]/40 focus:border-indigo-400 outline-none px-1 py-0.5 flex-1 min-w-0 transition-colors"
                   />
                 </div>
 
@@ -329,7 +329,7 @@ export default function FilterEditor() {
                   <select
                     value={filter.mode || "reject"}
                     onChange={(e) => updateFilter(filter.id, { mode: e.target.value })}
-                    className="text-xs font-semibold rounded-lg bg-slate-950 border border-white/10 px-2.5 py-1.5 text-slate-200 outline-none focus:border-indigo-400 cursor-pointer"
+                    className="text-xs font-semibold rounded-lg bg-[#0D1B2A] border border-[#415A77]/30 px-2.5 py-1.5 text-[#E0E1DD] outline-none focus:border-indigo-400 cursor-pointer"
                   >
                     <option value="reject">Reject (Hard Disqualification)</option>
                     <option value="warn">Warn (Keep & Mark for Review)</option>
@@ -337,7 +337,7 @@ export default function FilterEditor() {
 
                   <button
                     onClick={() => removeFilter(filter.id)}
-                    className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
+                    className="p-1.5 rounded-lg text-[#415A77] hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer"
                     title="Delete rule"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -349,9 +349,9 @@ export default function FilterEditor() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                 {/* Metric Select */}
                 <div className="space-y-1.5">
-                  <label className="text-slate-400 font-medium flex items-center justify-between">
+                  <label className="text-[#778DA9]/80 font-medium flex items-center justify-between">
                     <span>Target Signal</span>
-                    <span className="font-mono text-[10px] text-cyan-400">
+                    <span className="font-mono text-[10px] text-[#778DA9]">
                       {isTeamLevel ? "Team-level" : "Per-member"}
                     </span>
                   </label>
@@ -368,16 +368,16 @@ export default function FilterEditor() {
                         value: isNowBool ? true : typeof filter.value === "number" ? filter.value : 1,
                       });
                     }}
-                    className="w-full rounded-xl bg-slate-950 border border-white/15 px-3 py-2 text-slate-200 outline-none focus:border-indigo-400 font-mono text-xs cursor-pointer"
+                    className="w-full rounded-xl bg-[#0D1B2A] border border-white/15 px-3 py-2 text-[#E0E1DD] outline-none focus:border-indigo-400 font-mono text-xs cursor-pointer"
                   >
                     {METRIC_OPTIONS.map((g) => (
-                      <optgroup key={g.group} label={g.group} className="bg-slate-950 text-slate-200">
+                      <optgroup key={g.group} label={g.group} className="bg-[#0D1B2A] text-[#E0E1DD]">
                         {g.options.map((o) => (
                           <option
                             key={o.value}
                             value={o.value}
                             disabled={o.disabled}
-                            className={o.disabled ? "text-slate-500 bg-slate-950" : "bg-slate-950 text-slate-200"}
+                            className={o.disabled ? "text-[#415A77] bg-[#0D1B2A]" : "bg-[#0D1B2A] text-[#E0E1DD]"}
                           >
                             {o.label} {o.disabled ? `(Disabled)` : ""}
                           </option>
@@ -389,20 +389,20 @@ export default function FilterEditor() {
 
                 {/* Scope Select (Automatically locked to 'Team' if team-level metric) */}
                 <div className="space-y-1.5">
-                  <label className="text-slate-400 font-medium">Evaluation Scope</label>
+                  <label className="text-[#778DA9]/80 font-medium">Evaluation Scope</label>
                   {isTeamLevel ? (
-                    <div className="w-full rounded-xl bg-slate-950/80 border border-white/10 px-3 py-2 text-indigo-300 font-semibold font-mono text-xs flex items-center gap-1.5">
-                      <Users className="h-3.5 w-3.5 text-indigo-400" />
+                    <div className="w-full rounded-xl bg-[#0D1B2A]/80 border border-[#415A77]/30 px-3 py-2 text-[#778DA9] font-semibold font-mono text-xs flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5 text-[#415A77]" />
                       Entire Team Scope
                     </div>
                   ) : (
                     <select
                       value={filter.scope?.type || filter.scope || "any_member"}
                       onChange={(e) => updateFilter(filter.id, { scope: { type: e.target.value } })}
-                      className="w-full rounded-xl bg-slate-950 border border-white/15 px-3 py-2 text-slate-200 outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      className="w-full rounded-xl bg-[#0D1B2A] border border-white/15 px-3 py-2 text-[#E0E1DD] outline-none focus:border-indigo-400 text-xs cursor-pointer"
                     >
                       {MEMBER_SCOPES.map((s) => (
-                        <option key={s.value} value={s.value} className="bg-slate-950 text-slate-200">
+                        <option key={s.value} value={s.value} className="bg-[#0D1B2A] text-[#E0E1DD]">
                           {s.label}
                         </option>
                       ))}
@@ -412,14 +412,14 @@ export default function FilterEditor() {
 
                 {/* Comparison Operator */}
                 <div className="space-y-1.5">
-                  <label className="text-slate-400 font-medium">Comparison Operator</label>
+                  <label className="text-[#778DA9]/80 font-medium">Comparison Operator</label>
                   <select
                     value={filter.op || ">="}
                     onChange={(e) => updateFilter(filter.id, { op: e.target.value })}
-                    className="w-full rounded-xl bg-slate-950 border border-white/15 px-3 py-2 text-slate-200 outline-none focus:border-indigo-400 font-mono text-xs cursor-pointer"
+                    className="w-full rounded-xl bg-[#0D1B2A] border border-white/15 px-3 py-2 text-[#E0E1DD] outline-none focus:border-indigo-400 font-mono text-xs cursor-pointer"
                   >
                     {OPERATOR_CONFIG.map((op) => (
-                      <option key={op.value} value={op.value} className="bg-slate-950 text-slate-200">
+                      <option key={op.value} value={op.value} className="bg-[#0D1B2A] text-[#E0E1DD]">
                         {op.label}
                       </option>
                     ))}
@@ -428,9 +428,9 @@ export default function FilterEditor() {
 
                 {/* Expected Value Input */}
                 <div className="space-y-1.5">
-                  <label className="text-slate-400 font-medium">Required Threshold</label>
+                  <label className="text-[#778DA9]/80 font-medium">Required Threshold</label>
                   {filter.op === "exists" ? (
-                    <div className="w-full rounded-xl bg-slate-950/80 border border-emerald-500/20 px-3 py-2 text-emerald-300 font-semibold text-xs flex items-center gap-1.5">
+                    <div className="w-full rounded-xl bg-[#0D1B2A]/80 border border-emerald-500/20 px-3 py-2 text-emerald-300 font-semibold text-xs flex items-center gap-1.5">
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
                       Verified Present
                     </div>
@@ -438,7 +438,7 @@ export default function FilterEditor() {
                     <select
                       value={filter.value === true || filter.value === "true" ? "true" : "false"}
                       onChange={(e) => updateFilter(filter.id, { value: e.target.value === "true" })}
-                      className="w-full rounded-xl bg-slate-950 border border-white/15 px-3 py-2 text-slate-200 outline-none focus:border-indigo-400 text-xs cursor-pointer"
+                      className="w-full rounded-xl bg-[#0D1B2A] border border-white/15 px-3 py-2 text-[#E0E1DD] outline-none focus:border-indigo-400 text-xs cursor-pointer"
                     >
                       <option value="true">Must be Verified (True)</option>
                       <option value="false">Must be False</option>
@@ -448,7 +448,7 @@ export default function FilterEditor() {
                       type="number"
                       value={filter.value ?? 0}
                       onChange={(e) => updateFilter(filter.id, { value: Number(e.target.value) })}
-                      className="w-full rounded-xl bg-slate-950 border border-white/15 px-3 py-2 text-slate-100 font-mono font-bold outline-none focus:border-indigo-400 text-xs"
+                      className="w-full rounded-xl bg-[#0D1B2A] border border-white/15 px-3 py-2 text-[#E0E1DD] font-mono font-bold outline-none focus:border-indigo-400 text-xs"
                       placeholder="e.g. 50"
                     />
                   )}
@@ -456,16 +456,16 @@ export default function FilterEditor() {
               </div>
 
               {/* Row 3: Missing Data Policy & Live Cohort Simulation */}
-              <div className="pt-2 border-t border-white/[0.05] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2 text-slate-400">
+              <div className="pt-2 border-t border-[#415A77]/18 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 text-[#778DA9]/80">
                   <span>If signal missing:</span>
                   <select
                     value={filter.onMissing || "flag"}
                     onChange={(e) => updateFilter(filter.id, { onMissing: e.target.value })}
-                    className="rounded-lg bg-slate-950 border border-white/10 px-2 py-1 text-slate-300 text-xs outline-none focus:border-indigo-400 cursor-pointer"
+                    className="rounded-lg bg-[#0D1B2A] border border-[#415A77]/30 px-2 py-1 text-[#778DA9] text-xs outline-none focus:border-indigo-400 cursor-pointer"
                   >
                     {ON_MISSING_POLICIES.map((p) => (
-                      <option key={p.value} value={p.value} className="bg-slate-950 text-slate-200">
+                      <option key={p.value} value={p.value} className="bg-[#0D1B2A] text-[#E0E1DD]">
                         {p.label}
                       </option>
                     ))}
@@ -474,8 +474,8 @@ export default function FilterEditor() {
 
                 {/* Live Cohort Simulation Indicator */}
                 {activeCohort.length > 0 && filter.enabled !== false && (
-                  <div className="flex items-center gap-2 font-mono text-[11px] self-start sm:self-auto bg-slate-950/60 px-3 py-1 rounded-xl border border-white/5">
-                    <span className="text-slate-500">Live Simulation:</span>
+                  <div className="flex items-center gap-2 font-mono text-[11px] self-start sm:self-auto bg-[#0D1B2A]/60 px-3 py-1 rounded-xl border border-white/5">
+                    <span className="text-[#415A77]">Live Simulation:</span>
                     <span className="text-emerald-400 font-semibold">{passCount} Pass</span>
                     {reviewCount > 0 && (
                       <span className="text-amber-400 font-semibold">• {reviewCount} Review</span>
@@ -483,7 +483,7 @@ export default function FilterEditor() {
                     {failCount > 0 && (
                       <span className="text-rose-400 font-semibold">• {failCount} Fail</span>
                     )}
-                    <span className="text-slate-500">
+                    <span className="text-[#415A77]">
                       ({activeCohort.length} team{activeCohort.length !== 1 ? "s" : ""})
                     </span>
                   </div>

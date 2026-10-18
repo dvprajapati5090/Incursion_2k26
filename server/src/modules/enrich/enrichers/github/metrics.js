@@ -61,7 +61,7 @@ export function summarizeUser(user, fetchedAt) {
     emptyRepos: nodes.filter(isEmptyRepo).length,
     starsReceived: nodes.reduce((sum, r) => sum + r.stargazerCount, 0),
     languages,
-    mergedPrs1y: user.mergedPrs,
+    mergedPrs1y: user.mergedPrs ?? 0,
     lastActivityDate,
   };
 }
@@ -87,7 +87,7 @@ export function toMetrics(s) {
     lastActivity.note =
       "no contributions in the past year; the real value is above 365";
   return {
-    "github.merged_prs_1y": ok("github.merged_prs_1y", s.mergedPrs1y, o),
+    "github.merged_prs_1y": ok("github.merged_prs_1y", s.mergedPrs1y ?? 0, o),
     "github.last_activity_days": lastActivity,
     "github.contributions_1y": ok(
       "github.contributions_1y",

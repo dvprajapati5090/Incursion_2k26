@@ -13,30 +13,51 @@ const response = (status, body, headers = {}) => ({
 });
 
 describe("GitHub GraphQL client", () => {
-  it("returns the profile from a successful API response", async () => {
+  it("returns the profile and merged PR count from a successful API response", async () => {
     const profile = {
-      user: {
-        createdAt: "2020-01-01",
-        allRepos: { totalCount: 2 },
-        ownRepos: { totalCount: 1, nodes: [] },
-        contributionsCollection: { contributionCalendar: { totalContributions: 0, weeks: [] } },
-      },
-      mergedPrs: { issueCount: 7 },
+      user: { createdAt: "2020-01-01", allRepos: { totalCount: 2 } },
+      mergedPrs: { issueCount: 4 },
     };
-    const fetchMock = vi.fn().mockResolvedValue(response(200, { data: profile }));
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(response(200, { data: profile }));
     vi.stubGlobal("fetch", fetchMock);
-    await expect(fetchGithubProfile("octocat")).resolves.toEqual({ ...profile.user, mergedPrs: 7 });
+    await expect(fetchGithubProfile("octocat")).resolves.toEqual({
+      ...profile.user,
+      mergedPrs: 4,
+    });
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(fetchMock.mock.calls[0][1].body).toContain("octocat");
   });
 
+  it("defaults merged PR count when the search result is absent", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        response(200, { data: { user: { createdAt: "2020-01-01" } } }),
+      ),
+    );
+    await expect(fetchGithubProfile("octocat")).resolves.toMatchObject({
+      mergedPrs: 0,
+    });
+  });
+
   it("reports unknown profiles and rate limits without retrying fatal responses", async () => {
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(response(200, { errors: [{ type: "NOT_FOUND", message: "missing" }] }))
-      .mockResolvedValueOnce(response(429, {}, { "x-ratelimit-remaining": "0" }));
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        response(200, { errors: [{ type: "NOT_FOUND", message: "missing" }] }),
+      )
+      .mockResolvedValueOnce(
+        response(429, {}, { "x-ratelimit-remaining": "0" }),
+      );
     vi.stubGlobal("fetch", fetchMock);
-    await expect(fetchGithubProfile("unknown-user")).rejects.toThrow("github_user_not_found");
-    await expect(fetchGithubProfile("octocat")).rejects.toThrow("github_rate_limited");
+    await expect(fetchGithubProfile("unknown-user")).rejects.toThrow(
+      "github_user_not_found",
+    );
+    await expect(fetchGithubProfile("octocat")).rejects.toThrow(
+      "github_rate_limited",
+    );
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
@@ -53,7 +74,9 @@ describe("GitHub GraphQL client", () => {
 
   it("retries network timeouts and preserves the final timeout message", async () => {
     vi.useFakeTimers();
-    const timeout = Object.assign(new Error("request timed out"), { name: "TimeoutError" });
+    const timeout = Object.assign(new Error("request timed out"), {
+      name: "TimeoutError",
+    });
     const fetchMock = vi.fn().mockRejectedValue(timeout);
     vi.stubGlobal("fetch", fetchMock);
     const pending = fetchGithubProfile("octocat");
