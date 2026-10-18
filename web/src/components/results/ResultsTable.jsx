@@ -32,11 +32,11 @@ import { FLAG_DEFINITIONS, getSafeFlagDetail } from "@/lib/handoffFormatters";
 const columnHelper = createColumnHelper();
 
 const STATUS_BADGES = {
-  shortlisted: "bg-emerald-500/15 border-emerald-500/30 text-emerald-300",
+  shortlisted: "bg-emerald-500/15 border-[#415A77]/40 text-emerald-300",
   waitlisted:  "bg-amber-500/15 border-amber-500/30 text-amber-300",
   rejected:    "bg-rose-500/15 border-rose-500/30 text-rose-300",
   filter_rejected: "bg-orange-500/15 border-orange-500/30 text-orange-300",
-  excluded:    "bg-slate-700/30 border-slate-600/40 text-slate-400",
+  excluded:    "bg-slate-700/30 border-slate-600/40 text-[#778DA9]/80",
 };
 
 export default function ResultsTable({ data, config, onRowClick }) {
@@ -52,7 +52,7 @@ export default function ResultsTable({ data, config, onRowClick }) {
       header: "#",
       cell: (info) => {
         const rank = info.getValue();
-        if (!rank) return <span className="text-slate-600 font-mono text-xs">—</span>;
+        if (!rank) return <span className="text-[#415A77]/70 font-mono text-xs">—</span>;
 
         if (rank === 1) {
           return (
@@ -63,7 +63,7 @@ export default function ResultsTable({ data, config, onRowClick }) {
         }
         if (rank === 2) {
           return (
-            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-slate-300/20 text-slate-200 font-extrabold text-xs border border-slate-300/40 shadow-[0_0_8px_rgba(203,213,225,0.4)]">
+            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-slate-300/20 text-[#E0E1DD] font-extrabold text-xs border border-slate-300/40 shadow-[0_0_8px_rgba(203,213,225,0.4)]">
               2
             </span>
           );
@@ -76,7 +76,7 @@ export default function ResultsTable({ data, config, onRowClick }) {
           );
         }
         return (
-          <span className="font-mono text-xs text-slate-400 font-medium">
+          <span className="font-mono text-xs text-[#778DA9]/80 font-medium">
             #{rank}
           </span>
         );
@@ -95,13 +95,13 @@ export default function ResultsTable({ data, config, onRowClick }) {
 
         return (
           <div>
-            <p className="font-bold text-sm text-white group-hover:text-cyan-300 transition-colors">
+            <p className="font-bold text-sm text-white group-hover:text-[#778DA9] transition-colors">
               {blindMode ? `Team ${teamId}` : (info.getValue() || teamId)}
             </p>
             <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-              <span className="text-[11px] font-mono text-slate-500">{teamId}</span>
+              <span className="text-[11px] font-mono text-[#415A77]">{teamId}</span>
               {isPin && (
-                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold tracking-wide">
+                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-[#415A77]/20 text-[#778DA9] border border-[#415A77]/45 font-semibold tracking-wide">
                   PINNED
                 </span>
               )}
@@ -116,7 +116,7 @@ export default function ResultsTable({ data, config, onRowClick }) {
                 </span>
               )}
               {!blindMode && (
-                <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                <span className="text-[11px] text-[#778DA9]/80 flex items-center gap-1">
                   • {info.row.original.members?.length ?? 0} members
                 </span>
               )}
@@ -149,13 +149,13 @@ export default function ResultsTable({ data, config, onRowClick }) {
         const pct = Math.min(100, Math.max(0, Math.round(score * 100)));
         return (
           <div className="flex items-center gap-3 w-40">
-            <div className="flex-1 h-2 rounded-full bg-slate-800 overflow-hidden">
+            <div className="flex-1 h-2 rounded-full bg-[#1B263B] overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full transition-all"
+                className="h-full bg-gradient-to-r from-[#415A77] to-[#778DA9] rounded-full transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>
-            <span className="font-mono text-xs font-bold text-slate-200 w-12 text-right">
+            <span className="font-mono text-xs font-bold text-[#E0E1DD] w-12 text-right">
               {score.toFixed(4)}
             </span>
           </div>
@@ -204,7 +204,7 @@ export default function ResultsTable({ data, config, onRowClick }) {
 
         const flags = Array.from(flagsMap.values());
         if (flags.length === 0) {
-          return <span className="text-[11px] text-slate-600 font-mono">—</span>;
+          return <span className="text-[11px] text-[#415A77]/70 font-mono">—</span>;
         }
 
         return (
@@ -258,7 +258,7 @@ export default function ResultsTable({ data, config, onRowClick }) {
                   logAction("PIN", { teamId });
                 }}
                 title="Move to shortlist"
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 font-semibold text-xs transition cursor-pointer shadow-sm hover:shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-[#415A77]/40 text-emerald-300 font-semibold text-xs transition cursor-pointer shadow-sm hover:shadow-[0_0_10px_rgba(16,185,129,0.3)]"
               >
                 <Award className="h-3.5 w-3.5 text-emerald-400" />
                 <span className="whitespace-nowrap">Move to Shortlist</span>
@@ -275,8 +275,8 @@ export default function ResultsTable({ data, config, onRowClick }) {
                 title={isPin ? "Pinned in shortlist (Click to unpin)" : "Pin to shortlist"}
                 className={`p-1.5 rounded-lg transition cursor-pointer ${
                   isPin
-                    ? "bg-indigo-500/25 text-indigo-300 border border-indigo-500/40 shadow-[0_0_8px_rgba(99,102,241,0.4)]"
-                    : "text-slate-500 hover:text-indigo-300 hover:bg-slate-800"
+                    ? "bg-[#415A77]/25 text-[#778DA9] border border-[#415A77]/55 shadow-[0_0_8px_rgba(99,102,241,0.4)]"
+                    : "text-[#415A77] hover:text-[#778DA9] hover:bg-[#1B263B]"
                 }`}
               >
                 <Pin className={`h-3.5 w-3.5 ${isPin ? "fill-current" : ""}`} />
@@ -293,7 +293,7 @@ export default function ResultsTable({ data, config, onRowClick }) {
               className={`p-1.5 rounded-lg transition cursor-pointer ${
                 isExclude
                   ? "bg-rose-500/25 text-rose-300 border border-rose-500/40 shadow-[0_0_8px_rgba(244,63,94,0.4)]"
-                  : "text-slate-500 hover:text-rose-400 hover:bg-slate-800"
+                  : "text-[#415A77] hover:text-rose-400 hover:bg-[#1B263B]"
               }`}
             >
               <Ban className="h-3.5 w-3.5" />
@@ -309,13 +309,13 @@ export default function ResultsTable({ data, config, onRowClick }) {
               className={`p-1.5 rounded-lg transition cursor-pointer ${
                 isWaitlist
                   ? "bg-amber-500/25 text-amber-300 border border-amber-500/40 shadow-[0_0_8px_rgba(245,158,11,0.4)]"
-                  : "text-slate-500 hover:text-amber-400 hover:bg-slate-800"
+                  : "text-[#415A77] hover:text-amber-400 hover:bg-[#1B263B]"
               }`}
             >
               <Clock className="h-3.5 w-3.5" />
             </button>
 
-            <ChevronRight className="h-4 w-4 text-slate-600 group-hover:text-cyan-400 transition ml-1" />
+            <ChevronRight className="h-4 w-4 text-[#415A77]/70 group-hover:text-[#778DA9] transition ml-1" />
           </div>
         );
       },
@@ -338,33 +338,33 @@ export default function ResultsTable({ data, config, onRowClick }) {
     <div className="space-y-4">
       {/* Search Input Filter */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-3 h-4 w-4 text-slate-500" />
+        <Search className="absolute left-3.5 top-3 h-4 w-4 text-[#415A77]" />
         <input
           type="text"
           placeholder="Filter by team name, ID, or keywords…"
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/60 border border-white/10 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 transition"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#1B263B]/60 border border-[#415A77]/30 text-xs text-white placeholder-slate-500 focus:border-[#778DA9] focus:outline-none focus:ring-1 focus:ring-cyan-400 transition"
         />
       </div>
 
       {/* Leaderboard Table Container */}
-      <div className="glass-panel rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+      <div className="glass-panel rounded-2xl border border-[#415A77]/30 overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/70 border-b border-white/10 text-slate-400 font-semibold tracking-wider uppercase">
+            <thead className="bg-[#0D1B2A]/70 border-b border-[#415A77]/30 text-[#778DA9]/80 font-semibold tracking-wider uppercase">
               {table.getHeaderGroups().map((hg) => (
                 <tr key={hg.id}>
                   {hg.headers.map((header) => (
                     <th
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
-                      className="px-4 py-3.5 font-semibold text-slate-400 cursor-pointer select-none whitespace-nowrap hover:text-white transition"
+                      className="px-4 py-3.5 font-semibold text-[#778DA9]/80 cursor-pointer select-none whitespace-nowrap hover:text-white transition"
                     >
                       <div className="flex items-center gap-1.5">
                         {flexRender(header.column.columnDef.header, header.getContext())}
-                        {header.column.getIsSorted() === "asc" && <ChevronUp className="h-3.5 w-3.5 text-cyan-400" />}
-                        {header.column.getIsSorted() === "desc" && <ChevronDown className="h-3.5 w-3.5 text-cyan-400" />}
+                        {header.column.getIsSorted() === "asc" && <ChevronUp className="h-3.5 w-3.5 text-[#778DA9]" />}
+                        {header.column.getIsSorted() === "desc" && <ChevronDown className="h-3.5 w-3.5 text-[#778DA9]" />}
                       </div>
                     </th>
                   ))}
@@ -388,9 +388,9 @@ export default function ResultsTable({ data, config, onRowClick }) {
 
               {table.getRowModel().rows.length === 0 && (
                 <tr>
-                  <td colSpan={columns.length} className="px-4 py-12 text-center text-slate-500">
-                    <p className="font-medium text-slate-400">No teams found</p>
-                    <p className="text-xs text-slate-600 mt-0.5">Try adjusting your search query or tab filters</p>
+                  <td colSpan={columns.length} className="px-4 py-12 text-center text-[#415A77]">
+                    <p className="font-medium text-[#778DA9]/80">No teams found</p>
+                    <p className="text-xs text-[#415A77]/70 mt-0.5">Try adjusting your search query or tab filters</p>
                   </td>
                 </tr>
               )}
@@ -399,7 +399,7 @@ export default function ResultsTable({ data, config, onRowClick }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-[11px] text-slate-500 px-1 font-mono">
+      <div className="flex items-center justify-between text-[11px] text-[#415A77] px-1 font-mono">
         <span>Showing {table.getFilteredRowModel().rows.length} of {data.length} teams in view</span>
         <span>Click any row to open the detailed explanation drawer</span>
       </div>

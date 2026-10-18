@@ -37,7 +37,7 @@ export default function ColumnMapper({
     mapped.some((m) => m.canonical === "team_id");
 
   return (
-    <div className="glass-panel rounded-2xl p-6 border border-indigo-500/30 space-y-5 bg-slate-950/80">
+    <div className="glass-panel rounded-2xl p-6 border border-[#415A77]/45 space-y-5 bg-[#0D1B2A]/80">
       <div>
         <div className="flex items-center gap-2">
           {missingTeamIdError ? (
@@ -45,7 +45,7 @@ export default function ColumnMapper({
               <AlertCircle className="h-4 w-4" />
             </span>
           ) : (
-            <span className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <span className="p-1.5 rounded-lg bg-[#415A77]/20 text-[#778DA9] border border-[#415A77]/45">
               <CheckCircle2 className="h-4 w-4" />
             </span>
           )}
@@ -53,7 +53,7 @@ export default function ColumnMapper({
             {missingTeamIdError ? "Required Column Mapping" : "Header Mapping & Field Aliases"}
           </h3>
         </div>
-        <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+        <p className="text-xs text-[#778DA9]/80 mt-1 leading-relaxed">
           {missingTeamIdError
             ? "No column could be matched to team_id. Please specify which header from your spreadsheet identifies the team."
             : "Some columns were not recognized automatically. Map them to canonical profile signals or keep them as extra custom team fields."}
@@ -63,12 +63,12 @@ export default function ColumnMapper({
       {/* Auto-mapped headers */}
       {mapped.length > 0 && (
         <div className="space-y-1.5">
-          <p className="text-xs text-slate-400 font-semibold">Automatically Recognized Headers</p>
+          <p className="text-xs text-[#778DA9]/80 font-semibold">Automatically Recognized Headers</p>
           <div className="flex flex-wrap gap-2">
             {mapped.map(({ header, canonical }) => (
               <span
                 key={header}
-                className="text-xs bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-2.5 py-1 rounded-lg font-mono flex items-center gap-1.5"
+                className="text-xs bg-emerald-500/10 border border-[#415A77]/40 text-emerald-300 px-2.5 py-1 rounded-lg font-mono flex items-center gap-1.5"
               >
                 <CheckCircle2 className="h-3 w-3 text-emerald-400" />
                 "{header}" → <strong>{canonical}</strong>
@@ -80,19 +80,19 @@ export default function ColumnMapper({
 
       {/* Unmapped Headers to map */}
       <div className="space-y-3">
-        <p className="text-xs text-slate-300 font-semibold">
+        <p className="text-xs text-[#778DA9] font-semibold">
           Select Canonical Mapping for File Headers:
         </p>
         <div className="grid gap-2.5 max-h-64 overflow-y-auto pr-1">
           {headersToMap.map((header) => (
             <div
               key={header}
-              className="flex flex-col sm:flex-row sm:items-center gap-2.5 p-3 rounded-xl bg-slate-900/80 border border-white/10"
+              className="flex flex-col sm:flex-row sm:items-center gap-2.5 p-3 rounded-xl bg-[#1B263B]/80 border border-[#415A77]/30"
             >
-              <span className="text-xs font-mono text-cyan-300 bg-cyan-950/40 px-2 py-1 rounded border border-cyan-500/20 shrink-0 w-full sm:w-48 truncate">
+              <span className="text-xs font-mono text-[#778DA9] bg-[#0D1B2A]/40 px-2 py-1 rounded border border-[#415A77]/20 shrink-0 w-full sm:w-48 truncate">
                 "{header}"
               </span>
-              <span className="text-slate-500 hidden sm:inline text-xs">→</span>
+              <span className="text-[#415A77] hidden sm:inline text-xs">→</span>
               <select
                 value={columnMap[header] ?? ""}
                 onChange={(e) =>
@@ -101,7 +101,7 @@ export default function ColumnMapper({
                     [header]: e.target.value || undefined,
                   })
                 }
-                className="flex-1 text-xs rounded-lg bg-slate-950 border border-white/15 px-3 py-1.5 text-slate-200 outline-none focus:border-indigo-400"
+                className="flex-1 text-xs rounded-lg bg-[#0D1B2A] border border-white/15 px-3 py-1.5 text-[#E0E1DD] outline-none focus:border-indigo-400"
               >
                 <option value="">
                   Keep as custom field (field.{header.toLowerCase().replace(/[^a-z0-9]+/g, "_")})
@@ -119,8 +119,8 @@ export default function ColumnMapper({
 
       {/* Re-upload button if triggered from missing team_id */}
       {onReupload && (
-        <div className="flex items-center justify-between pt-2 border-t border-white/10">
-          <p className="text-xs text-slate-400">
+        <div className="flex items-center justify-between pt-2 border-t border-[#415A77]/30">
+          <p className="text-xs text-[#778DA9]/80">
             {hasTeamIdMapped ? (
               <span className="text-emerald-400 font-medium">✓ team_id is now mapped</span>
             ) : (
