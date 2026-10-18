@@ -13,8 +13,9 @@ vi.mock("../src/modules/cache/sqliteCache.js", () => ({ cacheGet, cacheSet }));
 vi.mock("../src/modules/enrich/enrichers/resume/fetchPdf.js", () => ({
   fetchResumeText,
 }));
-const { default: resume } =
-  await import("../src/modules/enrich/enrichers/resume/index.js");
+const { default: resume } = await import(
+  "../src/modules/enrich/enrichers/resume/index.js"
+);
 
 beforeEach(() => {
   cache.clear();
@@ -30,12 +31,9 @@ describe("resume enrichment cache", () => {
     const member = {
       sources: { resume: { url: "https://example.test/resume.pdf" } },
     };
-    const first = await resume.enrich(member, {
-      asOf: Date.parse("2026-01-01T00:00:00Z"),
-    });
-    const second = await resume.enrich(member, {
-      asOf: Date.parse("2026-01-01T00:00:00Z"),
-    });
+    const ctx = { asOf: Date.parse("2026-01-01T00:00:00Z") };
+    const first = await resume.enrich(member, ctx);
+    const second = await resume.enrich(member, ctx);
     expect(first).toEqual(second);
     expect(first["resume.skills"].value).toEqual(["React", "Node"]);
     expect(fetchResumeText).toHaveBeenCalledOnce();
@@ -50,12 +48,13 @@ describe("resume enrichment cache", () => {
     const member = {
       sources: { resume: { url: "https://example.test/retry.pdf" } },
     };
-    await expect(
-      resume.enrich(member, { asOf: Date.parse("2026-01-01T00:00:00Z") }),
-    ).rejects.toThrow("resume_fetch_timeout");
-    await expect(
-      resume.enrich(member, { asOf: Date.parse("2026-01-01T00:00:00Z") }),
-    ).resolves.toHaveProperty("resume.text");
+    const ctx = { asOf: Date.parse("2026-01-01T00:00:00Z") };
+    await expect(resume.enrich(member, ctx)).rejects.toThrow(
+      "resume_fetch_timeout",
+    );
+    await expect(resume.enrich(member, ctx)).resolves.toHaveProperty(
+      "resume.text",
+    );
     expect(fetchResumeText).toHaveBeenCalledTimes(2);
   });
 });

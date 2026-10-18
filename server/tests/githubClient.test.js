@@ -13,15 +13,14 @@ const response = (status, body, headers = {}) => ({
 });
 
 describe("GitHub GraphQL client", () => {
-  it("returns the profile from a successful API response", async () => {
+  it("returns the profile and merged PR count from a successful API response", async () => {
     const profile = {
       user: { createdAt: "2020-01-01", allRepos: { totalCount: 2 } },
+      mergedPrs: { issueCount: 4 },
     };
     const fetchMock = vi
       .fn()
-      .mockResolvedValue(
-        response(200, { data: { ...profile, mergedPrs: { issueCount: 4 } } }),
-      );
+      .mockResolvedValue(response(200, { data: profile }));
     vi.stubGlobal("fetch", fetchMock);
     await expect(fetchGithubProfile("octocat")).resolves.toEqual({
       ...profile.user,
@@ -29,6 +28,18 @@ describe("GitHub GraphQL client", () => {
     });
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(fetchMock.mock.calls[0][1].body).toContain("octocat");
+  });
+
+  it("defaults merged PR count when the search result is absent", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        response(200, { data: { user: { createdAt: "2020-01-01" } } }),
+      ),
+    );
+    await expect(fetchGithubProfile("octocat")).resolves.toMatchObject({
+      mergedPrs: 0,
+    });
   });
 
   it("reports unknown profiles and rate limits without retrying fatal responses", async () => {

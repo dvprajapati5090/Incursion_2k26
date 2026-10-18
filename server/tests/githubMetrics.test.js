@@ -50,12 +50,14 @@ describe("GitHub profile metric extraction", () => {
       starsReceived: 7,
       activeMonths: 2,
       languages: ["JavaScript", "TypeScript"],
+      mergedPrs1y: 3,
     });
     const metrics = toMetrics(stats);
     expect(metrics["github.contributions_1y"]).toMatchObject({
       value: 19,
       status: "ok",
     });
+    expect(metrics["github.merged_prs_1y"].value).toBe(3);
     expect(metrics["github.forked_ratio"].value).toBe(0.25);
     expect(metrics["github.empty_repo_ratio"].value).toBe(0.5);
   });
@@ -72,8 +74,11 @@ describe("GitHub profile metric extraction", () => {
       emptyRepos: 0,
       starsReceived: 0,
       languages: [],
+      mergedPrs1y: 0,
+      lastActivityDate: null,
     });
     expect(metrics["github.forked_ratio"].value).toBe(0);
     expect(metrics["github.empty_repo_ratio"].value).toBe(0);
+    expect(metrics["github.merged_prs_1y"].value).toBe(0);
   });
 });

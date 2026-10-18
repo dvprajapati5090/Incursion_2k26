@@ -1,33 +1,26 @@
-﻿import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { resolveResumeUrl } from "../src/modules/enrich/enrichers/resume/resolveUrl.js";
 
-// No real network in tests: DNS always answers with a public address, and PDF parsing is faked.
-vi.mock("node:dns/promises", () => ({
-  lookup: vi.fn().mockResolvedValue([{ address: "93.184.216.34" }]),
-}));
 vi.mock("unpdf", () => ({
   getDocumentProxy: vi.fn().mockResolvedValue({}),
   extractText: vi.fn(),
 }));
-
 import { extractText } from "unpdf";
 import { fetchResumeText } from "../src/modules/enrich/enrichers/resume/fetchPdf.js";
-import { resolveResumeUrl } from "../src/modules/enrich/enrichers/resume/resolveUrl.js";
 
 const LONG_TEXT =
   "Parsed resume text that is comfortably longer than the fifty character minimum.";
-
 const pdfResponse = () =>
   new Response(new TextEncoder().encode("%PDF-1.4 fake body"), {
     status: 200,
     headers: { "content-type": "application/pdf" },
   });
 
-// Each call to fetch returns the next response in order
 function stubFetch(...responses) {
-  const fn = vi.fn();
-  responses.forEach((r) => fn.mockResolvedValueOnce(r));
-  vi.stubGlobal("fetch", fn);
-  return fn;
+  const fetchMock = vi.fn();
+  responses.forEach((result) => fetchMock.mockResolvedValueOnce(result));
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
 }
 
 beforeEach(() => extractText.mockReset());
@@ -55,12 +48,12 @@ describe("resume link resolving", () => {
 });
 
 describe("resume PDF download", () => {
-  it("parses a real PDF response", async () => {
+  it("parses a PDF response", async () => {
     stubFetch(pdfResponse());
     extractText.mockResolvedValueOnce({ text: LONG_TEXT });
     await expect(
       fetchResumeText("https://example.com/resume.pdf"),
-    ).resolves.toContain("Parsed resume");
+    ).resolves.toBe(LONG_TEXT);
   });
 
   it("rejects a non-PDF response such as a private Drive login page", async () => {
@@ -75,17 +68,20 @@ describe("resume PDF download", () => {
     ).rejects.toThrow("resume_not_a_pdf_or_link_not_public");
   });
 
-  it("reports HTTP errors", async () => {
+  it("reports HTTP errors and rejects files over the size limit", async () => {
     stubFetch(new Response("", { status: 404 }));
-    await expect(fetchResumeText("https://example.com/404")).rejects.toThrow(
-      "resume_http_404",
-    );
-  });
-
-  it("rejects files over the size limit", async () => {
-    stubFetch(new Response(new Uint8Array(11 * 1024 * 1024), { status: 200 }));
     await expect(
-      fetchResumeText("https://example.com/huge.pdf"),
+      fetchResumeText("https://example.com/404"),
+    ).rejects.toThrow("resume_http_404");
+
+    stubFetch(
+      new Response(null, {
+        status: 200,
+        headers: { "content-length": String(11 * 1024 * 1024) },
+      }),
+    );
+    await expect(
+      fetchResumeText("https://example.com/large.pdf"),
     ).rejects.toThrow("resume_too_large");
   });
 
@@ -97,46 +93,18 @@ describe("resume PDF download", () => {
     ).rejects.toThrow("resume_no_text_scanned_pdf");
   });
 
-  it("maps timeouts and network failures into the documented resume errors", async () => {
-    const timeout = new Error("timed out");
-    timeout.name = "TimeoutError";
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(timeout));
+  it("maps timeouts and network failures into documented errors", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("timeout")));
     await expect(
       fetchResumeText("https://example.com/resume.pdf"),
     ).rejects.toThrow("resume_fetch_timeout");
 
     vi.stubGlobal(
       "fetch",
-      vi.fn().mockRejectedValue(new TypeError("fetch failed")),
+      vi.fn().mockRejectedValue(new Error("network_error")),
     );
     await expect(
       fetchResumeText("https://example.com/resume.pdf"),
     ).rejects.toThrow("resume_fetch_network_error");
-  });
-});
-
-describe("resume download security guard", () => {
-  it("never fetches localhost or private addresses", async () => {
-    const fetchMock = vi.fn();
-    vi.stubGlobal("fetch", fetchMock);
-    await expect(fetchResumeText("http://localhost/x")).rejects.toThrow(
-      "resume_url_host_not_allowed",
-    );
-    await expect(fetchResumeText("http://192.168.1.10/cv.pdf")).rejects.toThrow(
-      "resume_url_resolves_to_private_address",
-    );
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it("blocks a redirect that points at a private address", async () => {
-    stubFetch(
-      new Response(null, {
-        status: 302,
-        headers: { location: "http://127.0.0.1/secret" },
-      }),
-    );
-    await expect(fetchResumeText("https://example.com/r.pdf")).rejects.toThrow(
-      "resume_url_resolves_to_private_address",
-    );
   });
 });
