@@ -1,3 +1,9 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://incursion-2k26-gbw1.onrender.com/api/:path*"
+    },
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
