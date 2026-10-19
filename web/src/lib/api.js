@@ -1,9 +1,11 @@
 /**
  * API client — thin wrappers around fetch for every server endpoint.
- * Base URL is empty because vite.config.js proxies /api → http://localhost:3000
+ * Vite proxies same-origin /api requests in development. Production builds can
+ * set VITE_API_URL to the backend origin (without a trailing slash).
  */
 
-const BASE = "/api";
+const API_ORIGIN = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+const BASE = `${API_ORIGIN}/api`;
 
 async function handleResponse(res) {
   if (!res.ok) {

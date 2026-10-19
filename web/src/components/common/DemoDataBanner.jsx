@@ -1,19 +1,18 @@
 /**
- * DemoDataBanner — Surfaces a prominent advisory banner when the enrichment
- * server operates in mock demo mode (no GITHUB_TOKEN configured).
+ * DemoDataBanner — Surfaces a prominent advisory banner when GitHub metrics
+ * are generated locally or by the server's mock enricher.
  *
- * Implements Must-do UI Rule #8 & Section 3/5:
- * "enrichers containing 'mock_github' instead of 'github' means the server has no
- * GitHub token and GitHub numbers are fake demo data (origin: 'mock', and only 5
- * GitHub metrics exist). Show a visible 'demo data' banner in that case."
+ * Show this warning whenever the active GitHub enricher is synthetic, regardless
+ * of whether the estimates came from the browser or the server.
  */
-import { AlertTriangle, Info, ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 import useImportStore from "@/stores/importStore";
 
 export default function DemoDataBanner({ className = "" }) {
-  const { isMockGithub, enrichers } = useImportStore();
+  const { isMockGithub, enrichers, enrichSummary } = useImportStore();
 
   const isMock = isMockGithub || (Array.isArray(enrichers) && enrichers.includes("mock_github"));
+  const isClientFallback = enrichSummary?.mode === "client_fallback";
 
   if (!isMock) return null;
 
@@ -35,9 +34,9 @@ export default function DemoDataBanner({ className = "" }) {
             </span>
           </div>
           <p className="text-amber-200/90 leading-relaxed">
-            The enrichment server is operating without a GitHub Personal Access Token. GitHub metrics shown
-            are synthetic demo values (<code className="font-mono bg-black/40 px-1 py-0.5 rounded text-amber-300">origin: "mock"</code>)
-            and only 5 baseline GitHub metrics are populated. Connect a GitHub token on the server for authentic live profile intelligence.
+            {isClientFallback
+              ? "The app could not use the enrichment server and generated GitHub estimates locally. Check the production API URL and backend availability to enable live enrichment."
+              : <>The enrichment server is using mock GitHub data, which usually means <code className="font-mono bg-black/40 px-1 py-0.5 rounded text-amber-300">GITHUB_TOKEN</code> was not available when it started. GitHub metrics shown are synthetic demo values (<code className="font-mono bg-black/40 px-1 py-0.5 rounded text-amber-300">origin: "mock"</code>). Configure the token on the backend service and restart it for live profile intelligence.</>}
           </p>
         </div>
       </div>
