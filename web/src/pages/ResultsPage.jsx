@@ -23,12 +23,14 @@ import {
   Sparkles,
   Activity,
   Calendar,
+  ArrowLeftRight,
 } from "lucide-react";
 import useResultsStore from "@/stores/resultsStore";
 import useConfigStore from "@/stores/configStore";
 import useImportStore from "@/stores/importStore";
 import ResultsTable from "@/components/results/ResultsTable";
 import TeamDetailDrawer from "@/components/results/TeamDetailDrawer";
+import TeamComparisonModal from "@/components/results/TeamComparisonModal";
 import DemoDataBanner from "@/components/common/DemoDataBanner";
 import DataQualityDashboard from "@/components/upload/DataQualityDashboard";
 
@@ -56,6 +58,15 @@ export default function ResultsPage() {
   const [activeTab, setActiveTab] = useState("shortlisted");
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [showQualityDashboard, setShowQualityDashboard] = useState(false);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [compareTeamAId, setCompareTeamAId] = useState(null);
+  const [compareTeamBId, setCompareTeamBId] = useState(null);
+
+  const handleOpenCompare = (teamA = null, teamB = null) => {
+    setCompareTeamAId(teamA?.teamId || teamA || null);
+    setCompareTeamBId(teamB?.teamId || teamB || null);
+    setShowCompareModal(true);
+  };
 
   const tableData = {
     shortlisted: shortlist,
@@ -164,6 +175,13 @@ export default function ResultsPage() {
           )}
 
           <button
+            onClick={() => handleOpenCompare()}
+            className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-[#1B263B] border border-[#415A77]/60 hover:bg-[#415A77]/30 hover:border-[#778DA9] text-[#E0E1DD] transition cursor-pointer shadow-sm"
+          >
+            <ArrowLeftRight className="h-3.5 w-3.5 text-[#778DA9]" />
+            <span>Compare Teams</span>
+          </button>
+          <button
             onClick={() => navigate("/config")}
             className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-[#1B263B] border border-[#415A77]/60 hover:bg-[#415A77]/30 hover:border-[#778DA9] text-[#E0E1DD] transition cursor-pointer shadow-sm"
           >
@@ -267,6 +285,7 @@ export default function ResultsPage() {
         data={tableData}
         config={config}
         onRowClick={(team) => setSelectedTeam(team)}
+        onCompareTeam={(teamA, teamB) => handleOpenCompare(teamA, teamB)}
       />
 
       {/* Slide-out Drawer */}
@@ -276,6 +295,20 @@ export default function ResultsPage() {
             team={rankedResults.find((t) => t.teamId === selectedTeam.teamId) || selectedTeam}
             config={config}
             onClose={() => setSelectedTeam(null)}
+            onCompareWithTeam={(team) => handleOpenCompare(team)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Side-by-Side Pairwise Team Comparison Modal */}
+      <AnimatePresence>
+        {showCompareModal && (
+          <TeamComparisonModal
+            allTeams={rankedResults}
+            initialTeamAId={compareTeamAId}
+            initialTeamBId={compareTeamBId}
+            config={config}
+            onClose={() => setShowCompareModal(false)}
           />
         )}
       </AnimatePresence>

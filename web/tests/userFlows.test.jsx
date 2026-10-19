@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ResultsTable from "../src/components/results/ResultsTable.jsx";
 import TeamDetailDrawer from "../src/components/results/TeamDetailDrawer.jsx";
+import TeamComparisonModal from "../src/components/results/TeamComparisonModal.jsx";
 import CriteriaEditor from "../src/components/config/CriteriaEditor.jsx";
 import FilterEditor from "../src/components/config/FilterEditor.jsx";
 import PresetManager from "../src/components/config/PresetManager.jsx";
@@ -50,6 +51,31 @@ describe("visible results and override controls", () => {
     expect(document.body.textContent).not.toContain("Private Person");
     expect(document.body.textContent).not.toContain("private@example.test");
     expect(document.body.textContent).toContain("0.875");
+  });
+
+  it("renders pairwise head-to-head comparison modal with scores and rejection reasons", () => {
+    const rejectedTeam = {
+      teamId: "T-99",
+      teamName: "Underdogs",
+      status: "filter_rejected",
+      score: null,
+      filterResults: [{ metric: "resume.exists", label: "Resume Uploaded", status: "fail", required: true, actual: false }],
+      rejectionReasons: ["Failed eligibility rule: Resume Uploaded"],
+      members: [{ memberId: "m2", name: "Dev Two", sources: {} }],
+    };
+    render(
+      <TeamComparisonModal
+        allTeams={[result, rejectedTeam]}
+        initialTeamAId="T-17"
+        initialTeamBId="T-99"
+        config={useConfigStore.getState().config}
+        onClose={() => {}}
+      />
+    );
+    expect(screen.getByText("Head-to-Head Team Comparison")).toBeDefined();
+    expect(document.body.textContent).toContain("Secret Rockets");
+    expect(document.body.textContent).toContain("Underdogs");
+    expect(document.body.textContent).toContain("Disqualification Rationale");
   });
 });
 
