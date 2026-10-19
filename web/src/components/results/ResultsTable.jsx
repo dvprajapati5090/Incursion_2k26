@@ -24,6 +24,7 @@ import {
   ChevronRight,
   ShieldCheck,
   AlertCircle,
+  ArrowLeftRight,
 } from "lucide-react";
 import useConfigStore from "@/stores/configStore";
 import usePresetsStore from "@/stores/presetsStore";
@@ -39,14 +40,52 @@ const STATUS_BADGES = {
   excluded:    "bg-[#415A77]/25 border-[#778DA9]/30 text-[#778DA9]",
 };
 
-export default function ResultsTable({ data, config, onRowClick }) {
+export default function ResultsTable({ data, config, onRowClick, onCompareTeam }) {
   const [sorting, setSorting] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [selectedForCompare, setSelectedForCompare] = useState([]);
   const { pinTeam, excludeTeam, waitlistTeam, clearOverride } = useConfigStore();
   const { logAction } = usePresetsStore();
   const blindMode = config?.options?.blindMode;
 
   const columns = [
+    // Comparison Selection Checkbox
+    columnHelper.display({
+      id: "select",
+      header: () => (
+        <span title="Select 2 teams to compare side-by-side" className="text-[10px] font-bold text-[#778DA9] uppercase tracking-wider">
+          CMP
+        </span>
+      ),
+      cell: (info) => {
+        const team = info.row.original;
+        const isSelected = selectedForCompare.some((t) => t.teamId === team.teamId);
+        return (
+          <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-center">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => {
+                setSelectedForCompare((prev) => {
+                  const exists = prev.some((t) => t.teamId === team.teamId);
+                  if (exists) {
+                    return prev.filter((t) => t.teamId !== team.teamId);
+                  }
+                  if (prev.length >= 2) {
+                    return [prev[0], team];
+                  }
+                  return [...prev, team];
+                });
+              }}
+              title={isSelected ? "Deselect from comparison" : "Select team for pairwise comparison"}
+              className="h-4 w-4 rounded border-[#415A77] bg-[#1B263B] text-[#778DA9] focus:ring-0 cursor-pointer accent-[#778DA9]"
+            />
+          </div>
+        );
+      },
+      size: 40,
+    }),
+
     // Rank column with Podium Medals
     columnHelper.accessor("rank", {
       header: "#",
@@ -315,11 +354,26 @@ export default function ResultsTable({ data, config, onRowClick }) {
               <Clock className="h-3.5 w-3.5" />
             </button>
 
+            {/* Quick Pairwise Compare Button */}
+            <button
+              onClick={() => {
+                if (selectedForCompare.length === 1 && selectedForCompare[0].teamId !== teamId) {
+                  onCompareTeam?.(selectedForCompare[0], info.row.original);
+                } else {
+                  onCompareTeam?.(info.row.original);
+                }
+              }}
+              title="Compare this team head-to-head"
+              className="p-1.5 rounded-lg text-[#778DA9] hover:text-[#E0E1DD] hover:bg-[#415A77]/30 transition cursor-pointer"
+            >
+              <ArrowLeftRight className="h-3.5 w-3.5" />
+            </button>
+
             <ChevronRight className="h-4 w-4 text-[#415A77]/70 group-hover:text-[#778DA9] transition ml-1" />
           </div>
         );
       },
-      size: 160,
+      size: 195,
     }),
   ];
 
@@ -398,6 +452,53 @@ export default function ResultsTable({ data, config, onRowClick }) {
           </table>
         </div>
       </div>
+
+      {/* Floating Pairwise Comparison Dock */}
+      {selectedForCompare.length > 0 && (
+        <div className="sticky bottom-4 z-30 p-3.5 rounded-2xl bg-[#0D1B2A]/95 backdrop-blur-xl border border-[#778DA9]/60 shadow-[0_10px_30px_rgba(0,0,0,0.6)] flex flex-wrap items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-[#415A77]/30 border border-[#415A77]/50 flex items-center justify-center text-[#E0E1DD]">
+              <ArrowLeftRight className="h-4 w-4 text-[#778DA9]" />
+            </div>
+            <div className="text-xs">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="font-bold text-white">Compare:</span>
+                <span className="font-semibold text-emerald-300 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  {blindMode ? `Team ${selectedForCompare[0].teamId}` : selectedForCompare[0].teamName || selectedForCompare[0].teamId}
+                </span>
+                {selectedForCompare[1] ? (
+                  <>
+                    <span className="text-[#778DA9] font-bold">vs</span>
+                    <span className="font-semibold text-sky-300 font-mono bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
+                      {blindMode ? `Team ${selectedForCompare[1].teamId}` : selectedForCompare[1].teamName || selectedForCompare[1].teamId}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-[#778DA9] italic text-[11px] ml-1">
+                    (Select 1 more team with CMP checkbox or compare directly)
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            <button
+              onClick={() => onCompareTeam?.(selectedForCompare[0], selectedForCompare[1])}
+              className="px-4 py-2 rounded-xl bg-[#415A77] hover:bg-[#778DA9] text-white text-xs font-bold transition cursor-pointer shadow-lg flex items-center gap-2"
+            >
+              <ArrowLeftRight className="h-3.5 w-3.5" />
+              <span>{selectedForCompare.length === 2 ? "Compare Pair Now" : "Launch Comparison"}</span>
+            </button>
+            <button
+              onClick={() => setSelectedForCompare([])}
+              className="px-3 py-2 rounded-xl bg-[#1B263B] text-[#778DA9] hover:text-white hover:bg-[#415A77]/30 text-xs font-semibold transition cursor-pointer border border-[#415A77]/40"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center justify-between text-[11px] text-[#415A77] px-1 font-mono">
         <span>Showing {table.getFilteredRowModel().rows.length} of {data.length} teams in view</span>

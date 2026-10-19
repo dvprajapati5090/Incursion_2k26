@@ -37,6 +37,7 @@ import {
   Ban,
   Clock,
   RotateCcw,
+  ArrowLeftRight,
 } from "lucide-react";
 import useConfigStore from "@/stores/configStore";
 import usePresetsStore from "@/stores/presetsStore";
@@ -188,7 +189,7 @@ function getMemberMetricEntry(member, metricDef) {
   };
 }
 
-export default function TeamDetailDrawer({ team, config, onClose }) {
+export default function TeamDetailDrawer({ team, config, onClose, onCompareWithTeam }) {
   const { asOf, enrichedAt, isMockGithub } = useImportStore();
   const { pinTeam, excludeTeam, waitlistTeam, clearOverride } = useConfigStore();
   const { logAction } = usePresetsStore();
@@ -387,6 +388,15 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
             >
               <Ban className="h-3.5 w-3.5" />
               {isExclude ? "Excluded (Restore)" : "Exclude Team"}
+            </button>
+
+            <button
+              onClick={() => onCompareWithTeam?.(team)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#415A77]/25 hover:bg-[#415A77]/40 border border-[#778DA9]/40 text-[#E0E1DD] text-xs font-semibold transition cursor-pointer shadow-sm"
+              title="Compare this team against another team head-to-head"
+            >
+              <ArrowLeftRight className="h-3.5 w-3.5 text-[#778DA9]" />
+              Compare Team
             </button>
 
             {(isPin || isWaitlist || isExclude) && (
