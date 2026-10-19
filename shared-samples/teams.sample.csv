@@ -1,7 +1,0 @@
-team_id,team_name,member_name,member_email,is_lead,resume_url,github_url,linkedin_url,portfolio_url
-T-001,Byte Builders,Aarav Shah,aarav@example.com,TRUE,https://drive.example.com/aarav.pdf,https://github.com/aarav-dev,https://linkedin.com/in/aaravshah,https://aarav.dev
-T-001,Byte Builders,Meera Patel,meera@example.com,FALSE,https://drive.example.com/meera.pdf,https://github.com/meera-p,,
-T-001,Byte Builders,Rohan Desai,rohan@example.com,FALSE,,https://github.com/rohand,https://linkedin.com/in/rohandesai,
-T-002,Solo Stack,Isha Mehta,isha@example.com,TRUE,https://drive.example.com/isha.pdf,,https://linkedin.com/in/ishamehta,https://isha.codes
-T-003,Null Pointers,Kabir Rao,kabir@example.com,TRUE,,https://github.com/kabir-rao,,
-T-003,Null Pointers,Anaya Joshi,anaya@example.com,FALSE,,,,

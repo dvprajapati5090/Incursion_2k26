@@ -1,4 +1,4 @@
-index,team_id,team_name,member_name,member_email,is_lead,resume_url,github_url,linkedin_url,portfolio_url
+index,team_id,team_name,member_name,member_email,is_lead,resume_url,github_url,linkedin_pdf_url,portfolio_url
 0,T-001,Quantum Builders,Sana Kapoor,sana.kapoor.t001m1@example.org,True,https://drive.google.com/file/d/1A62IEMdPrP0fIBal81yipxOGua2MkrX2/view,https://github.com/octocat,https://drive.google.com/file/d/1yqziYtQeMPkUVjzmPmHJ3HH-nXDcPDRm/view,https://github.blog/
 1,T-001,Quantum Builders,Mira Khan,mira.khan.t001m2@example.org,False,https://drive.google.com/file/d/1ZE52foZTvkLM7zoQz2AKKdZKDEWfWeRx/view,https://github.com/torvalds,https://drive.google.com/file/d/1p1G5zEAaYKISpps_ZA5icnr09UzeJ7od/view,https://www.kernel.org/
 2,T-001,Quantum Builders,Zoya Nair,zoya.nair.t001m3@example.org,False,https://drive.google.com/file/d/1DzQHvA4rQbBwU2He5T5Pppz7NN2n7j9Y/view,https://github.com/gaearon,https://drive.google.com/file/d/1ui5bZqV6KE70qNZ7J93TE2RV3wqtaBcq/view,
