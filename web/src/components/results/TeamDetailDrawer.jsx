@@ -11,7 +11,7 @@
  * - Blind review mode masks names, emails, sources, and redacts usernames from duplicate flags
  * - asOf & enrichedAt display in run telemetry and demo data banner
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -53,10 +53,12 @@ import { reasonToText } from "@/lib/exportUtils";
 import {
   formatMetricValue,
   formatFailureReason,
+  formatNotProvidedReason,
   STATUS_BADGE_CONFIG,
   FLAG_DEFINITIONS,
   getSafeFlagDetail,
 } from "@/lib/handoffFormatters";
+import { getRegistry } from "@/lib/api";
 import useImportStore from "@/stores/importStore";
 import DemoDataBanner from "@/components/common/DemoDataBanner";
 
@@ -158,13 +160,11 @@ export const SIGNAL_DOMAINS = [
     color: "text-sky-400",
     badge: "bg-sky-500/10 text-sky-300 border-sky-500/30",
     metrics: [
-      { id: "linkedin.experience_count", label: "Positions Listed", aliases: ["linkedin.experience_months"] },
-      { id: "linkedin.skills", label: "Skills Endorsed / Listed" },
-      { id: "linkedin.certification_count", label: "Certifications" },
-      { id: "linkedin.endorsement_count", label: "Endorsements" },
-      { id: "linkedin.education_level", label: "Education Level" },
-      { id: "linkedin.post_count_1y", label: "Posts (Past Year)" },
       { id: "linkedin.text", label: "Headline & Experience Text" },
+      { id: "linkedin.experience_count", label: "Positions Listed", aliases: ["linkedin.experience_months"] },
+      { id: "linkedin.certification_count", label: "Certifications" },
+      { id: "linkedin.endorsement_count", label: "Skill Endorsements" },
+      { id: "linkedin.skills", label: "Skills Endorsed / Listed" },
     ],
   },
 ];
@@ -194,6 +194,44 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
   const { logAction } = usePresetsStore();
   const [highlightedMemberId, setHighlightedMemberId] = useState(null);
   const [activeSignalTab, setActiveSignalTab] = useState("all");
+  const [activeSignalDomains, setActiveSignalDomains] = useState(SIGNAL_DOMAINS);
+
+  useEffect(() => {
+    let mounted = true;
+    getRegistry()
+      .then((res) => {
+        if (!mounted || !res?.metrics) return;
+        // Build delivered LinkedIn metrics from registry: filter source === "linkedin" and !reserved
+        const liMetricsFromRegistry = res.metrics
+          .filter((m) => m.source === "linkedin" && !m.reserved)
+          .map((m) => {
+            const staticDef = SIGNAL_DOMAINS.find((d) => d.id === "linkedin")
+              ?.metrics.find((x) => x.id === m.id);
+            return {
+              id: m.id,
+              label: staticDef?.label || m.description || m.id,
+              aliases: staticDef?.aliases,
+            };
+          });
+
+        if (liMetricsFromRegistry.length > 0) {
+          setActiveSignalDomains((prev) =>
+            prev.map((dom) =>
+              dom.id === "linkedin"
+                ? { ...dom, metrics: liMetricsFromRegistry }
+                : dom
+            )
+          );
+        }
+      })
+      .catch(() => {
+        // Fallback to static 5 delivered metrics in SIGNAL_DOMAINS
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   if (!team) return null;
 
@@ -662,7 +700,7 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   <Layers className="h-3.5 w-3.5" />
                   <span>All Categories</span>
                 </button>
-                {SIGNAL_DOMAINS.map((domain) => {
+                {activeSignalDomains.map((domain) => {
                   const DomainIcon = domain.icon;
                   const isActive = activeSignalTab === domain.id;
                   return (
@@ -692,12 +730,12 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                   const isHighlighted = highlightedMemberId === m.memberId;
                   const domainsToRender =
                     activeSignalTab === "all"
-                      ? SIGNAL_DOMAINS
-                      : SIGNAL_DOMAINS.filter((d) => d.id === activeSignalTab);
+                      ? activeSignalDomains
+                      : activeSignalDomains.filter((d) => d.id === activeSignalTab);
 
                   // Collect any custom metrics not in standard domains
                   const allKnownMetricIds = new Set(
-                    SIGNAL_DOMAINS.flatMap((d) => [
+                    activeSignalDomains.flatMap((d) => [
                       d.metrics.map((x) => x.id),
                       d.metrics.flatMap((x) => x.aliases || []),
                     ]).flat()
@@ -971,9 +1009,18 @@ export default function TeamDetailDrawer({ team, config, onClose }) {
                                         </div>
                                       </div>
 
-                                      <div className="font-mono font-bold text-white text-xs truncate">
-                                        {formatted.display}
-                                      </div>
+                                      {metricDef.id.startsWith("linkedin.") && formatted.status === "not_provided" ? (
+                                        <div
+                                          className="text-[11px] text-[#778DA9] italic leading-tight py-0.5"
+                                          title={entry?.reason || formatted.tooltip || ""}
+                                        >
+                                          {formatted.reasonText || formatted.tooltip || formatNotProvidedReason(entry?.reason) || "Not provided by applicant"}
+                                        </div>
+                                      ) : (
+                                        <div className="font-mono font-bold text-white text-xs truncate">
+                                          {formatted.display}
+                                        </div>
+                                      )}
 
                                       {/* AI previous audit comparison note */}
                                       {isLlm && entry.previous && (

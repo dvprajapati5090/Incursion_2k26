@@ -209,11 +209,18 @@ export default function ImportReport({ report }) {
                   </span>
                   <div>
                     <p className="text-[#E0E1DD]">{iss.message}</p>
-                    {iss.code && (
-                      <span className="text-[10px] font-mono text-[#415A77] mr-2">
-                        code: {iss.code}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 mt-1">
+                      {iss.code && (
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#0D1B2A] text-[#778DA9] border border-[#415A77]/30">
+                          code: {iss.code}
+                        </span>
+                      )}
+                      {iss.code === "LINKEDIN_FILE_IN_URL_COLUMN" && (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-200 border border-sky-400/40 font-semibold">
+                          ✓ Auto-routed to LinkedIn PDF Analysis
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
