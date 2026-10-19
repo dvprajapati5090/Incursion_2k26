@@ -14,6 +14,7 @@ import {
   FileText,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
   Loader2,
   ArrowRight,
   Sparkles,

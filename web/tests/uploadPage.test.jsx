@@ -45,4 +45,27 @@ describe("registration upload user flow", () => {
     expect(screen.getByText("teams.csv")).toBeTruthy();
     expect(useImportStore.getState().rawTeams[0].teamId).toBe("T1");
   });
+
+  it("renders warning banner when uploaded file contains warnings without blank screen crashes", async () => {
+    api.uploadFile.mockResolvedValue({
+      importId: "imp_warn123",
+      report: {
+        teamsFound: 1,
+        membersFound: 1,
+        issueCounts: { warning: 2, error: 0 },
+        issues: [
+          { severity: "warning", message: "LinkedIn file link in URL column", code: "LINKEDIN_FILE_IN_URL_COLUMN" },
+        ],
+        columns: { extra: [] },
+      },
+    });
+    api.getImport.mockResolvedValue({ teams: [{ teamId: "T1", members: [] }] });
+    renderPage();
+    fireEvent.change(document.getElementById("file-input"), {
+      target: { files: [new File(["team_id\nT1"], "teams_with_warns.csv", { type: "text/csv" })] },
+    });
+    await waitFor(() => expect(useImportStore.getState().phase).toBe("imported"));
+    expect(screen.getByText(/Data Hygiene Warning\(s\)/)).toBeTruthy();
+    expect(screen.getByText("teams_with_warns.csv")).toBeTruthy();
+  });
 });
