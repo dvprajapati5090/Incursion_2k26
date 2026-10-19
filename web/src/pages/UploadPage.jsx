@@ -434,6 +434,9 @@ export default function UploadPage() {
                 <FileJson className="h-3.5 w-3.5 text-[#778DA9]" /> .json
               </span>
             </div>
+            <p className="text-[11px] text-[#778DA9]/80 mt-1">
+              Drive files (resume &amp; LinkedIn PDF) must be shared as &quot;Anyone with the link&quot;
+            </p>
           </div>
         )}
       </motion.div>
@@ -443,6 +446,18 @@ export default function UploadPage() {
         <div className="flex items-center gap-3 text-rose-200 text-sm p-4 bg-rose-950/40 border border-rose-500/40 rounded-xl shadow-lg">
           <AlertCircle className="h-5 w-5 shrink-0 text-rose-400" />
           <span>{error}</span>
+        </div>
+      )}
+
+      {/* Warning notice banner if import has warnings */}
+      {report?.issueCounts?.warning > 0 && !error && (
+        <div className="flex items-center justify-between gap-3 text-amber-200 text-xs p-3.5 bg-amber-950/30 border border-amber-500/35 rounded-xl">
+          <div className="flex items-center gap-2.5">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
+            <span>
+              <strong>{report.issueCounts.warning} Data Hygiene Warning(s)</strong> detected during import (e.g. LinkedIn PDF links in URL column). All items were safely routed — review the telemetry log below.
+            </span>
+          </div>
         </div>
       )}
 

@@ -10,16 +10,20 @@ export default {
   metricIds: METRIC_IDS,
 
   async enrich(member) {
-    const src = member.sources.linkedin;
+    const src = member.sources?.linkedin;
     if (src?.text) return toMetrics(src.text, "form_text");
     if (src?.pdfUrl)
       return toMetrics(await getResumeText(src.pdfUrl), "pdf_text");
 
-    // Only a profile link was given: nothing we may analyse, and we say so explicitly.
+    // Profile link only provided: cannot scrape LinkedIn; applicant must paste text or export PDF
+    const reason = src?.url
+      ? "profile_link_only_no_text_or_pdf"
+      : "not_provided_by_applicant";
+
     return Object.fromEntries(
       METRIC_IDS.map((id) => [
         id,
-        { ...notProvided(), reason: "profile_link_only_no_text_or_pdf" },
+        { ...notProvided(), reason },
       ]),
     );
   },

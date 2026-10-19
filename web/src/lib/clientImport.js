@@ -81,11 +81,21 @@ function cleanUrl(value, column, row, issues) {
   }
 }
 
-function toSource({ url, text }) {
-  if (url === null && text === null) return null;
+export function isFileUrl(value) {
+  if (!value) return false;
+  return (
+    /\.pdf(\?.*)?$/i.test(value) ||
+    /(?:drive|docs)\.google\.com/i.test(value) ||
+    /(?:dropbox\.com|1drv\.ms|onedrive\.live\.com)/i.test(value)
+  );
+}
+
+function toSource({ url, text, pdfUrl = null }) {
+  if (url === null && text === null && pdfUrl === null) return null;
   const s = {};
   if (url !== null) s.url = url;
   if (text !== null) s.text = text;
+  if (pdfUrl !== null) s.pdfUrl = pdfUrl;
   return s;
 }
 
@@ -175,6 +185,22 @@ export function parseClientCsv(text, columnMap = {}) {
       if (!(k in team.fields)) team.fields[k] = v;
     }
 
+    const rawLiUrl = cleanValue(rec.linkedin_url);
+    const liIsFile = isFileUrl(rawLiUrl);
+
+    if (liIsFile) {
+      if (!rec.linkedin_pdf_url) {
+        rec.linkedin_pdf_url = rawLiUrl;
+      }
+      issues.push({
+        severity: "warning",
+        code: "LINKEDIN_FILE_IN_URL_COLUMN",
+        row: rowNum,
+        column: "linkedin_url",
+        message: `A PDF/file link was provided in 'linkedin_url' (${rawLiUrl}). LinkedIn is read from a file, not scraped; it was processed as a LinkedIn PDF, but please use the 'linkedin_pdf_url' column instead.`,
+      });
+    }
+
     const memberId = `${teamId}-${team.members.length + 1}`;
     const url = (col) => cleanUrl(rec[col] ?? null, col, rowNum, issues);
 
@@ -189,7 +215,11 @@ export function parseClientCsv(text, columnMap = {}) {
           text: rec.resume_text ?? null,
         }),
         github: toSource({ url: url("github_url"), text: null }),
-        linkedin: toSource({ url: url("linkedin_url"), text: null }),
+        linkedin: toSource({
+          url: liIsFile ? null : url("linkedin_url"),
+          text: rec.linkedin_text ?? null,
+          pdfUrl: url("linkedin_pdf_url"),
+        }),
         portfolio: toSource({ url: url("portfolio_url"), text: null }),
       },
       metrics: {},
@@ -370,11 +400,20 @@ export function enrichTeamsClient(rawTeams) {
         }
       }
 
-      // LinkedIn metrics if provided
-      if (m.sources.linkedin?.url) {
+      // LinkedIn metrics (5 delivered: text, experience_count, certification_count, endorsement_count, skills)
+      // post_count_1y is reserved and never returned.
+      const liKeys = [
+        "linkedin.text",
+        "linkedin.experience_count",
+        "linkedin.certification_count",
+        "linkedin.endorsement_count",
+        "linkedin.skills",
+      ];
+
+      if (m.sources.linkedin?.pdfUrl || m.sources.linkedin?.text) {
         const seed = (m.memberId + "li").split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
-        m.metrics["linkedin.post_count_1y"] = {
-          value: seed % 10,
+        m.metrics["linkedin.text"] = {
+          value: "Engineer & Hackathon participant profile text.",
           status: "ok",
           origin: "client_estimate",
         };
@@ -398,18 +437,24 @@ export function enrichTeamsClient(rawTeams) {
           status: "ok",
           origin: "client_estimate",
         };
-        m.metrics["linkedin.text"] = {
-          value: "Engineer & Hackathon participant.",
-          status: "ok",
-          origin: "client_estimate",
-        };
-      } else {
-        const liKeys = [
-          "linkedin.post_count_1y", "linkedin.experience_count", "linkedin.certification_count",
-          "linkedin.endorsement_count", "linkedin.skills", "linkedin.text"
-        ];
+      } else if (m.sources.linkedin?.url) {
+        // Only profile link was given: cannot scrape LinkedIn
         for (const k of liKeys) {
-          m.metrics[k] = { value: null, status: "not_provided", origin: null };
+          m.metrics[k] = {
+            value: null,
+            status: "not_provided",
+            origin: null,
+            reason: "profile_link_only_no_text_or_pdf",
+          };
+        }
+      } else {
+        for (const k of liKeys) {
+          m.metrics[k] = {
+            value: null,
+            status: "not_provided",
+            origin: null,
+            reason: "not_provided_by_applicant",
+          };
         }
       }
 

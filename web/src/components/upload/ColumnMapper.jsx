@@ -10,12 +10,12 @@ export const CANONICAL_COLUMNS = [
   { id: "member_name", label: "Member Name" },
   { id: "member_email", label: "Member Email" },
   { id: "is_lead", label: "Is Team Lead (true/yes/1)" },
-  { id: "resume_url", label: "Resume URL (Public PDF link)" },
+  { id: "resume_url", label: "Resume URL (Public PDF link; Drive files must be 'Anyone with the link')" },
   { id: "resume_text", label: "Resume Text (Pasted text)" },
   { id: "github_url", label: "GitHub Profile URL" },
-  { id: "linkedin_url", label: "LinkedIn Profile URL" },
+  { id: "linkedin_url", label: "LinkedIn Profile URL (Profile link only)" },
   { id: "linkedin_text", label: "LinkedIn Profile Text (Pasted text)" },
-  { id: "linkedin_pdf_url", label: "LinkedIn Save-to-PDF Link" },
+  { id: "linkedin_pdf_url", label: "LinkedIn Save-to-PDF Link (Drive files must be 'Anyone with the link')" },
   { id: "portfolio_url", label: "Portfolio / Website URL" },
 ];
 

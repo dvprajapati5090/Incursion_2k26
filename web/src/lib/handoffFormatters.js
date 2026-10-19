@@ -67,7 +67,7 @@ export function formatFailureReason(errorStr) {
     return "Resume link is dead or private";
   }
   if (err.includes("resume_not_a_pdf_or_link_not_public")) {
-    return "Link is not a public PDF";
+    return "Link is not a public PDF (Drive file must be shared as 'Anyone with the link')";
   }
   if (err.includes("resume_no_text_scanned_pdf")) {
     return "PDF is an image (no selectable text)";
@@ -85,7 +85,7 @@ export function formatFailureReason(errorStr) {
     err.includes("unsupported_drive_link") ||
     err.includes("google_doc_link_export_as_pdf_instead")
   ) {
-    return "Link type not supported (a Google Doc must be shared as a PDF)";
+    return "Link type not supported (a Google Doc must be shared as a PDF; Drive file must be 'Anyone with the link')";
   }
   if (
     err.includes("url_host_not_allowed") ||
@@ -112,10 +112,14 @@ export function formatFailureReason(errorStr) {
  * Reason translation for not_provided status
  */
 export function formatNotProvidedReason(reason) {
+  if (!reason) return "Not provided by applicant";
   if (reason === "profile_link_only_no_text_or_pdf") {
     return "Profile link only provided (cannot scrape LinkedIn; paste text or export PDF)";
   }
-  return "Not provided by applicant";
+  if (reason === "not_provided_by_applicant" || reason === "not_provided") {
+    return "Not provided by applicant";
+  }
+  return String(reason).replace(/_/g, " ");
 }
 
 /**
@@ -204,10 +208,12 @@ export function formatMetricValue(metricId, entry, allMemberMetrics = {}) {
 
   // Rule 1: Never show missing value as 0
   if (status === "not_provided") {
+    const reasonText = formatNotProvidedReason(entry.reason);
     return {
-      display: "Not provided",
+      display: metricId.startsWith("linkedin.") ? reasonText : "Not provided",
       status: "not_provided",
-      tooltip: formatNotProvidedReason(entry.reason),
+      tooltip: reasonText,
+      reasonText,
     };
   }
 

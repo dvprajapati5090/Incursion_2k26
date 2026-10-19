@@ -13,6 +13,15 @@ function parseBool(v) {
   return ["true", "yes", "y", "1"].includes(String(v).toLowerCase());
 }
 
+export function isFileUrl(value) {
+  if (!value) return false;
+  return (
+    /\.pdf(\?.*)?$/i.test(value) ||
+    /(?:drive|docs)\.google\.com/i.test(value) ||
+    /(?:dropbox\.com|1drv\.ms|onedrive\.live\.com)/i.test(value)
+  );
+}
+
 function cleanUrl(value, column, row, issues) {
   if (value === null) return null;
   const withScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(value)
@@ -22,13 +31,17 @@ function cleanUrl(value, column, row, issues) {
     const url = new URL(withScheme);
     const hint = DOMAIN_HINTS[column];
     if (hint && !url.hostname.endsWith(hint)) {
-      issues.push({
-        severity: "warning",
-        code: "UNEXPECTED_DOMAIN",
-        row,
-        column,
-        message: `${column} does not look like a ${hint} link: ${value}`,
-      });
+      if (column === "linkedin_url" && isFileUrl(value)) {
+        // Handled by LINKEDIN_FILE_IN_URL_COLUMN warning
+      } else {
+        issues.push({
+          severity: "warning",
+          code: "UNEXPECTED_DOMAIN",
+          row,
+          column,
+          message: `${column} does not look like a ${hint} link: ${value}`,
+        });
+      }
     }
     return withScheme;
   } catch {
@@ -53,6 +66,22 @@ function toSource({ url, text, pdfUrl = null }) {
 }
 
 function buildMember(rec, memberId, row, issues) {
+  const rawLiUrl = cleanValue(rec.linkedin_url);
+  const liIsFile = isFileUrl(rawLiUrl);
+
+  if (liIsFile) {
+    if (!rec.linkedin_pdf_url) {
+      rec.linkedin_pdf_url = rawLiUrl;
+    }
+    issues.push({
+      severity: "warning",
+      code: "LINKEDIN_FILE_IN_URL_COLUMN",
+      row,
+      column: "linkedin_url",
+      message: `A PDF/file link was provided in 'linkedin_url' (${rawLiUrl}). LinkedIn is read from a file, not scraped; it was processed as a LinkedIn PDF, but please use the 'linkedin_pdf_url' column instead.`,
+    });
+  }
+
   const url = (col) => cleanUrl(rec[col] ?? null, col, row, issues);
 
   return {
@@ -68,7 +97,7 @@ function buildMember(rec, memberId, row, issues) {
       github: toSource({ url: url("github_url"), text: null }),
       portfolio: toSource({ url: url("portfolio_url"), text: null }),
       linkedin: toSource({
-        url: url("linkedin_url"),
+        url: liIsFile ? null : url("linkedin_url"),
         text: rec.linkedin_text ?? null,
         pdfUrl: url("linkedin_pdf_url"),
       }),
