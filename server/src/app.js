@@ -12,7 +12,7 @@ import engineRoutes from "./routes/engine.routes.js";
 
 const app = express();
 
-app.use(cors({ origin: env.corsOrigin }));
+app.use(cors({ origin: env.corsOrigin.split(",").map((s) => s.trim()) }));
 app.use(express.json({ limit: "10mb" })); // team data can be large
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/health", healthRoutes);
