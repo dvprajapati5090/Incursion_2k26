@@ -83,7 +83,27 @@ function buildMember(rec, memberId, row, issues) {
   }
 
   const url = (col) => cleanUrl(rec[col] ?? null, col, row, issues);
-
+  // A file link (Drive, Dropbox or a .pdf) in the profile-link column is the PDF export, not a profile page.
+  const rawLinkedin = rec.linkedin_url ?? null;
+  const fileInUrlColumn =
+    rawLinkedin !== null &&
+    /drive\.google\.com|dropbox\.com|\.pdf(\?|#|$)/i.test(rawLinkedin);
+  if (fileInUrlColumn) {
+    issues.push({
+      severity: "warning",
+      code: "LINKEDIN_FILE_IN_URL_COLUMN",
+      row,
+      column: "linkedin_url",
+      message:
+        "A file link was found in linkedin_url and was used as the LinkedIn PDF export",
+    });
+  }
+  const linkedinProfileUrl = fileInUrlColumn ? null : url("linkedin_url");
+  const linkedinPdfUrl = rec.linkedin_pdf_url
+    ? url("linkedin_pdf_url")
+    : fileInUrlColumn
+      ? cleanUrl(rawLinkedin, "linkedin_pdf_url", row, issues)
+      : null;
   return {
     memberId,
     name: rec.member_name ?? null,
@@ -97,9 +117,9 @@ function buildMember(rec, memberId, row, issues) {
       github: toSource({ url: url("github_url"), text: null }),
       portfolio: toSource({ url: url("portfolio_url"), text: null }),
       linkedin: toSource({
-        url: liIsFile ? null : url("linkedin_url"),
+        url: linkedinProfileUrl,
         text: rec.linkedin_text ?? null,
-        pdfUrl: url("linkedin_pdf_url"),
+        pdfUrl: linkedinPdfUrl,
       }),
     },
     metrics: {},
