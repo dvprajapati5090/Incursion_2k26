@@ -19,7 +19,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: process.env.VITE_API_URL || "http://localhost:4000",
+        target: process.env.VITE_API_URL || "https://incursion-2k26-gbw1.onrender.com",
         changeOrigin: true,
       },
     },

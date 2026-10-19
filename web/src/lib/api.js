@@ -4,7 +4,14 @@
  * set VITE_API_URL to the backend origin (without a trailing slash).
  */
 
-const API_ORIGIN = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+const DEFAULT_BACKEND_URL = "https://incursion-2k26-gbw1.onrender.com";
+
+const API_ORIGIN = (
+  import.meta.env.VITE_API_URL !== undefined
+    ? import.meta.env.VITE_API_URL
+    : (import.meta.env.PROD ? DEFAULT_BACKEND_URL : "")
+).replace(/\/+$/, "");
+
 const BASE = `${API_ORIGIN}/api`;
 
 async function handleResponse(res) {

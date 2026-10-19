@@ -7,7 +7,7 @@ export const env = {
   port: Number(process.env.PORT) || 4000,
   nodeEnv: process.env.NODE_ENV || "development",
   portfolioCacheTtlHours: Number(process.env.PORTFOLIO_CACHE_TTL_HOURS) || 24,
-  corsOrigin: process.env.CORS_ORIGIN || "http://localhost:5173",
+  corsOrigin: process.env.CORS_ORIGIN || "*",
   githubToken: process.env.GITHUB_TOKEN?.trim() || null,
   githubCacheTtlHours: Number(process.env.GITHUB_CACHE_TTL_HOURS) || 24,
   resumeCacheTtlHours: Number(process.env.RESUME_CACHE_TTL_HOURS) || 168,

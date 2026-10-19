@@ -298,7 +298,7 @@ export default function UploadPage() {
             />
             <span className="text-[#E0E1DD] font-mono">
               {serverOnline === true
-                ? "Backend: Port 4000"
+                ? "Backend Online"
                 : serverOnline === false
                 ? "Browser Engine"
                 : "Checking server…"}
