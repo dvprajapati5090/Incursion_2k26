@@ -51,11 +51,10 @@ export default function Layout({ children }) {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-lg font-black tracking-wider text-white">
-                  INCURSION{" "}
-                  <span className="font-extrabold text-[#778DA9]">2k26</span>
+                  TEAMLENS
                 </h1>
                 <span className="text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full bg-[#415A77]/25 text-[#E0E1DD] border border-[#778DA9]/40">
-                  Track 3
+                  Automated Recruiter
                 </span>
               </div>
               <p className="text-xs text-[#778DA9] font-medium tracking-tight">
@@ -149,7 +148,7 @@ export default function Layout({ children }) {
       <footer className="border-t border-[#415A77]/25 bg-[#0D1B2A]/80 py-4 px-6 text-center text-xs text-[#778DA9] flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto w-full gap-2">
         <div className="flex items-center gap-2">
           <Layers className="h-3.5 w-3.5 text-[#778DA9]" />
-          <span>Incursion 2k26 • Tunable Hackathon Shortlist Engine</span>
+          <span>TeamLens • Automated Team Recruiter &amp; Explainable Shortlisting</span>
         </div>
         <div className="flex items-center gap-4 text-[#778DA9]/80 font-mono text-[11px]">
           <span>Pure Web Worker Execution</span>

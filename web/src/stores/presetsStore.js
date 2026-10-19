@@ -46,7 +46,7 @@ const usePresetsStore = create(
       clearLog: () => set({ auditLog: [] }),
     }),
     {
-      name: "incursion-presets", // localStorage key
+      name: "teamlens-presets", // localStorage key
       partialize: (s) => ({ presets: s.presets, auditLog: s.auditLog }),
     }
   )
