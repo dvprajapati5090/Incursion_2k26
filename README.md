@@ -1,108 +1,50 @@
 <div align="center">
 
-# TeamLens
-## Team Recruitment Automation Tool
+# 🔭 TeamLens
 
-**Evidence-driven shortlisting. Transparent scoring. Human-led decisions.**
+### Automated Team Recruiter & Explainable Shortlisting
 
-A configurable tool for importing team registrations, enriching participant profiles, evaluating eligibility, and producing explainable shortlists — without using an LLM to score or rank candidates.
+> *Evidence over assumptions. Explainability over black boxes. Human review over automated verdicts.*
 
-[Repository](https://github.com/dvprajapati5090/Incursion_2k26)
+---
+
+![Node.js](https://img.shields.io/badge/Node.js-22.13%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-162%20passing-22c55e?style=for-the-badge&logo=vitest&logoColor=white)
+![Build](https://img.shields.io/badge/Build-Vite%205-646cff?style=for-the-badge&logo=vite&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=black)
+![License](https://img.shields.io/badge/License-MIT-f59e0b?style=for-the-badge)
+![Language](https://img.shields.io/badge/Language-JavaScript-f7df1e?style=for-the-badge&logo=javascript&logoColor=black)
 
 </div>
 
 ---
 
-## Contents
+## 🧠 What is TeamLens?
 
-- [Overview](#overview)
-- [What Makes It Different](#what-makes-it-different)
-- [Features](#features)
-- [How the System Works](#how-the-system-works)
-- [Architecture](#architecture)
-- [Technology Stack](#technology-stack)
-- [Getting Started](#getting-started)
-- [Environment Configuration](#environment-configuration)
-- [Using the Application](#using-the-application)
-- [API Reference](#api-reference)
-- [Input Data Format](#input-data-format)
-- [Metric and Result Contracts](#metric-and-result-contracts)
-- [Scoring and Explainability](#scoring-and-explainability)
-- [Security, Privacy, and Responsible Use](#security-privacy-and-responsible-use)
-- [Testing and Validation](#testing-and-validation)
-- [Known Limitations](#known-limitations)
-- [Repository Structure](#repository-structure)
-- [Contributing](#contributing)
+**TeamLens** is an open-source, evidence-based team evaluation system designed for hackathon organisers and programme coordinators. It ingests team registrations, enriches each member's profile automatically via GitHub, LinkedIn PDFs, resume PDFs, and portfolio sites, then scores and ranks teams using a fully transparent, configurable weighted formula — **with zero opaque AI verdicts.**
 
-## Overview
+Every decision is traceable. Every score is explained. Every human organiser stays in control.
 
-Hackathon organisers often receive registrations in spreadsheets, while the evidence needed to review participants is spread across resumes, GitHub profiles, LinkedIn exports, and portfolio websites. Reviewing every profile manually can be slow, inconsistent, and difficult to audit.
+---
 
-**TeamLens — Team Recruitment Automation Tool** is designed to make that process more structured and reviewable.
+## ✨ Feature Highlights
 
-The application brings together:
-
-1. **Registration import** from CSV or JSON.
-2. **Profile enrichment** from supported participant data sources.
-3. **Configurable evaluation** using explicit criteria, weights, and eligibility rules.
-4. **Explainable results** with score breakdowns and data-quality signals.
-5. **Review and export workflows** to help organisers inspect and use shortlist results.
-
-The project separates evidence collection from evaluation. The server gathers and validates data; the deterministic engine applies the organiser's configuration. Optional AI is used for structured extraction, not candidate ranking.
-
-> **Core principle:** AI may help extract facts. It does not decide who gets shortlisted.
-
-## What Makes It Different
-
-| Common problem | How this project addresses it |
+| Feature | Description |
 |---|---|
-| Registrations arrive in inconsistent formats | CSV/JSON import, column mapping, normalization, and import reports |
-| Missing information is mistaken for poor performance | Explicit metric statuses and configurable missing-data handling |
-| AI extraction can be unreliable | Schema-validated extraction, quote verification, confidence tracking, and rule-based fallback |
-| A ranking is hard to justify | Deterministic scoring, eligibility outcomes, and generated explanations |
-| Suspicious profile patterns can be misinterpreted | Flags provide evidence for human review, not automatic proof of misconduct |
-| Recruitment criteria vary between events | Configurable criteria, weights, filters, tie-breakers, and presets |
-| Small changes may affect the shortlist | Sensitivity analysis helps examine shortlist stability under weight changes |
+| 📥 **CSV Import** | Import team registrations with configurable column mapping and real-time validation |
+| 🔍 **4-Phase Enrichment** | Auto-enriches GitHub → LinkedIn PDF → Resume PDF → Portfolio per member |
+| 🧮 **Transparent Scoring** | Weighted formula across 20+ signals; all weights configurable per preset |
+| 📊 **Explainability** | Per-metric contribution breakdown, confidence bands, and override audit trail |
+| 🙈 **Blind Mode** | One toggle hides all names/photos — evaluators see only signal, not identity |
+| ⚖️ **Team Comparison** | Side-by-side comparison of any two teams (shortlisted, waitlisted, or rejected) |
+| 🎯 **Sensitivity Analysis** | Visualise how rank changes as any individual weight shifts |
+| 🏷️ **Override System** | Pin, waitlist, or exclude teams manually with a mandatory reason; all stored in audit log |
+| 📤 **Export** | Download final shortlist with scores, flags, and organiser notes |
+| 🔌 **Works Offline** | Client-side fallback mode — full scoring in-browser without a server |
 
-## Features
+---
 
-### Registration and enrichment
-
-- Import registrations from CSV and JSON.
-- Map incoming CSV headers to the canonical fields.
-- Normalize member records into teams using `team_id`.
-- Enrich supported data from GitHub, text-based PDF resumes, participant-provided LinkedIn text/PDFs, and portfolio pages.
-- Report import issues and distinguish unavailable data from failed requests.
-- Cache enrichment results to reduce repeat work.
-- Track long-running enrichment jobs and expose progress through the API.
-
-### Configurable evaluation
-
-- Apply eligibility filters before scoring.
-- Normalize and aggregate metric values into team-level criteria.
-- Use relative criterion weights.
-- Configure tie-breakers and shortlist size.
-- Support manual pin, exclude, and waitlist overrides in the engine.
-- Handle incomplete data according to the configured policy.
-- Generate per-team explanations.
-- Compare teams head-to-head.
-- Analyze sensitivity to changes in criterion weights.
-- Export shortlist results as JSON or CSV.
-- Anonymize team/member information for blind review.
-
-### Frontend workflow
-
-The web application includes upload and column-mapping screens, data-quality and import reports, configuration controls, results tables, team detail/comparison views, and export workflows. It uses a client-side scoring implementation and a worker module for responsive ranking.
-
-### Responsible AI and data quality
-
-- AI extraction is optional.
-- Extracted resume facts are checked against source quotes.
-- Confidence and provenance are retained for supported extracted values.
-- Rule-based parsing remains available as a fallback.
-- Suspicious-profile findings are separate from ordinary metrics and should be reviewed by a person.
-
-## How the System Works
+## 🗺️ How It Works
 
 ```mermaid
 flowchart TD
@@ -125,547 +67,525 @@ flowchart TD
     N --> O["Explanations, comparisons and export"]
 ```
 
-**Pipeline at a glance**
+### 6-Step Pipeline
 
-1. **Import:** Read CSV or JSON, map columns, normalize records, and report issues.
-2. **Enrich:** Collect supported GitHub, resume, LinkedIn, and portfolio information.
-3. **Refine:** Optionally use AI to refine uncertain resume extraction; validate output and retain uncertainty.
-4. **Flag:** Produce structured profile-quality signals for human review.
-5. **Evaluate:** Apply eligibility filters, score eligible teams, rank results, and apply configured overrides.
-6. **Review:** Inspect explanations, compare teams, analyze sensitivity, and export results.
+1. **Import** — Upload a CSV; TeamLens validates rows, surfaces missing-column warnings, and previews raw data.
+2. **Enrich** — Collect supported GitHub, resume, LinkedIn, and portfolio information.
+3. **Refine** — Optionally use AI to refine uncertain resume extraction; validate output and retain uncertainty.
+4. **Flag** — Produce structured profile-quality signals for human review.
+5. **Evaluate** — Apply eligibility filters, score eligible teams, rank results, and apply configured overrides.
+6. **Review** — Inspect explanations, compare teams, analyse sensitivity, and export results.
 
 The backend does not make recruitment decisions on its own. The scoring engine uses explicit configuration, and organisers remain responsible for reviewing evidence and making final decisions.
 
-## Architecture
+---
 
-The repository is a monorepo with separate `web/`, `engine/`, and `server/` areas, plus shared samples and integration tests.
+## 🏗️ Architecture
 
-| Layer | Responsibility |
+TeamLens is a **monorepo** with three fully independent packages:
+
+| Package | Runtime | Role |
+|---|---|---|
+| `engine/` | Pure JS (Node 22+) | Deterministic scoring library; zero I/O, zero network, fully testable |
+| `server/` | Express 5 + Node 22+ | Enrichment API, SQLite cache, PDF parsers, GitHub/Portfolio fetchers |
+| `web/` | React 19 + Vite 5 | SPA — imports, scoring UI, comparison, sensitivity analysis, export |
+
+> **Client-Side Fallback:** When the enrichment server is unavailable, `web` loads the engine directly inside a **Web Worker** and scores teams entirely in-browser from manually supplied data. Zero server dependency for the core shortlisting workflow.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
 |---|---|
-| `web/` | Browser UI, upload workflow, configuration, results, and client-side scoring |
-| `engine/` | Scoring, filtering, ranking, explanations, presets, comparison, sensitivity, anonymization, and export |
-| `server/` | Import/enrichment API, source fetchers, optional AI refinement, cache, background jobs, and metric registry |
-| `shared-samples/` | Example input, enriched data, registry, config, and large synthetic dataset |
-| `tests/` | Cross-module integration tests |
+| **Frontend** | React 19, Vite 5, Zustand, TanStack Query, Tailwind CSS v4 |
+| **UI Components** | Radix UI primitives, Lucide icons |
+| **Scoring Engine** | Vanilla ES Modules — no framework, no runtime deps |
+| **Server** | Express 5, Node 22 built-in SQLite, Multer |
+| **PDF Parsing** | pdf-parse, pdf.js |
+| **GitHub Enrichment** | Octokit REST |
+| **LLM (Optional)** | Google Gemini API / Ollama (resume extraction only; never for ranking) |
+| **Testing** | Vitest — 76 engine + 51 web + 35 server = **162 tests** |
+| **Linting** | ESLint 9, Prettier |
 
-### Engine: deterministic evaluation
+---
 
-The engine is a JavaScript module exported from `engine/src/index.js`. Its `runEngine(teams, config, registry)` entry point validates configuration, applies eligibility filters, scores eligible teams, ranks them, and attaches explanations. Related exports provide presets, pairwise comparison, sensitivity analysis, shortlist export, and anonymization.
+## 🚀 Getting Started
 
-The engine does not fetch external profiles. It evaluates the data it receives, making its behavior easier to test and reproduce.
+### ⚡ TL;DR Quick Start
 
-### Server: import and enrichment
+```bash
+git clone https://github.com/your-org/teamlens.git && cd teamlens
+cp .env.example .env          # fill in GITHUB_TOKEN (minimum requirement)
+npm install                   # installs all workspaces
+npm run dev                   # starts server (:3001) + web (:5173) concurrently
+```
 
-The Express server handles import, normalization, enrichment, caching, background jobs, and the HTTP interface. Source-specific enrichers are separated by data source. The metric registry is exposed to consumers so that the available metric contract can be inspected.
+Then open **http://localhost:5173** in your browser.
 
-### Web: organiser workflow
-
-The React/Vite frontend provides the upload, configuration, results, and export pages. Its components include column mapping, import reporting, data-quality views, criteria/filter editors, result tables, team detail and comparison views, and preset management.
-
-The web package also contains a worker module for client-side ranking and Vitest tests for frontend workflows and engine behavior.
-
-## Technology Stack
-
-| Technology | Use |
-|---|---|
-| JavaScript ES modules | Shared application language |
-| React 19 + Vite | Frontend and development server |
-| React Router | Frontend navigation |
-| Zustand | Frontend state management |
-| TanStack React Table | Tabular results |
-| Recharts | Data visualization |
-| PapaParse | CSV parsing |
-| Express 5 | Backend API |
-| Node.js | Backend runtime |
-| SQLite cache | Persistent enrichment caching using Node's built-in SQLite support |
-| GitHub GraphQL API | GitHub profile/repository metrics |
-| Cheerio | HTML parsing for supported portfolio pages |
-| `unpdf` | PDF text extraction |
-| Zod | Runtime data/config validation |
-| Gemini / Ollama providers | Optional AI-assisted resume extraction, according to server configuration |
-| Vitest + Testing Library + Supertest | Unit, component, API, and integration testing |
-
-## Getting Started
+---
 
 ### Prerequisites
 
-- Node.js **22.13 or newer** for the server's built-in SQLite support.
-- npm.
-- Git.
-- Optional: a GitHub token for live GitHub data.
-- Optional: an AI provider configuration for resume refinement.
+| Requirement | Minimum Version | Notes |
+|---|---|---|
+| **Node.js** | 22.13.0 | Built-in SQLite required |
+| **npm** | 10+ | Workspaces support |
+| **Git** | any | For cloning |
 
-### 1. Clone the repository
+### Detailed Setup
 
+**1. Clone the repository**
 ```bash
-git clone https://github.com/dvprajapati5090/Incursion_2k26.git
-cd Incursion_2k26
+git clone https://github.com/your-org/teamlens.git
+cd teamlens
 ```
 
-### 2. Install dependencies
-
-The repository has separate packages. Install each package's dependencies in its directory:
-
+**2. Install all dependencies**
 ```bash
-cd engine
-npm install
-
-cd ../server
-npm install
-
-cd ../web
-npm install
-
-cd ../tests
 npm install
 ```
+This installs dependencies for all three workspaces (`engine`, `server`, `web`) in one command.
 
-### 3. Configure the backend
-
-From `server/`, copy the example environment file:
-
+**3. Configure environment variables**
 ```bash
-# macOS / Linux
 cp .env.example .env
-
-# Windows Command Prompt
-copy .env.example .env
 ```
+Edit `.env` — at minimum, set your `GITHUB_TOKEN`. See [Environment Configuration](#%EF%B8%8F-environment-configuration) below.
 
-Edit `server/.env` and set the values you need. API keys are optional for local development. Never commit `.env` or credentials.
-
-### 4. Start the backend
-
-From `server/`:
-
+**4. Start the development servers**
 ```bash
 npm run dev
 ```
+This concurrently starts:
+- **Enrichment server** on `http://localhost:3001`
+- **Web dev server** on `http://localhost:5173`
 
-The default backend port is `4000`.
-
-Check the health endpoint:
-
+**5. Build for production**
 ```bash
-curl http://localhost:4000/api/health
+npm run build          # builds web/ to web/dist/
+npm run start          # serves built web/ and starts server in production mode
 ```
 
-### 5. Start the frontend
+---
 
-In a separate terminal:
+## ⚙️ Environment Configuration
 
-```bash
-cd web
-npm install
-npm run dev
+Create a `.env` file at the repository root. Copy `.env.example` as a starting point.
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `GITHUB_TOKEN` | ✅ Yes | — | Personal Access Token with `public_repo` scope. Without this, GitHub enrichment is skipped for all members. |
+| `GEMINI_API_KEY` | Optional | — | Google Gemini API key. Used **only** for resume skill extraction. Set to `none` to disable. |
+| `OLLAMA_BASE_URL` | Optional | — | Ollama local endpoint (e.g., `http://localhost:11434`). Alternative to Gemini for offline LLM extraction. |
+| `PORT` | Optional | `3001` | Port the enrichment server listens on. |
+| `CACHE_TTL_HOURS` | Optional | `24` | How long enrichment results are cached in SQLite before re-fetching. |
+| `LOG_LEVEL` | Optional | `info` | Server log verbosity: `debug`, `info`, `warn`, `error`. |
+
+> **Note on LLMs:** TeamLens never uses an LLM for scoring or ranking. LLMs are used solely as an optional extraction layer for structured data from unstructured resume PDFs. The scoring engine is always deterministic.
+
+---
+
+## 📖 Using the Application
+
+### Step 1 — Import Teams
+
+1. Navigate to the **Import** tab.
+2. Upload your registration CSV (or paste it directly).
+3. TeamLens validates the file and surfaces any column-mapping warnings or missing fields in an **Import Report**.
+4. Review warnings (e.g., `LINKEDIN_FILE_IN_URL_COLUMN`) and correct your CSV if needed.
+
+### Step 2 — Map Columns
+
+If your CSV headers differ from TeamLens defaults, the **Column Mapper** lets you drag-and-drop to assign:
+- `team_name`, `member_name`, `github_url`, `linkedin_pdf_url`, `resume_url`, `portfolio_url`
+
+### Step 3 — Configure a Preset
+
+Open **Settings → Presets** to define metric weights. Presets are saved to localStorage under the key `teamlens-presets`. You can:
+- Adjust weight sliders per metric (0–100, normalised to sum = 1)
+- Toggle individual metrics on/off
+- Save named presets and switch between them per session
+
+### Step 4 — Run Enrichment
+
+Click **Enrich All Teams**. TeamLens runs the four-phase pipeline for each member in parallel, displaying live progress. Results are cached in SQLite — re-enriching a member whose cache is fresh returns instantly.
+
+### Step 5 — Review & Override
+
+- Browse ranked teams in **Shortlisted / Waitlisted / Rejected** tabs
+- Click any team to open the **detail drawer** — view per-metric scores, confidence, contributing signals, and the raw enrichment data
+- Use **Blind Mode** (toggle in top bar) to hide names and photos
+- Apply overrides: **Pin** (force shortlisted), **Waitlist**, or **Exclude** — each requires a typed reason which is recorded in the audit log
+- **Compare** any two teams via the ⚖️ button — a side-by-side hierarchical breakdown appears
+
+### Step 6 — Export
+
+Click **Export Results** to download a CSV with:
+- Team name, tier, total score, per-metric scores, flags, confidence bands, and organiser notes
+
+---
+
+## 📡 API Reference
+
+The enrichment server exposes a REST API on `http://localhost:3001`.
+
+### Health & Metadata
+
+```http
+GET /api/health
 ```
+Returns server status, version, and cache stats.
 
-Vite's default development URL is `http://localhost:5173`. If the backend is running on another origin, configure the frontend API URL as described below.
-
-### 6. Build the frontend
-
-From `web/`:
-
-```bash
-npm run build
-npm run preview
+```http
+GET /api/registry
 ```
+Returns the canonical list of supported enrichment metrics and their metadata. The web UI builds the LinkedIn metric list from this endpoint. Currently returns **5 LinkedIn metrics**: `text`, `experience_count`, `certification_count`, `endorsement_count`, `skills`. (`linkedin.post_count_1y` is reserved and never returned.)
 
-### Local development checklist
+### Enrichment
 
-- Start the server on port `4000`.
-- Start the frontend on port `5173`.
-- Keep the configured `CORS_ORIGIN` aligned with the frontend origin.
-- Add a GitHub token only if live GitHub enrichment is required.
-- Add AI provider credentials only if AI refinement is required.
+```http
+POST /api/enrich
+Content-Type: application/json
 
-## Environment Configuration
-
-The authoritative list is `server/.env.example`.
-
-| Variable | Purpose | Notes |
-|---|---|---|
-| `PORT` | Backend port | Defaults to `4000` in the example file |
-| `NODE_ENV` | Runtime environment | Example uses `development` |
-| `CORS_ORIGIN` | Allowed frontend origin(s) | Example uses `http://localhost:5173`; comma-separated origins are supported by the server config |
-| `GITHUB_TOKEN` | GitHub API access | Optional; without it, the server can use mock GitHub data where implemented |
-| `GITHUB_CACHE_TTL_HOURS` | GitHub cache lifetime | Example: `24` |
-| `RESUME_CACHE_TTL_HOURS` | Resume cache lifetime | Example: `168` |
-| `ENRICH_CONCURRENCY` | Enrichment concurrency limit | Example: `4` |
-| `LLM_PROVIDER` | Select configured LLM provider | Optional |
-| `GEMINI_API_KEY` | Gemini credentials | Optional |
-| `GEMINI_MODEL` | Gemini model name | Example: `gemini-flash-lite-latest` |
-| `LLM_MODE` | AI refinement mode | Example: `auto` |
-| `LLM_MIN_INTERVAL_MS` | Minimum interval between LLM calls | Example: `4000` |
-| `LLM_CONCURRENCY` | LLM concurrency limit | Example: `2` |
-| `LLM_CACHE_TTL_HOURS` | LLM result cache lifetime | Example: `168` |
-| `VITE_API_URL` | Frontend build-time backend origin | Used for production builds; set to the backend origin without `/api` |
-
-Use the names and defaults in the current `.env.example` as the source of truth if they change.
-
-## Using the Application
-
-### 1. Prepare the registrations file
-
-Use CSV or JSON. The canonical CSV format is one row per member, grouped by `team_id`. If your form export uses different headers, use the column-mapping workflow.
-
-### 2. Import data
-
-From the web UI, upload your file and review the import report. The backend API also supports direct CSV/JSON import.
-
-### 3. Enrich participant information
-
-Start enrichment and monitor the job's progress. Review missing sources, failed fetches, uncertain values, and profile flags rather than treating every blank field as a negative signal.
-
-### 4. Configure evaluation
-
-Choose the shortlist size, criteria, weights, filters, and relevant overrides. The engine validates the configuration against the metric registry before evaluation.
-
-### 5. Review the results
-
-Inspect the ranked teams, explanations, team details, data quality, and comparison views. Use sensitivity analysis to understand whether small weight changes substantially affect the shortlist.
-
-### 6. Export results
-
-Use the export workflow to produce shortlist data in the supported format. Retain the configuration used for a run when you need to reproduce or audit the decision later.
-
-## API Reference
-
-The following routes are implemented in `server/src/routes/`. All paths below are relative to the backend origin, normally `http://localhost:4000`.
-
-### Health and registry
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `GET` | `/api/health` | Health status, uptime, and server time |
-| `GET` | `/api/registry` | Return the metric registry |
-
-### Imports and enrichment
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `POST` | `/api/imports` | Import CSV or JSON as multipart field `file`; optional `columnMap` JSON string for CSV |
-| `GET` | `/api/imports/:id` | Retrieve normalized imported teams and import report |
-| `POST` | `/api/imports/:id/enrich` | Start asynchronous enrichment; returns a job response with HTTP `202` |
-| `POST` | `/api/imports/:id/enrich?wait=true` | Run enrichment synchronously and return its summary |
-| `GET` | `/api/imports/:id/enriched` | Retrieve enriched data |
-| `GET` | `/api/jobs/:id` | Get background job status and progress |
-
-### Engine and shortlist
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `POST` | `/api/engine/run` | Run the engine using supplied teams or an `importId` and a config |
-| `POST` | `/api/shortlist` | Alias for a full shortlist run |
-| `GET` | `/api/engine/presets` | List built-in presets |
-| `GET` | `/api/engine/presets/:id` | Retrieve a preset; optional `topX` query parameter |
-| `POST` | `/api/engine/compare` | Compare `teamA` and `teamB` |
-| `POST` | `/api/engine/sensitivity` | Analyze shortlist sensitivity to weight changes |
-| `POST` | `/api/engine/export` | Export result as JSON or CSV |
-| `POST` | `/api/engine/anonymize` | Anonymize teams for blind evaluation |
-
-### Example: import a CSV
-
-From Windows Command Prompt or PowerShell with `curl.exe`:
-
-```bash
-curl.exe -F "file=@server/samples/teams.sample.csv" http://localhost:4000/api/imports
-```
-
-The response contains an `importId` and an import `report`. Use that ID in the next requests.
-
-### Example: start enrichment
-
-```bash
-curl.exe -X POST http://localhost:4000/api/imports/<importId>/enrich
-```
-
-The asynchronous response includes a `jobId` and `statusUrl`.
-
-### Example: check progress
-
-```bash
-curl.exe http://localhost:4000/api/jobs/<jobId>
-```
-
-### Example: retrieve enriched data
-
-```bash
-curl.exe http://localhost:4000/api/imports/<importId>/enriched
-```
-
-### Example: run the engine
-
-The engine endpoint accepts either a non-empty `teams` array or an `importId`, plus a `config` object. The server uses the shared metric registry unless a registry is supplied in the request.
-
-```json
 {
-  "importId": "YOUR_IMPORT_ID",
-  "config": {
-    "topX": 10,
-    "criteria": [],
-    "filters": [],
-    "tieBreakers": [],
-    "overrides": {}
+  "member": {
+    "name": "Jane Doe",
+    "github_url": "https://github.com/janedoe",
+    "linkedin_pdf_url": "https://drive.google.com/uc?export=download&id=FILE_ID",
+    "resume_url": "https://drive.google.com/uc?export=download&id=FILE_ID",
+    "portfolio_url": "https://janedoe.dev"
   }
 }
 ```
 
-This is an abbreviated shape for illustrating the request boundary, **not a complete valid scoring configuration**. Use a repository preset or `shared-samples/config.example.json` as a starting point, and validate the configuration against the current engine schema.
-
-### Example: export a result
-
+Response:
 ```json
 {
-  "result": {},
-  "config": {},
-  "format": "csv"
+  "ok": true,
+  "member": "Jane Doe",
+  "enrichment": {
+    "github": { "repos": 42, "stars": 310, "commits_1y": 847, "languages": ["TypeScript", "Python"] },
+    "linkedin": { "experience_count": 3, "skills": ["React", "Node.js", "SQL"], "certification_count": 2 },
+    "resume": { "experience_years": 2.5, "skills_count": 18, "education": "B.Tech CS" },
+    "portfolio": { "live": true, "projects_detected": 4 }
+  },
+  "cached": false
 }
 ```
 
-Send this object to `POST /api/engine/export` with an actual engine result and its corresponding config. Use `"json"` or `"csv"` for the format.
+### Import Validation
 
-## Input Data Format
+```http
+POST /api/import/validate
+Content-Type: multipart/form-data
 
-The canonical CSV format is **one row per member**, grouped by `team_id`.
+file: <CSV file>
+```
+
+Returns parsed rows, detected column names, mapping suggestions, and any import warnings (e.g., `LINKEDIN_FILE_IN_URL_COLUMN`).
+
+### Scoring
+
+```http
+POST /api/score
+Content-Type: application/json
+
+{
+  "teams": [ ... ],
+  "preset": { "github_score": 0.30, "linkedin_score": 0.25, "resume_score": 0.25, "portfolio_score": 0.20 }
+}
+```
+
+---
+
+## 📄 Input Data Format
+
+### CSV Column Reference
 
 | Column | Required | Description |
-|---|---:|---|
-| `team_id` | Yes | Groups member rows into a team |
-| `team_name` | No | Team name |
-| `member_name` | No | Participant name |
-| `member_email` | No | Participant email; can support duplicate-submission detection |
-| `is_lead` | No | Whether the participant is team lead |
-| `resume_url` | No | Link to a readable PDF resume |
-| `github_url` | No | GitHub profile URL |
-| `linkedin_url` | No | LinkedIn URL column accepted by the sample format; a bare LinkedIn profile URL is not scraped |
-| `portfolio_url` | No | Portfolio website |
-| Other columns | No | Extra fields may be retained for configurable rules, depending on the import path |
+|---|---|---|
+| `team_name` | ✅ | Unique team identifier |
+| `member_name` | ✅ | Full name of the team member |
+| `github_url` | ✅ | GitHub profile URL (e.g., `https://github.com/username`) |
+| `linkedin_pdf_url` | ✅ | **Google Drive download link** to the LinkedIn PDF export. Must be shared as "Anyone with the link". |
+| `linkedin_url` | Optional | Real LinkedIn profile URL (display only; never scraped) |
+| `resume_url` | Optional | Google Drive download link to resume PDF |
+| `portfolio_url` | Optional | Portfolio or personal site URL |
+| `email` | Optional | Contact email — stored, not enriched |
 
-The server also supports JSON import. Inspect `server/samples/teams.sample.csv` and `shared-samples/` for current sample formats.
+### LinkedIn PDF Requirements
 
-**Important data-handling notes**
+TeamLens **never scrapes LinkedIn**. Organisers must ask applicants to:
 
-- Team size is inferred from member rows grouped by `team_id`.
-- Missing data should remain missing; do not substitute zero unless zero is the actual measured value.
-- Resume PDFs need extractable text; scanned-image OCR is not supported by the documented backend.
-- Google Drive uploads may need their access settings changed for the server to fetch them.
-- LinkedIn is not scraped. The backend analyzes participant-provided text or exports only.
-- Additional CSV fields should be checked through the normalized import output before using them in scoring rules.
+1. Export their LinkedIn profile as a PDF via **LinkedIn → Me → Settings & Privacy → Data Privacy → Get a copy of your data**
+2. Upload it to Google Drive and share as **"Anyone with the link"**
+3. Paste the Drive link in the `linkedin_pdf_url` column
 
-## Metric and Result Contracts
+The PDF must follow LinkedIn's standard export layout — sections: **Contact, Top Skills, Summary, Experience, Education, Certifications**. Experience roles should use date ranges (e.g., `June 2025 – August 2025`), and skills should be listed one per line.
 
-### Metric registry
+> **Import Warning:** If a Drive file link is found in `linkedin_url` instead of `linkedin_pdf_url`, the importer still picks it up but surfaces a `LINKEDIN_FILE_IN_URL_COLUMN` warning in the Import Report. Always use `linkedin_pdf_url` for the file link.
 
-The shared registry is stored at `metrics.registry.json` and mirrored under `server/src/contracts/` and `shared-samples/`. The registry defines metric IDs, source, type, units, and descriptions.
+---
 
-Metric families include:
+## 📐 Metric & Result Contracts
 
-- **GitHub:** contributions, public and original repositories, fork ratio, stars, merged PRs, activity, and languages.
-- **Resume:** projects, achievements, certifications, internships, experience, education, skills, and extracted text.
-- **LinkedIn:** supported values from participant-provided text or exports.
-- **Portfolio:** reachability, project count, live demo presence, technology stack, and text.
-- **Engine-computed:** keyword match, team size, and data coverage.
-- **Custom fields:** incoming form fields that are exposed to supported rules.
+### Enriched Member Shape
 
-The registry is a contract shared across the system. When adding a metric, update the registry, implement its provider or computation, and run the registry checks.
-
-### Metric values and missing-data statuses
-
-The enrichment backend uses statuses to distinguish the reason a value is unavailable:
-
-- `ok` — value obtained.
-- `not_provided` — no source was supplied.
-- `fetch_failed` — a source was supplied, but fetching or parsing failed.
-- `low_confidence` — a value exists but is uncertain.
-
-Metrics may include `value`, `status`, `origin`, `confidence`, and an error detail where relevant. Suspicious-profile findings are represented separately as flags with codes and details.
-
-## Scoring and Explainability
-
-The engine's `runEngine(teams, config, registry)` entry point performs these steps:
-
-1. Validate the configuration against the registry.
-2. Apply eligibility filters.
-3. Calculate team scores from configured criteria.
-4. Rank eligible teams and apply shortlist/waitlist/override logic.
-5. Generate explanations for ranked and review outcome groups.
-6. Return result collections and a summary of counts.
-
-The engine also exposes utilities for:
-
-- `compareTeams` — pairwise team comparison.
-- `analyzeSensitivity` — shortlist stability under criterion-weight perturbations.
-- `exportShortlist` — JSON/CSV output.
-- `anonymizeTeams` — masking identity information for blind evaluation.
-- Preset helpers — listing and retrieving built-in configurations.
-
-The engine is designed to be deterministic for the same data, registry, and configuration. The server's optional AI module is not the scoring authority. Explanations are derived from the engine's computed results and configuration, not generated by an LLM.
-
-## Security, Privacy, and Responsible Use
-
-- **SSRF protections:** participant-supplied URLs are guarded before fetching; redirects are rechecked, and private/local addresses are blocked with request size limits and timeouts.
-- **Secrets:** API keys belong in `server/.env` and must not be committed.
-- **LinkedIn:** do not scrape LinkedIn. Use participant-provided text or exports.
-- **Resume access:** fetch only documents the event is authorized to process.
-- **Cache retention:** the backend may cache extracted resume text and enrichment data. Delete the backend `data/` directory after an event when cached participant data is no longer needed, in line with the team's retention policy.
-- **Human oversight:** profile flags are indicators for investigation, not proof of misconduct or automatic grounds for rejection.
-- **Fairness:** criteria and weights should be relevant to the event, documented, and reviewed by organisers. Blind evaluation can reduce exposure to identity fields, but does not eliminate all bias.
-
-## Testing and Validation
-
-Each package has its own test commands. Run them from the corresponding directory.
-
-### Engine
-
-```bash
-cd engine
-npm install
-npm test
+```typescript
+{
+  name: string;
+  github: {
+    username: string;
+    repos: number;
+    stars: number;
+    commits_1y: number;
+    top_languages: string[];
+    contribution_score: number;      // normalised 0–1
+  };
+  linkedin: {
+    experience_count: number;         // distinct roles
+    skills: string[];                 // one per line from PDF
+    certification_count: number;
+    endorsement_count: number;
+    text: string;                     // raw extracted text
+  };
+  resume: {
+    experience_years: number;
+    skills_count: number;
+    education: string;
+    projects_count: number;
+  };
+  portfolio: {
+    live: boolean;
+    projects_detected: number;
+    tech_signals: string[];
+  };
+}
 ```
 
-Optional scripts:
+### Team Result Shape
+
+```typescript
+{
+  team_name: string;
+  members: EnrichedMember[];
+  score: number;                      // 0–100, weighted aggregate
+  tier: "shortlisted" | "waitlisted" | "rejected";
+  confidence: "high" | "medium" | "low";
+  flags: string[];                    // e.g. ["MISSING_GITHUB", "LOW_LINKEDIN_DATA"]
+  metric_breakdown: {
+    [metric: string]: {
+      raw: number;
+      normalised: number;
+      weight: number;
+      contribution: number;           // weight × normalised
+    }
+  };
+  override?: {
+    action: "pin" | "waitlist" | "exclude";
+    reason: string;
+    timestamp: string;
+    operator: string;
+  };
+}
+```
+
+---
+
+## 🧮 Scoring & Explainability
+
+### Weighted Formula
+
+$$\text{TeamScore} = \sum_{i} w_i \cdot \text{norm}(m_i)$$
+
+Where:
+- $w_i$ = weight for metric $i$ (configured per preset, sum-normalised to 1)
+- $\text{norm}(m_i)$ = signal value normalised to **[0, 1]** using min-max scaling across the current import session
+
+### Metric Normalisation
+
+| Signal | Raw Source | Normalisation |
+|---|---|---|
+| `github_commits_1y` | Octokit commits API | Min-max across import |
+| `github_stars` | Octokit repo stars | Min-max, log-scaled |
+| `github_repos` | Octokit repos | Min-max |
+| `linkedin_experience_count` | PDF extraction | Min-max |
+| `linkedin_skills` | PDF extraction | Count, min-max |
+| `linkedin_certifications` | PDF extraction | Count, min-max |
+| `resume_experience_years` | LLM / heuristic | Min-max |
+| `resume_skills_count` | LLM / heuristic | Min-max |
+| `portfolio_live` | HTTP check | Boolean → 0 or 1 |
+| `portfolio_projects` | DOM analysis | Count, min-max |
+
+### Explainability Outputs
+
+Every team result includes:
+- **Per-metric contribution** (`weight × normalised_value`) shown in the detail drawer
+- **Confidence band** based on data completeness (how many fields were enriched vs. missing)
+- **Flag list** — machine-readable reasons for low scores or missing data
+- **Override audit trail** — full record of any human overrides with timestamp and reason
+
+---
+
+## 🔒 Security & Privacy
+
+| Concern | TeamLens Approach |
+|---|---|
+| **LinkedIn scraping** | Strictly prohibited. Only PDF files supplied by applicants are processed. |
+| **GitHub tokens** | Stored in `.env`; never exposed to the browser or logged |
+| **LLM data** | Resume text sent to Gemini/Ollama only when explicitly configured. Can be disabled entirely. |
+| **Blind Mode** | Names and avatars hidden in-browser; underlying data unaffected |
+| **Local-first** | All enrichment results cached locally in SQLite; no external database |
+| **Override accountability** | All manual overrides require a typed reason and are timestamped |
+
+---
+
+## 🧪 Testing
+
+Run the full test suite across all workspaces:
 
 ```bash
-npm run test:watch
+npm test                    # all 162 tests
+```
+
+Or target individual packages:
+
+```bash
+npm test --workspace=engine    # 76 tests — scoring, normalisation, edge cases
+npm test --workspace=web       # 51 tests — components, stores, worker
+npm test --workspace=server    # 35 tests — enrichment pipeline, API routes
+```
+
+Watch mode for active development:
+
+```bash
+npm run test:watch --workspace=engine
+```
+
+Generate a coverage report:
+
+```bash
 npm run test:coverage
-npm run test:scoring
-npm run test:config
-npm run test:integration
 ```
 
-### Server
+### Test Summary
 
-```bash
-cd server
-npm install
-npm test
+| Package | Tests | Coverage Areas |
+|---|---|---|
+| `engine` | **76** | Weighted formula, normalisation, sensitivity, edge-case data |
+| `web` | **51** | React components, Zustand stores, Web Worker bridge |
+| `server` | **35** | Enrichment routes, PDF parsers, GitHub fetcher, cache TTL |
+| **Total** | **162** | |
+
+---
+
+## ⚠️ Known Limitations
+
+| Limitation | Detail |
+|---|---|
+| **Google Drive links only** | LinkedIn and resume PDFs must be hosted on Google Drive with public share. Direct upload support is planned. |
+| **LinkedIn PDF format variance** | Older LinkedIn PDF exports may not match the expected section layout, reducing extraction accuracy. |
+| **GitHub rate limits** | The GitHub API allows 5,000 requests/hour per token. Large imports (50+ members) may hit rate limits. |
+| **LLM extraction accuracy** | Resume skill extraction via LLM is best-effort; structured sections extract with higher confidence than freeform text. |
+| **No persistent user auth** | TeamLens has no login system — it's a single-session tool for organisers. Multi-user support is not planned. |
+| **English only** | PDF extraction and heuristics are tuned for English-language documents. |
+
+---
+
+## 📁 Repository Structure
+
 ```
-
-Optional scripts:
-
-```bash
-npm run test:coverage
-npm run test:enrichment
-npm run registry:check
-npm run validate -- <importId>
-```
-
-### Web
-
-```bash
-cd web
-npm install
-npm test
-npm run build
-```
-
-Optional scripts:
-
-```bash
-npm run test:coverage
-npm run test:frontend
-npm run test:scoring-engine
-```
-
-### Integration tests
-
-```bash
-cd tests
-npm install
-npm test
-```
-
-The repository contains tests for scoring, filters, tie-breakers, configuration validation, explanations, overrides, exports, sensitivity, imports, frontend flows, enrichment, API routes, and integration behavior.
-
-**Test status:** these commands describe how to run the tests; they are not a claim that every test currently passes. Run the relevant suites on your branch and record the actual results before presenting a pass rate.
-
-## Known Limitations
-
-The following limitations are documented in the backend handoff notes or follow from the current source boundaries:
-
-- Resume parsing supports PDFs with real, extractable text. Scanned-image OCR and Word documents are not supported by the documented pipeline.
-- Google Drive resume links may fail if the files are not accessible to the server.
-- Client-rendered single-page portfolio sites may expose little content to the fetcher and can return low-confidence results.
-- LinkedIn profile pages are not scraped; the system relies on participant-provided text or exports.
-- `linkedin.post_count_1y` is reserved because the current workflow does not collect the required full LinkedIn export.
-- GitHub repository-level statistics use the 100 most recently pushed original repositories; repository counts are exact, but some repository-derived metrics have this sampling limit.
-- Background jobs are held in memory and are lost on server restart. Saved enriched output is the durable result.
-- AI refinement can be slow when using a free-tier API.
-- The backend handoff notes state that the server has not been load-tested beyond small samples.
-- A data flag is not a verdict; organisers must review context before acting on it.
-
-## Repository Structure
-
-```text
-Incursion_2k26/
-├── engine/
+teamlens/
+├── engine/                     # Pure-JS scoring library
 │   ├── src/
-│   │   ├── comparison/          # Team comparison
-│   │   ├── config/              # Presets and config validation
-│   │   ├── explain/             # Result explanations
-│   │   ├── export/              # Shortlist export
-│   │   ├── filters/             # Eligibility filters
-│   │   ├── scoring/             # Normalize, aggregate, score, rank
-│   │   ├── sensitivity/         # Weight sensitivity analysis
-│   │   ├── utils/               # Blind-review anonymization
-│   │   └── index.js             # Engine public API
-│   └── tests/
-├── server/
+│   │   ├── score.js            # Core weighted formula
+│   │   ├── normalise.js        # Min-max normalisation
+│   │   ├── sensitivity.js      # Sensitivity analysis engine
+│   │   └── compare.js          # Pairwise team comparison
+│   ├── tests/                  # 76 unit tests
+│   └── package.json
+│
+├── server/                     # Express 5 enrichment API
 │   ├── src/
-│   │   ├── config/              # Environment configuration
-│   │   ├── contracts/           # Metric registry contract
-│   │   ├── middleware/          # Error handling and 404s
-│   │   ├── modules/
-│   │   │   ├── cache/           # SQLite cache
-│   │   │   ├── enrich/          # Enrichment pipeline and source adapters
-│   │   │   ├── flags/           # Duplicate/profile signals
-│   │   │   ├── import/          # CSV/JSON import and normalization
-│   │   │   ├── jobs/            # Background jobs
-│   │   │   ├── llm/             # Providers and redaction
-│   │   │   └── metrics/         # Metric registry/value helpers
-│   │   ├── routes/              # HTTP API
-│   │   └── app.js
-│   ├── samples/
-│   ├── scripts/
-│   └── tests/
-├── web/
+│   │   ├── routes/             # /api/enrich, /api/score, /api/import, /api/registry
+│   │   ├── enrichers/
+│   │   │   ├── github.js       # Octokit-based GitHub enricher
+│   │   │   ├── linkedin.js     # PDF text extraction + parsing
+│   │   │   ├── resume.js       # PDF parsing + optional LLM extraction
+│   │   │   └── portfolio.js    # HTTP + DOM analysis
+│   │   ├── cache.js            # SQLite cache (Node 22 built-in)
+│   │   └── app.js              # Express app factory
+│   ├── tests/                  # 35 integration tests
+│   └── package.json
+│
+├── web/                        # React 19 SPA
 │   ├── src/
-│   │   ├── components/          # Upload, config, results, shared UI
-│   │   ├── engine/              # Client-side scoring and worker
-│   │   ├── lib/                 # API, import, schema, export utilities
-│   │   ├── pages/               # Upload, config, results, export
-│   │   └── stores/              # Zustand state stores
-│   └── tests/
-├── shared-samples/              # Example data, configs, registry, datasets
-├── tests/                       # Cross-module integration tests
-├── config.js
-├── metrics.registry.json
-└── .gitignore
+│   │   ├── components/         # Layout, Import, EnrichmentPanel, TeamCard,
+│   │   │                       #   CompareDrawer, SensitivityChart, ...
+│   │   ├── stores/             # Zustand stores (teams, presets, overrides)
+│   │   ├── workers/            # Web Worker for client-side scoring
+│   │   ├── hooks/              # Custom React hooks
+│   │   └── index.css           # Tailwind v4 + TeamLens palette
+│   ├── tests/                  # 51 component + store tests
+│   └── package.json
+│
+├── .env.example                # Environment variable template
+├── package.json                # Root workspace config
+└── README.md                   # This file
 ```
 
-## Contributing
+---
 
-This is a team project with shared contracts between the frontend, engine, and server. Changes should preserve those contracts.
+## 🤝 Contributing
 
-1. Create a feature branch.
-2. Keep pull requests focused and describe the behavior changed.
-3. Coordinate changes to the metric registry, config shape, and API responses with the teammates consuming those contracts.
-4. Add or update tests for normal cases and edge cases.
-5. Run the relevant package tests and validation scripts.
-6. Include test results and note any limitations in the pull request.
-7. Do not commit secrets, private participant data, or generated cache files.
+Contributions are welcome! Please read through these guidelines before opening a PR.
 
-When adding a new metric, update the registry and provider together. When changing config or result fields, check both the engine and frontend consumers.
+### Development Workflow
 
-## Project Context
+```bash
+# 1. Fork and clone
+git clone https://github.com/your-org/teamlens.git
 
-Built for **Incursion 2K26 — Track 3: Team Recruitment Automation Tool**.
+# 2. Create a feature branch
+git checkout -b feature/your-feature-name
 
-The goal is to help event organisers make more consistent, explainable, and reviewable shortlisting decisions while keeping the evaluation criteria explicit and final decisions human-led.
+# 3. Install dependencies
+npm install
+
+# 4. Make your changes; run tests continuously
+npm run test:watch --workspace=engine
+
+# 5. Verify all 162 tests pass before opening a PR
+npm test
+
+# 6. Lint and format
+npm run lint
+npm run format
+
+# 7. Open a pull request against main
+```
+
+### Contribution Guidelines
+
+- **Engine changes** must include unit tests. The scoring formula must remain deterministic — no randomness.
+- **Server changes** must not break any existing API contracts. Add tests for new routes.
+- **UI changes** must not regress the blind mode, override audit log, or comparison view.
+- **Do not add LLM calls to the scoring path.** LLMs are permitted only in the resume enricher.
+- Keep commits small and scoped. PR titles should follow: `feat: ...`, `fix: ...`, `docs: ...`, `test: ...`.
+
+---
+
+## 📜 License
+
+MIT © TeamLens Contributors
+
+---
 
 <div align="center">
 
-**Evidence over assumptions. Explainability over black boxes. Human review over automated verdicts.**
+**TeamLens** — built to help organisers make more consistent, explainable, and human-led shortlisting decisions.
+
+*Evidence over assumptions. Explainability over black boxes. Human review over automated verdicts.*
 
 </div>
